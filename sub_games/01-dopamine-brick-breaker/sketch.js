@@ -194,10 +194,10 @@ function drawHeader() {
   noStroke();
   textAlign(LEFT, CENTER);
   textSize(28);
-  text("도파민 벽돌깨기", 34, 36);
+  text("도파민 벽돌깨기", 120, 36);
   textSize(15);
   fill("#d9ddde");
-  text("자극 블럭은 맞을 때 상승, 회복 블럭은 파괴될 때 감소", 34, 70);
+  text("자극 블럭은 맞을 때 상승, \n회복 블럭은 파괴될 때 감소", 120, 75);
 
   drawMeter(620, 28, 260, dopamine);
   fill("#f6f1df");
