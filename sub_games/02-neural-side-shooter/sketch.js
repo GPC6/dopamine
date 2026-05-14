@@ -1,5 +1,10 @@
 const W = 980;
 const H = 620;
+const SKILL_A_THRESHOLD = 45;
+const SKILL_B_THRESHOLD = 75;
+const SKILL_A_COST = 25;
+const SKILL_B_COST = 45;
+
 let player;
 let shots;
 let enemies;
@@ -10,9 +15,11 @@ let lives;
 let score;
 let startedAt;
 let spawnTimer;
-let fieldCooldown;
+let skillCooldown;
 let gameOver;
 let resultText;
+let overloadStart;
+let skillFlash;
 
 function setup() {
   createCanvas(W, H);
@@ -31,9 +38,11 @@ function resetGame() {
   score = 0;
   startedAt = millis();
   spawnTimer = 0;
-  fieldCooldown = 0;
+  skillCooldown = 0;
   gameOver = false;
-  resultText = "";
+  resultText = "Space 공격 / Shift 또는 X 기술 사용";
+  overloadStart = 0;
+  skillFlash = 0;
 }
 
 function draw() {
@@ -47,9 +56,9 @@ function draw() {
 
 function keyPressed() {
   if (gameOver && (key === "r" || key === "R")) resetGame();
-  if (key === " " && !gameOver) fireShot();
-  if ((keyCode === SHIFT || key === "x" || key === "X") && !gameOver) useReuptakeField();
-  if ((key === "b" || key === "B") && dopamine >= 75 && !gameOver) receptorBeam();
+  if (gameOver) return;
+  if (key === " ") fireShot();
+  if (keyCode === SHIFT || key === "x" || key === "X") useSkill();
 }
 
 function updateGame() {
@@ -60,7 +69,9 @@ function updateGame() {
   if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) player.x += speedBoost * 0.75;
   player.x = constrain(player.x, 40, W - 80);
   player.y = constrain(player.y, 92, H - 45);
-  fieldCooldown = max(0, fieldCooldown - 1);
+
+  skillCooldown = max(0, skillCooldown - 1);
+  skillFlash = max(0, skillFlash - 1);
 
   spawnTimer--;
   if (spawnTimer <= 0) {
@@ -70,7 +81,7 @@ function updateGame() {
   }
 
   for (const s of shots) s.x += s.vx;
-  shots = shots.filter((s) => s.x < W + 40);
+  shots = shots.filter((s) => s.x < W + 90);
 
   for (const gate of gates) gate.x -= 3.5;
   gates = gates.filter((gate) => gate.x > -40);
@@ -80,7 +91,9 @@ function updateGame() {
     if (enemy.type === "addict" && dist(player.x, player.y, enemy.x, enemy.y) < 130) {
       dopamine = constrain(dopamine + 0.08, 0, 120);
     }
-    if (frameCount % 65 === 0) bullets.push({ x: enemy.x - 12, y: enemy.y, vx: -4.2, vy: random(-1.2, 1.2) });
+    if (frameCount % 65 === 0) {
+      bullets.push({ x: enemy.x - 12, y: enemy.y, vx: -4.2, vy: random(-1.2, 1.2) });
+    }
   }
 
   for (const b of bullets) {
@@ -94,39 +107,56 @@ function updateGame() {
 
   const elapsed = (millis() - startedAt) / 1000;
   if (elapsed >= 90) endGame("90초 생존 성공");
-  if (dopamine > 105 && elapsedOverload() > 4) endGame("도파민 과부하");
+  if (dopamine > 105) overloadStart = overloadStart || millis();
+  else overloadStart = 0;
+  if (overloadStart && millis() - overloadStart > 4200) endGame("도파민 과부하");
   if (lives <= 0) endGame("라이프 소진");
 }
 
-function elapsedOverload() {
-  if (!window.overloadStart && dopamine > 105) window.overloadStart = millis();
-  if (dopamine <= 105) window.overloadStart = 0;
-  return window.overloadStart ? (millis() - window.overloadStart) / 1000 : 0;
-}
-
 function fireShot() {
-  shots.push({ x: player.x + 18, y: player.y, vx: 8, r: dopamine > 70 ? 8 : 5 });
+  shots.push({ x: player.x + 18, y: player.y, vx: 8.2, r: dopamine > 70 ? 8 : 5, beam: false });
   dopamine = constrain(dopamine + 0.8, 0, 120);
 }
 
-function useReuptakeField() {
-  if (fieldCooldown > 0) return;
-  const blocked = enemies.some((enemy) => enemy.type === "blocker" && dist(player.x, player.y, enemy.x, enemy.y) < 190);
-  if (blocked) {
-    resultText = "재흡수 방해체 근처에서는 필드가 약해짐";
-    dopamine = constrain(dopamine - 5, 0, 120);
-  } else {
-    bullets = bullets.filter((b) => dist(player.x, player.y, b.x, b.y) > 130);
-    dopamine = constrain(dopamine - 14, 0, 120);
-    resultText = "재흡수 필드로 탄막 흡수";
+function useSkill() {
+  if (skillCooldown > 0) {
+    resultText = "기술 재사용 대기 중";
+    return;
   }
-  fieldCooldown = 150;
+
+  if (dopamine >= SKILL_B_THRESHOLD) {
+    useReceptorBeam();
+    return;
+  }
+
+  if (dopamine >= SKILL_A_THRESHOLD) {
+    useReuptakePulse();
+    return;
+  }
+
+  resultText = `도파민 ${SKILL_A_THRESHOLD} 이상부터 기술 사용 가능`;
 }
 
-function receptorBeam() {
-  shots.push({ x: player.x + 18, y: player.y, vx: 15, r: 16, beam: true });
-  dopamine = constrain(dopamine + 12, 0, 120);
-  resultText = "수용체 빔: 강하지만 도파민이 크게 상승";
+function useReuptakePulse() {
+  dopamine = constrain(dopamine - SKILL_A_COST, 0, 120);
+  bullets = bullets.filter((b) => dist(player.x, player.y, b.x, b.y) > 160);
+  for (const enemy of enemies) {
+    if (dist(player.x, player.y, enemy.x, enemy.y) < 175) {
+      enemy.hp -= enemy.type === "blocker" ? 1 : 2;
+      enemy.speed *= 0.55;
+    }
+  }
+  skillCooldown = 110;
+  skillFlash = 26;
+  resultText = `A기술 재흡수 펄스 발동: 도파민 -${SKILL_A_COST}`;
+}
+
+function useReceptorBeam() {
+  dopamine = constrain(dopamine - SKILL_B_COST, 0, 120);
+  shots.push({ x: player.x + 22, y: player.y, vx: 16, r: 17, beam: true });
+  skillCooldown = 145;
+  skillFlash = 34;
+  resultText = `B기술 수용체 빔 발동: 도파민 -${SKILL_B_COST}`;
 }
 
 function spawnEnemy() {
@@ -147,14 +177,14 @@ function handleCollisions() {
     if (dist(player.x, player.y, gate.x, gate.y) < gate.r + player.r) {
       dopamine = lerp(dopamine, 55, 0.55);
       gate.x = -100;
-      resultText = "수용체 게이트 통과: 안정화";
+      resultText = "수용체 게이트 통과: 도파민 안정화";
     }
   }
 
   for (const s of shots) {
     for (const enemy of enemies) {
       if (dist(s.x, s.y, enemy.x, enemy.y) < s.r + enemy.r) {
-        enemy.hp -= s.beam ? 3 : 1;
+        enemy.hp -= s.beam ? 4 : 1;
         if (!s.beam) s.x = W + 100;
       }
     }
@@ -221,7 +251,7 @@ function drawGame() {
 
   for (const s of shots) {
     fill(s.beam ? "#ffd166" : "#f06c86");
-    ellipse(s.x, s.y, s.beam ? 52 : 18, s.beam ? 10 : 8);
+    ellipse(s.x, s.y, s.beam ? 72 : 18, s.beam ? 12 : 8);
   }
 
   for (const enemy of enemies) {
@@ -236,11 +266,11 @@ function drawGame() {
   fill("#ffc857");
   for (const b of bullets) circle(b.x, b.y, 8);
 
-  if (fieldCooldown > 120) {
+  if (skillFlash > 0) {
     noFill();
-    stroke("#7be0b7");
+    stroke(dopamine >= SKILL_A_THRESHOLD ? "#7be0b7" : "#ffd166");
     strokeWeight(2);
-    circle(player.x, player.y, 260);
+    circle(player.x, player.y, 320 - skillFlash * 3);
     noStroke();
   }
 }
@@ -266,8 +296,9 @@ function drawHud() {
   text("횡스크롤 슈팅게임", 28, 32);
   fill("#dfe8e2");
   textSize(14);
-  text("WASD/방향키 이동, Space 도파민 샷, Shift/X 재흡수 필드, B 수용체 빔", 28, 63);
+  text("WASD/방향키 이동, Space 공격, Shift/X 기술 사용", 28, 63);
   drawMeter(615, 28, 280, dopamine);
+  drawSkillState(615, 80);
   fill("#eef4ee");
   textAlign(RIGHT, CENTER);
   textSize(16);
@@ -286,6 +317,22 @@ function drawMeter(x, y, w, value) {
   textAlign(LEFT, CENTER);
   textSize(14);
   text(`도파민 ${round(value)}`, x, y + 35);
+}
+
+function drawSkillState(x, y) {
+  const readyText = skillCooldown > 0 ? `대기 ${ceil(skillCooldown / 60)}초` : nextSkillName();
+  fill("#17222b");
+  rect(x, y, 280, 34, 6);
+  fill(skillCooldown > 0 ? "#99a4aa" : "#f8e7a2");
+  textAlign(LEFT, CENTER);
+  textSize(13);
+  text(`기술: ${readyText}`, x + 12, y + 17);
+}
+
+function nextSkillName() {
+  if (dopamine >= SKILL_B_THRESHOLD) return `B 수용체 빔 사용 가능 (${SKILL_B_COST} 소모)`;
+  if (dopamine >= SKILL_A_THRESHOLD) return `A 재흡수 펄스 사용 가능 (${SKILL_A_COST} 소모)`;
+  return `도파민 ${SKILL_A_THRESHOLD} 필요`;
 }
 
 function drawEnd() {

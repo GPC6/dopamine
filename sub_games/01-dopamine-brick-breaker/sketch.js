@@ -1,4 +1,4 @@
-const W = 960;
+const W = 980;
 const H = 640;
 const COLS = 9;
 const CELL = 76;
