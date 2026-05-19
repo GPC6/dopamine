@@ -1,9 +1,149 @@
-<a href="./main_game/index.html">전체 게임 틀 MVP</a>
-<br>
-<a href="./sub_games/01-dopamine-brick-breaker/index.html">미니 게임1 벽돌깨기 MVP</a>
-<br>
-<a href="./sub_games/02-neural-side-shooter/index.html">미니 게임2 슈팅게임 MVP</a>
-<br>
-<a href="./sub_games/03-neural-circuit-run/index.html">미니 게임3 러너게임 MVP</a>
-<br>
-<a href="./sub_games/04-dopamine-ball/index.html">미니 게임4 핀볼게임 MVP</a>
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DOPA Story Editor</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">DOPA Story Editor</p>
+      <h1>스토리 편집기</h1>
+    </div>
+    <div class="header-actions">
+      <button id="loadSampleButton" class="secondary-button" type="button">샘플</button>
+      <button id="loadScenario3Button" class="secondary-button" type="button">3차 시나리오</button>
+      <button id="importButton" class="secondary-button" type="button">가져오기</button>
+      <button id="testStoryButton" class="secondary-button" type="button">테스트 적용</button>
+      <button id="exportButton" class="primary-button" type="button">내보내기</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="sidebar">
+      <div class="panel-title">
+        <h2>에피소드</h2>
+        <button id="addEpisodeButton" class="icon-button" type="button" aria-label="에피소드 추가">+</button>
+      </div>
+      <div id="episodeList" class="episode-list"></div>
+    </aside>
+
+    <section class="editor-shell">
+      <div class="episode-toolbar">
+        <label>
+          에피소드 ID
+          <input id="episodeIdInput" type="text" spellcheck="false" />
+        </label>
+        <button id="renameEpisodeButton" class="secondary-button" type="button">ID 변경</button>
+        <button id="deleteEpisodeButton" class="danger-button" type="button">삭제</button>
+      </div>
+
+      <div class="node-toolbar" aria-label="노드 추가">
+        <button data-add-type="dialogue" class="secondary-button" type="button">대사</button>
+        <button data-add-type="choice" class="secondary-button" type="button">선택지</button>
+        <button data-add-type="move" class="secondary-button" type="button">이동</button>
+        <button data-add-type="background" class="secondary-button" type="button">배경</button>
+        <button data-add-type="character in" class="secondary-button" type="button">등장</button>
+        <button data-add-type="character out" class="secondary-button" type="button">퇴장</button>
+        <button data-add-type="clear characters" class="secondary-button" type="button">캐릭터 지우기</button>
+        <button data-add-type="clear background" class="secondary-button" type="button">배경 지우기</button>
+        <button data-add-type="scene reset" class="secondary-button" type="button">장면 초기화</button>
+        <button data-add-type="endingCheck" class="secondary-button" type="button">엔딩 체크</button>
+      </div>
+
+      <div class="notice-strip">
+        선택지는 현재 에피소드 안의 노드 번호만 고릅니다. 에피소드 이동과 미니게임 시작은 이동 노드에서만 처리됩니다.
+      </div>
+
+      <div id="nodeList" class="node-list"></div>
+    </section>
+  </main>
+
+  <dialog id="importDialog">
+    <form method="dialog" class="dialog-card">
+      <div class="dialog-heading">
+        <h2>스토리 가져오기</h2>
+        <button value="cancel" class="icon-button" type="submit" aria-label="닫기">x</button>
+      </div>
+      <textarea id="importText" spellcheck="false" placeholder="{ &quot;EP1&quot;: [...] } 또는 const EPISODES = { ... };"></textarea>
+      <p id="importMessage" class="message" role="status"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="secondary-button" type="submit">취소</button>
+        <button id="applyImportButton" class="primary-button" type="button">적용</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="exportDialog">
+    <form method="dialog" class="dialog-card wide-dialog">
+      <div class="dialog-heading">
+        <h2>스토리 내보내기</h2>
+        <button value="cancel" class="icon-button" type="submit" aria-label="닫기">x</button>
+      </div>
+      <div class="segmented-control" role="tablist" aria-label="내보내기 형식">
+        <button id="showJsonButton" class="active" type="button">JSON</button>
+        <button id="showJsButton" type="button">story-data.js</button>
+      </div>
+      <textarea id="exportText" spellcheck="false" readonly></textarea>
+      <div class="dialog-actions">
+        <button id="copyExportButton" class="secondary-button" type="button">복사</button>
+        <button id="downloadExportButton" class="primary-button" type="button">파일 저장</button>
+      </div>
+    </form>
+  </dialog>
+
+  <template id="nodeTemplate">
+    <article class="node-card">
+      <div class="node-card-header">
+        <div>
+          <span class="node-id"></span>
+          <strong class="node-title"></strong>
+        </div>
+        <div class="node-actions">
+          <button class="move-up icon-button" type="button" aria-label="위로 이동">↑</button>
+          <button class="move-down icon-button" type="button" aria-label="아래로 이동">↓</button>
+          <button class="delete-node icon-button danger-icon" type="button" aria-label="노드 삭제">x</button>
+        </div>
+      </div>
+      <div class="node-fields"></div>
+    </article>
+  </template>
+
+  <template id="choiceItemTemplate">
+    <div class="choice-item">
+      <div class="choice-item-header">
+        <strong>선택 항목</strong>
+        <button class="remove-choice-item icon-button danger-icon" type="button" aria-label="선택 항목 삭제">x</button>
+      </div>
+      <label>버튼 문구 <input class="choice-text-input" type="text" /></label>
+      <div class="field-grid three">
+        <label>다음 노드 번호 <input class="choice-next-node-input" type="number" min="1" step="1" /></label>
+        <label>호감도 변화 <input class="choice-affection-input" type="number" step="1" /></label>
+        <label>도파민 변화 <input class="choice-dopamine-input" type="number" step="1" /></label>
+      </div>
+      <details>
+        <summary>선택 조건</summary>
+        <div class="field-grid four">
+          <label>도파민 최소 <input class="condition-dopamine-min-input" type="number" step="1" /></label>
+          <label>도파민 최대 <input class="condition-dopamine-max-input" type="number" step="1" /></label>
+          <label>호감도 최소 <input class="condition-affection-min-input" type="number" step="1" /></label>
+          <label>호감도 최대 <input class="condition-affection-max-input" type="number" step="1" /></label>
+        </div>
+      </details>
+      <details>
+        <summary>선택 직후 추가 발화</summary>
+        <div class="follow-list"></div>
+        <button class="add-follow-line secondary-button small-button" type="button">발화 추가</button>
+      </details>
+    </div>
+  </template>
+
+  <script src="./gametest/story-data-scenario3.js"></script>
+  <script src="./app.js"></script>
+</body>
+
+</html>
