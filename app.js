@@ -718,6 +718,7 @@ function saveAndOpenTestStory() {
   try {
     const payload = {
       savedAt: new Date().toISOString(),
+      startEpisodeId: selectedEpisodeId,
       episodes: getExportEpisodes()
     };
     localStorage.setItem(TEST_STORAGE_KEY, JSON.stringify(payload));

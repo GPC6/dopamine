@@ -1,4 +1,5 @@
 const DOPA_STORY_TEST_STORAGE_KEY = "dopaStoryEditor.testEpisodes";
+let DOPA_STORY_START_EPISODE_ID = "EP1";
 
 function loadDefaultEpisodes() {
   const request = new XMLHttpRequest();
@@ -21,6 +22,10 @@ function loadLocalTestEpisodes() {
     const episodes = payload && payload.episodes ? payload.episodes : payload;
     if (!episodes || typeof episodes !== "object" || Array.isArray(episodes)) return null;
 
+    if (payload && payload.startEpisodeId && episodes[payload.startEpisodeId]) {
+      DOPA_STORY_START_EPISODE_ID = payload.startEpisodeId;
+    }
+
     console.info("Loaded story data from localStorage.");
     return episodes;
   } catch (error) {
@@ -30,3 +35,6 @@ function loadLocalTestEpisodes() {
 }
 
 const EPISODES = loadLocalTestEpisodes() || loadDefaultEpisodes();
+DOPA_STORY_START_EPISODE_ID = EPISODES[DOPA_STORY_START_EPISODE_ID]
+  ? DOPA_STORY_START_EPISODE_ID
+  : Object.keys(EPISODES)[0];

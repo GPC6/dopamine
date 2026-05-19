@@ -2,9 +2,10 @@ class Game {
   constructor(assets) {
     this.assets = assets;
     this.validateStoryData();
+    const startEpisodeId = this.getStartEpisodeId();
     this.state = {
       scene: SCENES.TITLE,
-      episodeId: "EP1",
+      episodeId: startEpisodeId,
       nodeIndex: 0,
       dopamine: CONFIG.initialDopamine,
       affection: CONFIG.initialAffection,
@@ -279,6 +280,21 @@ class Game {
     this.state.nodeIndex = targetNodeIndex;
   }
 
+  getStartEpisodeId() {
+    if (typeof DOPA_STORY_START_EPISODE_ID !== "undefined" && EPISODES[DOPA_STORY_START_EPISODE_ID]) {
+      return DOPA_STORY_START_EPISODE_ID;
+    }
+
+    if (EPISODES.EP1) return "EP1";
+
+    const episodeIds = Object.keys(EPISODES);
+    if (episodeIds.length > 0) return episodeIds[0];
+
+    console.warn("No episodes found. Creating empty EP1 fallback.");
+    EPISODES.EP1 = [];
+    return "EP1";
+  }
+
   getNodeIndexById(episodeId, nodeId) {
     const nodes = EPISODES[episodeId];
     if (!Array.isArray(nodes)) return -1;
@@ -310,6 +326,7 @@ class Game {
 
   handleStoryClick() {
     const node = this.getCurrentNode();
+    if (!node) return;
 
     if (node.type === NODE_TYPES.DIALOGUE) {
       this.advanceCurrentNode();
@@ -325,7 +342,13 @@ class Game {
       return this.state.pendingNodes[0];
     }
 
-    return EPISODES[this.state.episodeId][this.state.nodeIndex];
+    const nodes = EPISODES[this.state.episodeId];
+    if (!Array.isArray(nodes)) {
+      console.warn("Missing current episode: " + this.state.episodeId);
+      return null;
+    }
+
+    return nodes[this.state.nodeIndex];
   }
 
   advanceCurrentNode() {
