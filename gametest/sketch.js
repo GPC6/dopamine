@@ -49,3 +49,9 @@ function mousePressed() {
 function keyPressed() {
   game.keyPressed();
 }
+
+function mouseWheel(event) {
+  if (game && typeof game.mouseWheel === "function") {
+    return game.mouseWheel(event);
+  }
+}

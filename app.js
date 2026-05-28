@@ -56,6 +56,7 @@ const sampleEpisodes = {
 let episodes = clone(sampleEpisodes);
 let selectedEpisodeId = Object.keys(episodes)[0];
 let exportMode = "json";
+let activeNodeUid = null;
 const gameStoryEpisodes = typeof EPISODES === "undefined" ? null : clone(EPISODES);
 const gameStoryStartEpisodeId = typeof STORY_START_EPISODE === "undefined" ? null : STORY_START_EPISODE;
 const gameAssetManifest = typeof ASSET_MANIFEST === "undefined" ? { backgrounds: {}, characters: {} } : ASSET_MANIFEST;
@@ -103,6 +104,7 @@ function ensureSelection() {
   }
 
   if (!episodes[selectedEpisodeId]) selectedEpisodeId = ids[0];
+  if (!getActiveNode()) activeNodeUid = null;
 }
 
 function assignNodeIds() {
@@ -156,6 +158,7 @@ function renderEpisodes() {
     button.textContent = `${episodeId} (${nodes.length})`;
     button.addEventListener("click", () => {
       selectedEpisodeId = episodeId;
+      activeNodeUid = null;
       render();
     });
     elements.episodeList.append(button);
@@ -175,12 +178,13 @@ function renderNodes() {
 function createNodeCard(node, index) {
   const card = elements.nodeTemplate.content.firstElementChild.cloneNode(true);
   card.dataset.type = node.type;
+  card.classList.toggle("active", node[UID_KEY] === activeNodeUid);
   card.querySelector(".node-id").textContent = `#${index + 1}`;
   card.querySelector(".node-title").textContent = NODE_LABELS[node.type] || node.type;
 
   const fields = card.querySelector(".node-fields");
   renderNodeFields(fields, node);
-  bindNodeActions(card, index);
+  bindNodeActions(card, node, index);
   return card;
 }
 
@@ -255,6 +259,7 @@ function renderNodeFields(container, node) {
   if (node.type === "background") {
     container.append(
       makeComboInput("배경 이름", node.name, (value) => node.name = value, getSuggestionOptions("backgrounds"), "dummy"),
+      createBackgroundTransitionEditor(node),
       createConditionEditor(node)
     );
     return;
@@ -355,6 +360,23 @@ function createEffectsEditor(target) {
   return details;
 }
 
+function createBackgroundTransitionEditor(node) {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = "배경 전환";
+  const grid = document.createElement("div");
+  grid.className = "field-grid five";
+  grid.append(
+    makeSelectInput("전환 방식", getBackgroundTransitionType(node), ["fadeBlack", "fadeSlide", "none"], (value) => setBackgroundTransitionType(node, value)),
+    makeNumberInput("전환 시간(ms)", getBackgroundTransitionDuration(node), (value) => setBackgroundTransitionDuration(node, value), 120),
+    makeSelectInput("슬라이드 방향", getBackgroundTransitionDirection(node), ["right", "left"], (value) => setBackgroundTransitionDirection(node, value)),
+    makeNumberInput("슬라이드 시간(ms)", getBackgroundSlideDuration(node), (value) => setBackgroundSlideDuration(node, value), 120),
+    makeNumberInput("슬라이드 속도", getBackgroundSlideSpeed(node), (value) => setBackgroundSlideSpeed(node, value), 0.25)
+  );
+  details.append(summary, grid);
+  return details;
+}
+
 function createConditionEditor(node) {
   const details = document.createElement("details");
   const summary = document.createElement("summary");
@@ -372,15 +394,25 @@ function createConditionEditor(node) {
   return details;
 }
 
-function bindNodeActions(card, index) {
+function bindNodeActions(card, node, index) {
   const nodes = getSelectedNodes();
 
+  card.addEventListener("pointerdown", () => setActiveNode(node));
+  card.addEventListener("focusin", () => setActiveNode(node));
   card.querySelector(".move-up").disabled = index === 0;
   card.querySelector(".move-down").disabled = index === nodes.length - 1;
-  card.querySelector(".move-up").addEventListener("click", () => swapNodes(index, index - 1));
-  card.querySelector(".move-down").addEventListener("click", () => swapNodes(index, index + 1));
+  card.querySelector(".move-up").addEventListener("click", () => {
+    setActiveNode(node);
+    swapNodes(index, index - 1);
+  });
+  card.querySelector(".move-down").addEventListener("click", () => {
+    setActiveNode(node);
+    swapNodes(index, index + 1);
+  });
+  card.querySelector(".duplicate-node").addEventListener("click", () => duplicateNode(index));
   card.querySelector(".delete-node").addEventListener("click", () => {
     nodes.splice(index, 1);
+    activeNodeUid = nodes[index]?.[UID_KEY] || nodes[index - 1]?.[UID_KEY] || null;
     render();
   });
 }
@@ -554,6 +586,39 @@ function getSelectedNodes() {
   return episodes[selectedEpisodeId] || [];
 }
 
+function getActiveNode() {
+  return getSelectedNodes().find((node) => node[UID_KEY] === activeNodeUid) || null;
+}
+
+function getActiveNodeIndex() {
+  return getSelectedNodes().findIndex((node) => node[UID_KEY] === activeNodeUid);
+}
+
+function setActiveNode(node) {
+  activeNodeUid = node ? node[UID_KEY] : null;
+}
+
+function insertNodeAfterActive(node) {
+  const nodes = getSelectedNodes();
+  const activeIndex = getActiveNodeIndex();
+  const insertIndex = activeIndex === -1 ? nodes.length : activeIndex + 1;
+  nodes.splice(insertIndex, 0, node);
+  setActiveNode(node);
+  render();
+}
+
+function duplicateNode(index) {
+  const nodes = getSelectedNodes();
+  const source = nodes[index];
+  if (!source) return;
+
+  const duplicated = clone(source);
+  duplicated[UID_KEY] = createUid();
+  nodes.splice(index + 1, 0, duplicated);
+  setActiveNode(duplicated);
+  render();
+}
+
 function swapNodes(from, to) {
   const nodes = getSelectedNodes();
   const current = nodes[from];
@@ -580,6 +645,98 @@ function createDefaultChoice() {
 
 function numberToInput(value) {
   return Number.isFinite(value) ? String(value) : "";
+}
+
+function getBackgroundTransitionObject(node) {
+  if (node.transition && typeof node.transition === "object") return node.transition;
+  if (node.backgroundTransition && typeof node.backgroundTransition === "object") return node.backgroundTransition;
+  if (node.effect && typeof node.effect === "object") return node.effect;
+  return null;
+}
+
+function getBackgroundTransitionType(node) {
+  const options = getBackgroundTransitionObject(node);
+  if (options) return options.type || options.name || "";
+  return node.transition || node.backgroundTransition || node.effect || "";
+}
+
+function getBackgroundTransitionDuration(node) {
+  const options = getBackgroundTransitionObject(node);
+  return options && options.duration !== undefined ? options.duration : node.transitionDuration;
+}
+
+function getBackgroundTransitionDirection(node) {
+  const options = getBackgroundTransitionObject(node);
+  return options && options.direction !== undefined ? options.direction : node.transitionDirection;
+}
+
+function getBackgroundSlideDuration(node) {
+  const options = getBackgroundTransitionObject(node);
+  return options && options.slideDuration !== undefined ? options.slideDuration : node.transitionSlideDuration;
+}
+
+function getBackgroundSlideSpeed(node) {
+  const options = getBackgroundTransitionObject(node);
+  const optionValue = options && (options.slideSpeed ?? options.speed);
+  return optionValue !== undefined ? optionValue : node.transitionSlideSpeed;
+}
+
+function setBackgroundTransitionType(node, rawValue) {
+  const value = rawValue.trim();
+  const options = getBackgroundTransitionObject(node);
+  if (options) {
+    if (!value) delete options.type;
+    else options.type = value;
+    return;
+  }
+
+  if (!value) delete node.transition;
+  else node.transition = value;
+}
+
+function setBackgroundTransitionDuration(node, rawValue) {
+  const options = getBackgroundTransitionObject(node);
+  if (options) {
+    if (rawValue === "") delete options.duration;
+    else options.duration = Number(rawValue);
+    return;
+  }
+
+  setOptionalNumber(node, "transitionDuration", rawValue);
+}
+
+function setBackgroundTransitionDirection(node, rawValue) {
+  const value = rawValue.trim();
+  const options = getBackgroundTransitionObject(node);
+  if (options) {
+    if (!value) delete options.direction;
+    else options.direction = value;
+    return;
+  }
+
+  setOptionalString(node, "transitionDirection", value);
+}
+
+function setBackgroundSlideDuration(node, rawValue) {
+  const options = getBackgroundTransitionObject(node);
+  if (options) {
+    if (rawValue === "") delete options.slideDuration;
+    else options.slideDuration = Number(rawValue);
+    return;
+  }
+
+  setOptionalNumber(node, "transitionSlideDuration", rawValue);
+}
+
+function setBackgroundSlideSpeed(node, rawValue) {
+  const options = getBackgroundTransitionObject(node);
+  if (options) {
+    if (rawValue === "") delete options.slideSpeed;
+    else options.slideSpeed = Number(rawValue);
+    return;
+  }
+
+  setOptionalNumber(node, "transitionSlideSpeed", rawValue);
 }
 
 function setOptionalString(target, key, rawValue) {
@@ -662,6 +819,7 @@ function addEpisode() {
 
   episodes[id] = [];
   selectedEpisodeId = id;
+  activeNodeUid = null;
   render();
 }
 
@@ -692,12 +850,14 @@ function deleteEpisode() {
   const ids = Object.keys(episodes);
   if (ids.length <= 1) {
     episodes[selectedEpisodeId] = [];
+    activeNodeUid = null;
     render();
     return;
   }
 
   delete episodes[selectedEpisodeId];
   selectedEpisodeId = Object.keys(episodes)[0];
+  activeNodeUid = null;
   render();
 }
 
@@ -716,6 +876,7 @@ function applyImport() {
     selectedEpisodeId = importedStartEpisodeId && episodes[importedStartEpisodeId]
       ? importedStartEpisodeId
       : Object.keys(episodes)[0];
+    activeNodeUid = null;
     elements.importMessage.textContent = "적용했습니다.";
     elements.importMessage.classList.remove("error");
     elements.importDialog.close();
@@ -895,8 +1056,7 @@ function resolveNodeIdByUid(sourceEpisodes, episodeId, uid) {
 
 document.querySelectorAll("[data-add-type]").forEach((button) => {
   button.addEventListener("click", () => {
-    getSelectedNodes().push(createDefaultNode(button.dataset.addType));
-    render();
+    insertNodeAfterActive(createDefaultNode(button.dataset.addType));
   });
 });
 
@@ -906,6 +1066,7 @@ elements.deleteEpisodeButton.addEventListener("click", deleteEpisode);
 elements.loadSampleButton.addEventListener("click", () => {
   episodes = clone(sampleEpisodes);
   selectedEpisodeId = Object.keys(episodes)[0];
+  activeNodeUid = null;
   render();
 });
 elements.loadGameStoryButton.addEventListener("click", () => {
@@ -918,6 +1079,7 @@ elements.loadGameStoryButton.addEventListener("click", () => {
   selectedEpisodeId = gameStoryStartEpisodeId && episodes[gameStoryStartEpisodeId]
     ? gameStoryStartEpisodeId
     : Object.keys(episodes)[0];
+  activeNodeUid = null;
   render();
 });
 elements.importButton.addEventListener("click", openImportDialog);

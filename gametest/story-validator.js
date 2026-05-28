@@ -37,6 +37,10 @@ function validateStoryData() {
         console.warn("Background node has no name at " + location);
       }
 
+      if (node.type === NODE_TYPES.BACKGROUND) {
+        validateBackgroundTransition(node, location);
+      }
+
       if (node.type === NODE_TYPES.CHARACTER_IN && !node.name) {
         console.warn("Character node has no name at " + location);
       }
@@ -101,6 +105,39 @@ function validateSoundNode(node, location) {
 
   if (node.volume !== undefined && (typeof node.volume !== "number" || node.volume < 0 || node.volume > 1)) {
     console.warn("Sound volume must be a number from 0 to 1 at " + location);
+  }
+}
+
+function validateBackgroundTransition(node, location) {
+  const rawOptions = node.transition ?? node.backgroundTransition ?? node.effect;
+  const options = rawOptions && typeof rawOptions === "object"
+    ? rawOptions
+    : { type: rawOptions };
+  const type = String(options.type || options.name || rawOptions || "fadeBlack").toLowerCase();
+  const validTypes = ["fadeblack", "fade-black", "fade", "black", "fadeinout", "fade-in-out", "fadeslide", "fade-slide", "slide", "none", "cut", "instant"];
+  const duration = options.duration ?? node.transitionDuration;
+  const direction = options.direction ?? node.transitionDirection;
+  const slideDuration = options.slideDuration ?? options.revealDuration ?? node.transitionSlideDuration;
+  const slideSpeed = options.slideSpeed ?? options.speed ?? node.transitionSlideSpeed;
+
+  if (!validTypes.includes(type)) {
+    console.warn("Unknown background transition at " + location + ": " + type);
+  }
+
+  if (duration !== undefined && (typeof duration !== "number" || duration < 120 || duration > 2000)) {
+    console.warn("Background transition duration must be a number from 120 to 2000 at " + location);
+  }
+
+  if (direction !== undefined && direction !== "left" && direction !== "right") {
+    console.warn("Background transition direction must be left or right at " + location);
+  }
+
+  if (slideDuration !== undefined && (typeof slideDuration !== "number" || slideDuration < 120 || slideDuration > 2000)) {
+    console.warn("Background slide duration must be a number from 120 to 2000 at " + location);
+  }
+
+  if (slideSpeed !== undefined && (typeof slideSpeed !== "number" || slideSpeed < 0.25 || slideSpeed > 4)) {
+    console.warn("Background slide speed must be a number from 0.25 to 4 at " + location);
   }
 }
 

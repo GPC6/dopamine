@@ -54,6 +54,8 @@ const ASSET_MANIFEST = {
     bedroomNight: "./assets/bg/bedroom_night.png",
     "도서관 열람실": "./assets/bg/library_reading_room.png",
     "편의점": "./assets/bg/convenience_store_night.png",
+    "(CG) 수진이 편의점 계산대에서 졸고 있음": "./assets/bg/convenience_sujin_sleepy_cg_v2.png",
+    "(CG) 수진이 편의점 계산대에서 화들짝 깨어남": "./assets/bg/convenience_sujin_startled_cg_v3.png",
     "강의실 혹은 동아리방": "./assets/bg/club_classroom.png",
     "MT 장소": "./assets/bg/mt_room.png",
     "(CG) MT 장소에 둘러앉은 주인공, 수진, 건호, 혜지": "./assets/bg/mt_group_cg.png",

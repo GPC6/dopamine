@@ -169,6 +169,11 @@ h2 {
   background: var(--surface);
 }
 
+.node-card.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(233, 196, 106, 0.18);
+}
+
 .node-card[data-type="choice"] {
   background: #1e242d;
 }
@@ -272,6 +277,10 @@ select:focus {
 
 .field-grid.four {
   grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.field-grid.five {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .choice-items {
@@ -452,6 +461,7 @@ dialog::backdrop {
   .field-grid.two,
   .field-grid.three,
   .field-grid.four,
+  .field-grid.five,
   .follow-line,
   .combo-input {
     grid-template-columns: 1fr;

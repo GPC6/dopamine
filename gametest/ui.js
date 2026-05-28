@@ -1,3 +1,14 @@
+const SPEAKER_COLORS = {
+  수진: "#f48fb1",
+  혜지: "#b39ddb",
+  건호: "#90caf9",
+  주인공: "#ffffff",
+  나레이션: "#cfd8dc",
+  독백: "#ffffff",
+  선택: "#ffd166",
+  default: "#fff7dc"
+};
+
 class Button {
   constructor(x, y, w, h, label, onClick, options = {}) {
     this.x = x;
@@ -60,7 +71,9 @@ class TextBox {
     this.h = h;
   }
 
-  draw(speaker, bodyText) {
+  draw(speaker, bodyText, speakerKey = speaker) {
+    const speakerColor = SPEAKER_COLORS[speakerKey] || SPEAKER_COLORS.default;
+
     noStroke();
     for (let i = 0; i < this.h; i++) {
       const t = i / max(1, this.h - 1);
@@ -71,7 +84,7 @@ class TextBox {
     fill(255, 255, 255, 44);
     rect(this.x, this.y + 44, this.w, 1);
 
-    fill("#ffe2a8");
+    fill(speakerColor);
     textAlign(LEFT, TOP);
     textStyle(BOLD);
     textSize(18);
