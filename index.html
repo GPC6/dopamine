@@ -16,7 +16,7 @@
     </div>
     <div class="header-actions">
       <button id="loadSampleButton" class="secondary-button" type="button">샘플</button>
-      <button id="loadScenario3Button" class="secondary-button" type="button">3차 시나리오</button>
+      <button id="loadGameStoryButton" class="secondary-button" type="button">본게임 스토리</button>
       <button id="importButton" class="secondary-button" type="button">가져오기</button>
       <button id="testStoryButton" class="secondary-button" type="button">테스트 적용</button>
       <button id="exportButton" class="primary-button" type="button">내보내기</button>
@@ -46,6 +46,7 @@
         <button data-add-type="dialogue" class="secondary-button" type="button">대사</button>
         <button data-add-type="choice" class="secondary-button" type="button">선택지</button>
         <button data-add-type="move" class="secondary-button" type="button">이동</button>
+        <button data-add-type="sound" class="secondary-button" type="button">사운드</button>
         <button data-add-type="background" class="secondary-button" type="button">배경</button>
         <button data-add-type="character in" class="secondary-button" type="button">등장</button>
         <button data-add-type="character out" class="secondary-button" type="button">퇴장</button>
@@ -142,7 +143,8 @@
     </div>
   </template>
 
-  <script src="./gametest/story-data-scenario3.js"></script>
+  <script src="./gametest/config.js"></script>
+  <script src="./gametest/story-data-excel.js"></script>
   <script src="./app.js"></script>
 </body>
 

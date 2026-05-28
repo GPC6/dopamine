@@ -1,11 +1,12 @@
 class Button {
-  constructor(x, y, w, h, label, onClick) {
+  constructor(x, y, w, h, label, onClick, options = {}) {
     this.x = x;
     this.y = y;
     this.w = w;
     this.h = h;
     this.label = label;
     this.onClick = onClick;
+    this.options = options;
   }
 
   contains(px, py) {
@@ -14,16 +15,34 @@ class Button {
 
   draw() {
     const hover = this.contains(mouseX, mouseY);
-    stroke(hover ? "#f6d365" : "#5f6675");
-    strokeWeight(2);
-    fill(hover ? "#28303f" : "#202633");
-    rect(this.x, this.y, this.w, this.h, 8);
+    const fillColor = hover
+      ? (this.options.hoverFill || "#5f85f2")
+      : (this.options.fill || "#f4f4f8");
+    const strokeColor = hover
+      ? (this.options.hoverStroke || "#ffffff")
+      : (this.options.stroke || "rgba(0, 0, 0, 0)");
+    stroke(strokeColor);
+    strokeWeight(this.options.strokeWeight || 2);
+    fill(fillColor);
+    rect(this.x, this.y, this.w, this.h, this.options.radius ?? 10);
 
     noStroke();
-    fill("#f5f2ea");
-    textAlign(CENTER, CENTER);
-    textSize(22);
-    text(this.label, this.x + this.w / 2, this.y + this.h / 2);
+    fill(hover ? (this.options.hoverText || "#ffffff") : (this.options.text || "#242947"));
+    textStyle(this.options.bold === false ? NORMAL : BOLD);
+    textSize(this.options.textSize || 22);
+    if (this.options.align === "left") {
+      const paddingX = this.options.paddingX || 24;
+      textAlign(LEFT, CENTER);
+      text(this.label, this.x + paddingX, this.y + this.h / 2);
+      if (this.options.suffix) {
+        textAlign(RIGHT, CENTER);
+        text(this.options.suffix, this.x + this.w - paddingX, this.y + this.h / 2);
+      }
+    } else {
+      textAlign(CENTER, CENTER);
+      text(this.label, this.x + this.w / 2, this.y + this.h / 2);
+    }
+    textStyle(NORMAL);
   }
 
   mousePressed() {
@@ -42,21 +61,30 @@ class TextBox {
   }
 
   draw(speaker, bodyText) {
-    fill(16, 19, 26, 235);
-    stroke("#5f6675");
-    strokeWeight(2);
-    rect(this.x, this.y, this.w, this.h, 8);
-
     noStroke();
-    fill("#f6d365");
-    textAlign(LEFT, TOP);
-    textSize(24);
-    text(speaker || "", this.x + 28, this.y + 22);
+    for (let i = 0; i < this.h; i++) {
+      const t = i / max(1, this.h - 1);
+      fill(0, 0, 0, lerp(0, 226, t));
+      rect(this.x, this.y + i, this.w, 1);
+    }
 
-    fill("#f5f2ea");
+    fill(255, 255, 255, 44);
+    rect(this.x, this.y + 44, this.w, 1);
+
+    fill("#ffe2a8");
+    textAlign(LEFT, TOP);
+    textStyle(BOLD);
+    textSize(18);
+    text(speaker || "", this.x + 76, this.y + 74);
+    textStyle(NORMAL);
+
+    fill("#ffffff");
     textSize(25);
     textLeading(38);
-    text(bodyText || "", this.x + 28, this.y + 64, this.w - 56, this.h - 84);
+    text(bodyText || "", this.x + 76, this.y + 108, this.w - 152, this.h - 130);
+
+    fill(255, 255, 255, 200);
+    triangle(this.x + this.w - 72, this.y + this.h - 42, this.x + this.w - 52, this.y + this.h - 42, this.x + this.w - 62, this.y + this.h - 28);
   }
 }
 
@@ -82,18 +110,19 @@ class CharacterImage {
   }
 
   draw(i, char_len) {
-    let w = 200;
+    let w = 250;
     let h = w * this.img.height / this.img.width;
+    const y = height / 1.5;
     if (char_len == 1) {
-      image(this.img, width / 2, height / 2, w, h);
+      image(this.img, width / 2, y, w, h);
     }
     else {
       if (i == 0)
-        image(this.img, width * 0.25, height / 2, w, h);
+        image(this.img, width * 0.25, y, w, h);
       else if (i == 1)
-        image(this.img, width * 0.75, height / 2, w, h);
+        image(this.img, width * 0.75, y, w, h);
       else if (i == 2)
-        image(this.img, width * 0.5, height / 2, w, h);
+        image(this.img, width * 0.5, y, w, h);
     }
 
   }

@@ -3,14 +3,18 @@ let DOPA_STORY_START_EPISODE_ID = "EP1";
 
 function loadDefaultEpisodes() {
   const request = new XMLHttpRequest();
-  request.open("GET", "./story-data-scenario3.js", false);
+  request.open("GET", "./story-data-excel.js", false);
   request.send(null);
 
   if (request.status !== 200 && request.status !== 0) {
     throw new Error("Cannot load default story data.");
   }
 
-  return Function(request.responseText + "\nreturn EPISODES;")();
+  const storyData = Function(request.responseText + "\nreturn { episodes: EPISODES, startEpisodeId: typeof STORY_START_EPISODE !== 'undefined' ? STORY_START_EPISODE : null };")();
+  if (storyData.startEpisodeId) {
+    DOPA_STORY_START_EPISODE_ID = storyData.startEpisodeId;
+  }
+  return storyData.episodes;
 }
 
 function loadLocalTestEpisodes() {
@@ -38,3 +42,4 @@ const EPISODES = loadLocalTestEpisodes() || loadDefaultEpisodes();
 DOPA_STORY_START_EPISODE_ID = EPISODES[DOPA_STORY_START_EPISODE_ID]
   ? DOPA_STORY_START_EPISODE_ID
   : Object.keys(EPISODES)[0];
+const STORY_START_EPISODE = DOPA_STORY_START_EPISODE_ID;

@@ -5,13 +5,14 @@ const NODE_LABELS = {
   "clear characters": "캐릭터 지우기",
   "clear background": "배경 지우기",
   "scene reset": "장면 초기화",
+  sound: "사운드",
   dialogue: "대사",
   choice: "선택지",
   move: "이동",
   endingCheck: "엔딩 체크"
 };
 
-const SUB_GAMES = ["brickBreaker", "sideShooter"];
+const SUB_GAME_OPTIONS = typeof SUB_GAMES === "undefined" ? ["brickBreaker", "sideShooter"] : Object.values(SUB_GAMES);
 const UID_KEY = "__editorUid";
 const NEXT_UID_KEY = "__editorNextUid";
 const AFTER_UID_KEY = "__editorAfterUid";
@@ -21,43 +22,43 @@ let nextUid = 1;
 
 const sampleEpisodes = {
   EP1: [
-    { id: 1, type: "background", name: "dummy" },
-    { id: 2, type: "dialogue", speaker: "주인공", text: "오늘은 이상하게 마음이 붕 떠 있다." },
+    { id: 1, type: "background", name: "bedroomNight" },
+    { id: 2, type: "dialogue", speaker: "주인공", text: "잠이 오지 않아~" },
     { id: 3, type: "character in", name: "수진", emotion: "일반" },
-    { id: 4, type: "dialogue", speaker: "수진", text: "안녕. 여기 앉아도 돼?" },
+    { id: 4, type: "dialogue", speaker: "수진", text: "헬로~" },
     {
       id: 5,
       type: "choice",
-      prompt: "수진에게 어떻게 답할까?",
+      prompt: "누구지..?",
       choices: [
         {
-          text: "편하게 앉으라고 한다",
-          effects: { affection: 10, dopamine: -5 },
-          follow: [{ speaker: "주인공", text: "응, 여기 앉아." }],
+          text: "수진이니?",
+          effects: { dopamine: 0, affection: 20 },
+          follow: [],
           nextNode: 6
         },
         {
-          text: "장난스럽게 말을 건다",
-          effects: { affection: 15, dopamine: 8 },
-          follow: [{ speaker: "주인공", text: "자리세는 비싼데?" }],
+          text: "몰루",
+          effects: { dopamine: 0, affection: 0 },
+          follow: [],
           nextNode: 6
         }
       ]
     },
-    { id: 6, type: "dialogue", speaker: "수진", text: "고마워. 오늘 뭔가 재밌는 일이 생길 것 같아." },
-    { id: 7, type: "move", next: "MINIGAME", minigame: "brickBreaker", after: "EP2" }
-  ],
-  EP2: [
-    { id: 1, type: "scene reset" },
-    { id: 2, type: "dialogue", speaker: "주인공", text: "미니게임이 끝나고 마음이 조금 정리됐다." },
-    { id: 3, type: "endingCheck" }
+    { id: 6, type: "character in", name: "혜지", emotion: "일반" },
+    { id: 7, type: "dialogue", speaker: "혜지", text: "사랑해 자기야!", condition: { affectionMin: 15 } },
+    { id: 8, type: "dialogue", speaker: "혜지", text: "어서오고 ㅋㅋ" },
+    { id: 9, type: "character in", name: "건호", emotion: "일반" },
+    { id: 10, type: "dialogue", speaker: "형근", text: "저는 형근입니다." }
   ]
 };
 
 let episodes = clone(sampleEpisodes);
 let selectedEpisodeId = Object.keys(episodes)[0];
 let exportMode = "json";
-const scenario3Episodes = typeof EPISODES === "undefined" ? null : clone(EPISODES);
+const gameStoryEpisodes = typeof EPISODES === "undefined" ? null : clone(EPISODES);
+const gameStoryStartEpisodeId = typeof STORY_START_EPISODE === "undefined" ? null : STORY_START_EPISODE;
+const gameAssetManifest = typeof ASSET_MANIFEST === "undefined" ? { backgrounds: {}, characters: {} } : ASSET_MANIFEST;
 
 const elements = {
   episodeList: document.querySelector("#episodeList"),
@@ -67,7 +68,7 @@ const elements = {
   renameEpisodeButton: document.querySelector("#renameEpisodeButton"),
   deleteEpisodeButton: document.querySelector("#deleteEpisodeButton"),
   loadSampleButton: document.querySelector("#loadSampleButton"),
-  loadScenario3Button: document.querySelector("#loadScenario3Button"),
+  loadGameStoryButton: document.querySelector("#loadGameStoryButton"),
   importButton: document.querySelector("#importButton"),
   testStoryButton: document.querySelector("#testStoryButton"),
   exportButton: document.querySelector("#exportButton"),
@@ -188,8 +189,9 @@ function renderNodeFields(container, node) {
 
   if (node.type === "dialogue") {
     container.append(
-      makeTextInput("화자", node.speaker, (value) => node.speaker = value),
+      makeComboInput("화자", node.speaker, (value) => node.speaker = value, getSuggestionOptions("characters")),
       makeTextarea("대사", node.text, (value) => node.text = value),
+      createEffectsEditor(node),
       createConditionEditor(node)
     );
     return;
@@ -223,7 +225,7 @@ function renderNodeFields(container, node) {
     grid.append(
       makeTextInput("다음 에피소드", node.next, (value) => setOptionalString(node, "next", value), "EP2 또는 MINIGAME"),
       makeNumberInput("다음 노드 번호", getMoveNextNodeId(node), (value) => setMoveNextNode(node, value)),
-      makeSelectInput("미니게임", node.minigame, SUB_GAMES, (value) => setOptionalString(node, "minigame", value))
+      makeSelectInput("미니게임", node.minigame, SUB_GAME_OPTIONS, (value) => setOptionalString(node, "minigame", value))
     );
 
     const returnGrid = document.createElement("div");
@@ -237,9 +239,22 @@ function renderNodeFields(container, node) {
     return;
   }
 
+  if (node.type === "sound") {
+    const grid = document.createElement("div");
+    grid.className = "field-grid four";
+    grid.append(
+      makeSelectInput("사운드 종류", node.soundType || node.kind, ["bgm", "effect"], (value) => setOptionalString(node, "soundType", value)),
+      makeSelectInput("동작", node.action, ["play", "stop"], (value) => setOptionalString(node, "action", value)),
+      makeTextInput("사운드 이름", node.name, (value) => setOptionalString(node, "name", value)),
+      makeNumberInput("볼륨", node.volume, (value) => setOptionalNumber(node, "volume", value))
+    );
+    container.append(grid, createConditionEditor(node));
+    return;
+  }
+
   if (node.type === "background") {
     container.append(
-      makeTextInput("배경 이름", node.name, (value) => node.name = value, "dummy"),
+      makeComboInput("배경 이름", node.name, (value) => node.name = value, getSuggestionOptions("backgrounds"), "dummy"),
       createConditionEditor(node)
     );
     return;
@@ -249,8 +264,8 @@ function renderNodeFields(container, node) {
     const grid = document.createElement("div");
     grid.className = "field-grid two";
     grid.append(
-      makeTextInput("캐릭터 이름", node.name, (value) => node.name = value),
-      makeTextInput("표정", node.emotion, (value) => setOptionalString(node, "emotion", value), "일반")
+      makeComboInput("캐릭터 이름", node.name, (value) => node.name = value, getSuggestionOptions("characters")),
+      makeComboInput("표정", node.emotion, (value) => setOptionalString(node, "emotion", value), getSuggestionOptions("emotions", node.name), "일반")
     );
     container.append(grid, createConditionEditor(node));
     return;
@@ -258,7 +273,7 @@ function renderNodeFields(container, node) {
 
   if (node.type === "character out") {
     container.append(
-      makeTextInput("캐릭터 이름", node.name, (value) => node.name = value),
+      makeComboInput("캐릭터 이름", node.name, (value) => node.name = value, getSuggestionOptions("characters")),
       createConditionEditor(node)
     );
     return;
@@ -314,14 +329,30 @@ function createFollowLine(lines, line, lineIndex) {
   const row = document.createElement("div");
   row.className = "follow-line";
   row.append(
-    makeTextInput("화자", line.speaker, (value) => line.speaker = value),
+    makeComboInput("화자", line.speaker, (value) => line.speaker = value, getSuggestionOptions("characters")),
     makeTextarea("발화", line.text, (value) => line.text = value),
     makeButton("삭제", "danger-button small-button", () => {
       lines.splice(lineIndex, 1);
       renderNodes();
-    })
+    }),
+    createEffectsEditor(line)
   );
   return row;
+}
+
+function createEffectsEditor(target) {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = "수치 변화";
+  const effects = target.effects || {};
+  const grid = document.createElement("div");
+  grid.className = "field-grid two";
+  grid.append(
+    makeNumberInput("도파민 변화", effects.dopamine, (value) => setNestedNumber(target, "effects", "dopamine", value)),
+    makeNumberInput("호감도 변화", effects.affection, (value) => setNestedNumber(target, "effects", "affection", value))
+  );
+  details.append(summary, grid);
+  return details;
 }
 
 function createConditionEditor(node) {
@@ -362,6 +393,54 @@ function makeTextInput(labelText, value, onInput, placeholder = "") {
   input.placeholder = placeholder;
   input.addEventListener("input", (event) => onInput(event.target.value));
   label.append(input);
+  return label;
+}
+
+function makeComboInput(labelText, value, onInput, options, placeholder = "") {
+  const label = makeLabel(labelText);
+  const wrap = document.createElement("div");
+  const input = document.createElement("input");
+  const select = document.createElement("select");
+  const datalist = document.createElement("datalist");
+  const listId = `list-${Math.random().toString(36).slice(2)}`;
+  const optionValues = uniqueSorted(options);
+
+  wrap.className = "combo-input";
+
+  datalist.id = listId;
+  optionValues.forEach((optionValue) => {
+    const option = document.createElement("option");
+    option.value = optionValue;
+    datalist.append(option);
+  });
+
+  const emptyOption = document.createElement("option");
+  emptyOption.value = "";
+  emptyOption.textContent = "목록에서 선택";
+  select.append(emptyOption);
+  optionValues.forEach((optionValue) => {
+    const option = document.createElement("option");
+    option.value = optionValue;
+    option.textContent = optionValue;
+    select.append(option);
+  });
+
+  input.type = "text";
+  input.value = value || "";
+  input.placeholder = placeholder;
+  input.setAttribute("list", listId);
+  input.addEventListener("input", (event) => {
+    select.value = optionValues.includes(event.target.value) ? event.target.value : "";
+    onInput(event.target.value);
+  });
+  select.value = optionValues.includes(value) ? value : "";
+  select.addEventListener("change", (event) => {
+    input.value = event.target.value;
+    onInput(event.target.value);
+  });
+
+  wrap.append(input, select);
+  label.append(wrap, datalist);
   return label;
 }
 
@@ -421,6 +500,56 @@ function makeButton(text, className, onClick) {
   return button;
 }
 
+function getSuggestionOptions(kind, characterName = "") {
+  const values = [];
+
+  if (kind === "backgrounds") {
+    values.push(...Object.keys(gameAssetManifest.backgrounds || {}));
+  }
+
+  if (kind === "characters") {
+    values.push(...Object.keys(gameAssetManifest.characters || {}));
+    values.push("주인공", "지시문", "나레이션", "END");
+  }
+
+  if (kind === "emotions") {
+    const characterAssets = gameAssetManifest.characters || {};
+    const emotionGroups = characterName && characterAssets[characterName]
+      ? [characterAssets[characterName]]
+      : Object.values(characterAssets);
+    emotionGroups.forEach((emotions) => {
+      values.push(...Object.keys(emotions || {}));
+    });
+  }
+
+  Object.values(episodes).forEach((nodes) => {
+    nodes.forEach((node) => {
+      if (kind === "backgrounds" && node.type === "background" && node.name) values.push(node.name);
+
+      if (kind === "characters") {
+        if (node.name && (node.type === "character in" || node.type === "character out")) values.push(node.name);
+        if (node.speaker) values.push(node.speaker);
+        if (node.type === "choice" && Array.isArray(node.choices)) {
+          node.choices.forEach((choice) => {
+            (choice.follow || []).forEach((line) => {
+              if (line.speaker) values.push(line.speaker);
+            });
+          });
+        }
+      }
+
+      if (kind === "emotions" && node.emotion) values.push(node.emotion);
+    });
+  });
+
+  return uniqueSorted(values);
+}
+
+function uniqueSorted(values) {
+  return Array.from(new Set(values.filter((value) => typeof value === "string" && value.trim()).map((value) => value.trim())))
+    .sort((a, b) => a.localeCompare(b, "ko"));
+}
+
 function getSelectedNodes() {
   return episodes[selectedEpisodeId] || [];
 }
@@ -438,6 +567,7 @@ function createDefaultNode(type) {
   if (type === "dialogue") return { ...base, speaker: "", text: "" };
   if (type === "choice") return { ...base, prompt: "", choices: [createDefaultChoice()] };
   if (type === "move") return { ...base, next: "" };
+  if (type === "sound") return { ...base, soundType: "effect", action: "play", name: "" };
   if (type === "background") return { ...base, name: "" };
   if (type === "character in") return { ...base, name: "", emotion: "" };
   if (type === "character out") return { ...base, name: "" };
@@ -582,7 +712,10 @@ function applyImport() {
   try {
     const parsed = parseImportText(elements.importText.value);
     episodes = normalizeImportedData(parsed);
-    selectedEpisodeId = Object.keys(episodes)[0];
+    const importedStartEpisodeId = parsed && (parsed.STORY_START_EPISODE || parsed.startEpisodeId);
+    selectedEpisodeId = importedStartEpisodeId && episodes[importedStartEpisodeId]
+      ? importedStartEpisodeId
+      : Object.keys(episodes)[0];
     elements.importMessage.textContent = "적용했습니다.";
     elements.importMessage.classList.remove("error");
     elements.importDialog.close();
@@ -595,10 +728,26 @@ function applyImport() {
 
 function parseImportText(rawText) {
   let text = rawText.trim();
+  const startEpisodeMatch = text.match(/const\s+STORY_START_EPISODE\s*=\s*("[^"]+"|'[^']+')\s*;/);
+  const startEpisodeId = startEpisodeMatch ? JSON.parse(startEpisodeMatch[1].replace(/^'/, "\"").replace(/'$/, "\"")) : null;
+
   if (text.startsWith("const EPISODES")) {
     text = text.replace(/^const\s+EPISODES\s*=\s*/, "").replace(/;\s*$/, "");
   }
-  return JSON.parse(text);
+
+  if (text.includes("const EPISODES")) {
+    text = text.replace(/^[\s\S]*?const\s+EPISODES\s*=\s*/, "").replace(/;\s*$/, "");
+  }
+
+  const parsed = JSON.parse(text);
+  if (startEpisodeId) {
+    return {
+      STORY_START_EPISODE: startEpisodeId,
+      EPISODES: parsed
+    };
+  }
+
+  return parsed;
 }
 
 function normalizeImportedData(value) {
@@ -692,7 +841,8 @@ function formatJson(value) {
 }
 
 function formatJs(value) {
-  return `const EPISODES = ${formatJson(value)};\n`;
+  const startEpisodeId = episodes[selectedEpisodeId] ? selectedEpisodeId : Object.keys(episodes)[0];
+  return `const STORY_START_EPISODE = ${JSON.stringify(startEpisodeId)};\nconst EPISODES = ${formatJson(value)};\n`;
 }
 
 async function copyExport() {
@@ -758,14 +908,16 @@ elements.loadSampleButton.addEventListener("click", () => {
   selectedEpisodeId = Object.keys(episodes)[0];
   render();
 });
-elements.loadScenario3Button.addEventListener("click", () => {
-  if (!scenario3Episodes) {
-    alert("3차 시나리오 파일을 불러오지 못했습니다.");
+elements.loadGameStoryButton.addEventListener("click", () => {
+  if (!gameStoryEpisodes) {
+    alert("본게임 story-data-excel 파일을 불러오지 못했습니다.");
     return;
   }
 
-  episodes = normalizeImportedData(scenario3Episodes);
-  selectedEpisodeId = Object.keys(episodes)[0];
+  episodes = normalizeImportedData(gameStoryEpisodes);
+  selectedEpisodeId = gameStoryStartEpisodeId && episodes[gameStoryStartEpisodeId]
+    ? gameStoryStartEpisodeId
+    : Object.keys(episodes)[0];
   render();
 });
 elements.importButton.addEventListener("click", openImportDialog);

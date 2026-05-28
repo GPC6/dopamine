@@ -609,3 +609,56 @@ minigame: "sideShooter"
 ```
 
 전체적으로 `story-data.js`는 게임 내용, `game.js`는 게임 규칙, `ui.js`는 기본 화면 객체, `sub_games/`는 본게임 안에서 실행되는 미니게임을 담당한다고 보면 됩니다.
+## sound 노드
+
+`sound` 노드는 BGM과 효과음을 재생하는 명령 노드입니다. 대사처럼 클릭을 기다리지 않고 즉시 실행된 뒤 다음 노드로 넘어갑니다.
+
+사운드 파일은 `assets/sound/bgm/` 또는 `assets/sound/effects/`에 넣고, `config.js`의 `ASSET_MANIFEST.sounds`에 등록합니다.
+
+```js
+const ASSET_MANIFEST = {
+  sounds: {
+    bgm: {
+      nightLibrary: "./assets/sound/bgm/night-library.mp3"
+    },
+    effects: {
+      doorOpen: "./assets/sound/effects/door-open.mp3"
+    }
+  }
+};
+```
+
+BGM 시작:
+
+```js
+{
+  type: "sound",
+  soundType: "bgm",
+  action: "play",
+  name: "nightLibrary",
+  volume: 0.6
+}
+```
+
+BGM 정지:
+
+```js
+{
+  type: "sound",
+  soundType: "bgm",
+  action: "stop"
+}
+```
+
+효과음 재생:
+
+```js
+{
+  type: "sound",
+  soundType: "effect",
+  name: "doorOpen",
+  volume: 0.8
+}
+```
+
+`volume`은 `0`부터 `1` 사이의 숫자입니다.

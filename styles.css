@@ -228,6 +228,12 @@ select {
   padding: 0 11px;
 }
 
+.combo-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(160px, 0.65fr);
+  gap: 8px;
+}
+
 textarea {
   min-height: 84px;
   padding: 10px 11px;
@@ -296,6 +302,10 @@ select:focus {
   border: 1px solid var(--line);
   border-radius: 7px;
   background: rgba(0, 0, 0, 0.12);
+}
+
+.follow-line details {
+  grid-column: 1 / -1;
 }
 
 summary {
@@ -442,7 +452,8 @@ dialog::backdrop {
   .field-grid.two,
   .field-grid.three,
   .field-grid.four,
-  .follow-line {
+  .follow-line,
+  .combo-input {
     grid-template-columns: 1fr;
   }
 }

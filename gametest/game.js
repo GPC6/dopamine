@@ -1,36 +1,150 @@
 class Game {
   constructor(assets) {
     this.assets = assets;
-    this.validateStoryData();
-    const startEpisodeId = this.getStartEpisodeId();
+    if (typeof validateStoryData === "function") {
+      validateStoryData();
+    }
     this.state = {
       scene: SCENES.TITLE,
-      episodeId: startEpisodeId,
+      episodeId: this.getStartEpisodeId(),
       nodeIndex: 0,
       dopamine: CONFIG.initialDopamine,
       affection: CONFIG.initialAffection,
       ending: null,
       characters: [],
       background: null,
+      currentBgm: null,
       selectedSubGame: null,
       selectedSubGameReturn: null,
       selectedSubGameReturnNode: null,
-      pendingNodes: []
+      pendingNodes: [],
+      playerName: localStorage.getItem("dopaPlayerName") || "",
+      endingText: null
     };
 
-    this.titleButton = new Button(500, 500, 280, 68, "시작", () => {
-      this.changeScene(SCENES.STORY);
+    this.bindNameOverlay();
+
+    this.titleButton = new Button(538, 522, 204, 54, "START", () => {
+      this.showNameEntry();
+    }, {
+      fill: "#ffffff",
+      hoverFill: "#ff7ba6",
+      text: "#ef4778",
+      radius: 22,
+      textSize: 18
     });
 
-    this.restartButton = new Button(500, 560, 280, 64, "다시 시작", () => {
+    this.loadButton = new Button(538, 590, 204, 48, "LOAD", () => {
+      this.loadSnapshot();
+    }, {
+      fill: "rgba(255, 255, 255, 0.82)",
+      hoverFill: "#ffd35a",
+      text: "#40445a",
+      radius: 22,
+      textSize: 17
+    });
+
+    this.restartButton = new Button(500, 560, 280, 64, "타이틀로", () => {
       location.reload();
     });
 
-    this.textBox = new TextBox(80, 470, 1120, 200);
+    this.textBox = new TextBox(0, 452, CONFIG.width, 268);
     this.choiceButtons = [];
     this.subGame = null;
     this.backgroundImage = null;
     this.character = {};
+    this.saveButton = new Button(76, 464, 68, 28, "SAVE", () => {
+      this.saveSnapshot();
+    }, {
+      fill: "rgba(0, 0, 0, 0.5)",
+      hoverFill: "rgba(255, 255, 255, 0.18)",
+      stroke: "rgba(255, 255, 255, 0.38)",
+      hoverStroke: "rgba(255, 255, 255, 0.75)",
+      text: "#ffffff",
+      radius: 14,
+      textSize: 12
+    });
+    this.dopamineStartButton = new Button(826, 370, 312, 58, "도파민 게임 시작하기", () => {
+      this.changeScene(SCENES.MINIGAME);
+    }, {
+      fill: "#b9ccff",
+      hoverFill: "#8ba8ff",
+      text: "#1f2852",
+      radius: 28,
+      textSize: 20
+    });
+    this.dopamineSkipButton = new Button(826, 444, 312, 58, "건너뛰기(개발단계용)", () => {
+      this.skipSelectedSubGame();
+    }, {
+      fill: "#d1b5ff",
+      hoverFill: "#ba8dff",
+      text: "#221a44",
+      radius: 28,
+      textSize: 18
+    });
+  }
+
+  bindNameOverlay() {
+    this.nameOverlay = document.getElementById("nameOverlay");
+    this.nameEntry = document.getElementById("nameEntry");
+    this.nameConfirm = document.getElementById("nameConfirm");
+    this.nameInput = document.getElementById("playerNameInput");
+    this.nameConfirmText = document.getElementById("nameConfirmText");
+
+    const stopOverlayEvent = (event) => {
+      this.ignoreCanvasClickUntil = Date.now() + 300;
+      event.stopPropagation();
+    };
+    const handleOverlayButton = (event, action) => {
+      event.preventDefault();
+      stopOverlayEvent(event);
+      action();
+    };
+
+    ["pointerdown", "pointerup", "mousedown", "mouseup", "click", "touchstart", "touchend"].forEach((eventName) => {
+      this.nameOverlay.addEventListener(eventName, stopOverlayEvent);
+    });
+
+    document.getElementById("nameNextButton").addEventListener("click", (event) => {
+      handleOverlayButton(event, () => this.openNameConfirm());
+    });
+    document.getElementById("nameConfirmButton").addEventListener("click", (event) => {
+      handleOverlayButton(event, () => this.confirmName());
+    });
+    document.getElementById("nameCancelButton").addEventListener("click", (event) => {
+      handleOverlayButton(event, () => this.showNameEntry());
+    });
+    this.nameInput.addEventListener("keydown", (event) => {
+      event.stopPropagation();
+      if (event.key === "Enter") {
+        event.preventDefault();
+        this.ignoreCanvasClickUntil = Date.now() + 300;
+        this.openNameConfirm();
+      }
+    });
+  }
+
+  showNameEntry() {
+    this.nameOverlay.hidden = false;
+    this.nameEntry.hidden = false;
+    this.nameConfirm.hidden = true;
+    this.nameInput.value = this.state.playerName || "";
+    window.setTimeout(() => this.nameInput.focus(), 0);
+  }
+
+  openNameConfirm() {
+    const name = (this.nameInput.value || "").trim().slice(0, 6) || "현수";
+    this.pendingPlayerName = name;
+    this.nameConfirmText.textContent = `당신의 이름은 [${name}](이)가 맞습니까?`;
+    this.nameEntry.hidden = true;
+    this.nameConfirm.hidden = false;
+  }
+
+  confirmName() {
+    this.state.playerName = this.pendingPlayerName || "현수";
+    localStorage.setItem("dopaPlayerName", this.state.playerName);
+    this.nameOverlay.hidden = true;
+    this.changeScene(SCENES.STORY);
   }
 
   changeScene(scene) {
@@ -43,6 +157,14 @@ class Game {
     if (scene === SCENES.MINIGAME) {
       this.startSelectedSubGame();
     }
+  }
+
+  getStartEpisodeId() {
+    if (typeof STORY_START_EPISODE !== "undefined" && EPISODES[STORY_START_EPISODE]) {
+      return STORY_START_EPISODE;
+    }
+
+    return EPISODES.EP1 ? "EP1" : Object.keys(EPISODES)[0];
   }
 
   update() {
@@ -60,58 +182,92 @@ class Game {
   draw() {
     if (this.state.scene === SCENES.TITLE) this.drawTitle();
     if (this.state.scene === SCENES.STORY) this.drawStory();
+    if (this.state.scene === SCENES.DOPAMINE_READY) this.drawDopamineReady();
     if (this.state.scene === SCENES.MINIGAME && this.subGame) this.subGame.draw();
     if (this.state.scene === SCENES.ENDING) this.drawEnding();
   }
 
   mousePressed() {
+    if (this.isNameOverlayOpen() || Date.now() < (this.ignoreCanvasClickUntil || 0)) return;
+
+    this.unlockAudio();
+
     if (this.state.scene === SCENES.TITLE) this.titleButton.mousePressed();
+    if (this.state.scene === SCENES.TITLE) this.loadButton.mousePressed();
     if (this.state.scene === SCENES.STORY) this.handleStoryClick();
+    if (this.state.scene === SCENES.DOPAMINE_READY) this.handleDopamineReadyClick();
     if (this.state.scene === SCENES.MINIGAME && this.subGame) this.subGame.mousePressed();
     if (this.state.scene === SCENES.ENDING) this.restartButton.mousePressed();
   }
 
+  isNameOverlayOpen() {
+    return this.nameOverlay && !this.nameOverlay.hidden;
+  }
+
   keyPressed() {
+    this.unlockAudio();
+
     if (this.state.scene === SCENES.MINIGAME && this.subGame && this.subGame.keyPressed) {
       this.subGame.keyPressed();
     }
   }
 
   drawTitle() {
-    background("#171b24");
-    noStroke();
-    fill("#f6d365");
-    textAlign(CENTER, CENTER);
-    textSize(68);
-    text("도파민때문에", width / 2, 240);
+    this.drawSceneImage("convenienceStore", true);
+    fill(255, 255, 255, 176);
+    rect(0, 0, width, height);
 
-    fill("#f5f2ea");
-    textSize(24);
-    text("감정을 너무 낮추지도, 너무 과열시키지도 말 것", width / 2, 330);
+    noStroke();
+    fill("#ee3f73");
+    textAlign(CENTER, CENTER);
+    textStyle(BOLD);
+    textSize(72);
+    text("도파민때문에", width / 2, 240);
+    textStyle(NORMAL);
+
+    stroke("#ee3f73");
+    strokeWeight(4);
+    line(width / 2 - 205, 188, width / 2 + 205, 188);
+    line(width / 2 - 205, 292, width / 2 + 205, 292);
+    noStroke();
+
+    fill("#5b5f70");
+    textSize(16);
+    text("SOME HOW STOPS LOVE CONVENIENCE STORY", width / 2, 310);
+    textSize(18);
+    text("감정을 너무 낮추지도, 너무 과열시키지도 말 것", width / 2, 354);
 
     this.titleButton.draw();
+    this.loadButton.draw();
+    this.drawTitleSideMenu();
   }
 
   drawStory() {
     this.drawBackground();
-    this.drawStatus();
+    this.drawEpisodeBadge();
+    if (this.shouldShowDopamineMeter()) this.drawStatus();
 
     const node = this.processStoryCommandNodes();
     if (!node) return;
 
+    if (node.type === NODE_TYPES.DIALOGUE && node.speaker === "END") {
+      this.state.endingText = node.text;
+      this.changeScene(SCENES.ENDING);
+      return;
+    }
+
     if (node.type === NODE_TYPES.DIALOGUE) {
       this.drawCharacters();
-      this.textBox.draw(node.speaker, node.text);
+      this.textBox.draw(this.formatSpeaker(node.speaker), this.formatStoryText(node.text));
+      this.drawStoryQuickMenu();
       return;
     }
 
     if (node.type === NODE_TYPES.CHOICE) {
       this.drawCharacters();
-      fill("#f5f2ea");
-      textAlign(CENTER, CENTER);
-      textSize(28);
-      text(node.prompt, width / 2, 260);
+      this.drawChoiceOverlay(this.formatStoryText(node.prompt));
       this.choiceButtons.forEach((button) => button.draw());
+      this.drawStoryQuickMenu();
       return;
     }
 
@@ -128,13 +284,15 @@ class Game {
       low: "LowDo 엔딩: 마음이 식거나 용기가 부족했다.",
       high: "HighDo 엔딩: 감정이 너무 앞서버렸다.",
       bad: "배드 엔딩: 호감도가 충분히 쌓이지 않았다.",
-      good: "Good 엔딩: 적당한 설렘으로 고백에 성공했다."
+      good: "Good 엔딩: 적당한 설렘으로 고백에 성공했다.",
+      "TRUE END": "TRUE END",
+      "BAD END": "BAD END"
     };
 
     fill("#f6d365");
     textAlign(CENTER, CENTER);
     textSize(42);
-    text(endingText[this.state.ending], width / 2, 280);
+    text(endingText[this.state.ending] || this.state.endingText || "END", width / 2, 280);
 
     fill("#f5f2ea");
     textSize(24);
@@ -144,6 +302,11 @@ class Game {
   }
 
   drawBackground() {
+    if (this.state.background === "dummy") {
+      this.drawSceneImage("convenienceStore", false);
+      return;
+    }
+
     if (this.backgroundImage) {
       this.backgroundImage.draw();
       return;
@@ -152,16 +315,159 @@ class Game {
     background("#202633");
   }
 
-  drawCharacters() {
-    let i = 0;
-    const characterLength = this.state.characters.length;
-
-    for (const character of this.state.characters) {
-      if (this.character[character]) {
-        this.character[character].draw(i, characterLength);
-      }
-      i++;
+  drawSceneImage(name, faded = false) {
+    const imageAsset = this.assets.backgrounds[name];
+    if (!imageAsset) {
+      background("#202633");
+      return;
     }
+
+    new BackgroundImage(imageAsset).draw();
+    if (faded) {
+      fill(255, 255, 255, 124);
+      noStroke();
+      rect(0, 0, width, height);
+    }
+  }
+
+  drawTitleSideMenu() {
+    const labels = ["START", "LOAD", "SETTING", "EXTRA", "HLP"];
+    for (let i = 0; i < labels.length; i++) {
+      const y = 350 + i * 38;
+      fill(i === 0 ? "#ff8f2a" : "#4b5565");
+      circle(1104, y, 24);
+      fill("#fff");
+      textAlign(CENTER, CENTER);
+      textSize(9);
+      text(labels[i][0], 1104, y + 1);
+      fill("#4b5565");
+      textAlign(LEFT, CENTER);
+      textSize(10);
+      text(labels[i], 1124, y);
+    }
+  }
+
+  drawEpisodeBadge() {
+    noStroke();
+    fill(28, 31, 43, 180);
+    rect(width - 114, 20, 86, 36, 18);
+    fill("#fff5dc");
+    textAlign(CENTER, CENTER);
+    textSize(16);
+    text(this.getEpisodeLabel(), width - 71, 38);
+  }
+
+  drawStoryQuickMenu() {
+    const currentNode = this.getCurrentNode();
+    const isChoiceScreen = currentNode && currentNode.type === NODE_TYPES.CHOICE;
+    const menuY = isChoiceScreen ? 676 : 464;
+
+    this.saveButton.x = 76;
+    this.saveButton.y = menuY;
+    this.saveButton.w = 68;
+    this.saveButton.h = 28;
+    this.saveButton.label = "SAVE";
+    this.saveButton.draw();
+    const items = ["메뉴", "대사록", "자동", "빠른저장", "불러오기"];
+    for (let i = 0; i < items.length; i++) {
+      const x = 154 + i * 78;
+      const y = menuY;
+      fill(0, 0, 0, 128);
+      stroke(255, 255, 255, 74);
+      strokeWeight(1);
+      rect(x, y, 66, 28, 14);
+      noStroke();
+      fill(255, 255, 255, 218);
+      textAlign(CENTER, CENTER);
+      textSize(11);
+      text(items[i], x + 33, y + 14);
+    }
+  }
+
+  drawChoiceOverlay(prompt) {
+    noStroke();
+    fill(0, 0, 0, 92);
+    rect(0, 0, width, height);
+
+    const promptX = 290;
+    const promptY = this.getChoicePromptY();
+    const promptW = 700;
+
+    fill("#ee3f73");
+    rect(promptX, promptY, 72, 22, 11);
+
+    noStroke();
+    fill("#ffffff");
+    textAlign(CENTER, CENTER);
+    textStyle(BOLD);
+    textSize(12);
+    text("CHOICE", promptX + 36, promptY + 11);
+
+    noStroke();
+    fill("#ffffff");
+    textAlign(LEFT, TOP);
+    textStyle(BOLD);
+    textSize(28);
+    text(prompt || "", promptX, promptY + 34, promptW, 38);
+
+    stroke(255, 255, 255, 110);
+    strokeWeight(1);
+    line(promptX, promptY + 76, promptX + promptW, promptY + 76);
+    textStyle(NORMAL);
+  }
+
+  getChoicePromptY() {
+    const count = max(1, this.choiceButtons.length);
+    if (count <= 2) return 370;
+    if (count === 3) return 336;
+    return 302;
+  }
+
+  drawDopamineReady() {
+    this.drawSceneImage("bedroomNight", false);
+    fill(0, 0, 0, 58);
+    rect(0, 0, width, height);
+
+    this.drawMeter(826, 298, "도파민", this.state.dopamine, "#e94c8a");
+
+    this.dopamineStartButton.draw();
+    this.dopamineSkipButton.draw();
+    this.saveButton.x = 826;
+    this.saveButton.y = 516;
+    this.saveButton.w = 312;
+    this.saveButton.h = 40;
+    this.saveButton.label = "SAVE";
+    this.saveButton.draw();
+
+    fill("#f6f1ff");
+    textAlign(CENTER, CENTER);
+    textSize(20);
+    text("하루가 끝나면 잠에 들고, 도파민 게임으로 마음을 정리합니다.", width / 2, 632);
+  }
+
+  handleDopamineReadyClick() {
+    this.saveButton.mousePressed();
+    this.dopamineStartButton.mousePressed();
+    this.dopamineSkipButton.mousePressed();
+  }
+
+  skipSelectedSubGame() {
+    const returnEpisodeId = this.state.selectedSubGameReturn || "EP_AFTER_MINIGAME";
+    const returnNodeId = this.state.selectedSubGameReturnNode;
+    this.state.selectedSubGame = null;
+    this.state.selectedSubGameReturn = null;
+    this.state.selectedSubGameReturnNode = null;
+    this.moveTo(returnEpisodeId, returnNodeId);
+    this.changeScene(SCENES.STORY);
+  }
+
+  drawCharacters() {
+    const visibleCharacters = this.state.characters.filter((character) => this.character[character]);
+    const characterLength = visibleCharacters.length;
+
+    visibleCharacters.forEach((character, index) => {
+      this.character[character].draw(index, characterLength);
+    });
   }
 
   processStoryCommandNodes() {
@@ -191,7 +497,7 @@ class Game {
       }
 
       if (node.type === NODE_TYPES.CHARACTER_IN) {
-        if(this.state.characters.indexOf(node.name) === -1){
+        if (this.state.characters.indexOf(node.name) === -1) {
           this.state.characters.push(node.name);
         }
         const image = this.getCharacterAsset(node.name, node.emotion);
@@ -219,12 +525,16 @@ class Game {
         this.backgroundImage = null;
       }
 
+      if (node.type === NODE_TYPES.SOUND) {
+        this.handleSoundNode(node);
+      }
+
       if (node.type === NODE_TYPES.MOVE) {
         if (node.next === NEXT_TARGETS.MINIGAME) {
           this.state.selectedSubGame = node.minigame || node.subGame || SUB_GAMES.BRICK_BREAKER;
           this.state.selectedSubGameReturn = node.after || "EP_AFTER_MINIGAME";
           this.state.selectedSubGameReturnNode = node.afterNode || null;
-          this.changeScene(SCENES.MINIGAME);
+          this.changeScene(SCENES.DOPAMINE_READY);
           return null;
         }
 
@@ -253,7 +563,103 @@ class Game {
       node.type === NODE_TYPES.CLEAR_CHARACTERS ||
       node.type === NODE_TYPES.CLEAR_BACKGROUND ||
       node.type === NODE_TYPES.SCENE_RESET ||
+      node.type === NODE_TYPES.SOUND ||
       node.type === NODE_TYPES.MOVE;
+  }
+
+  unlockAudio() {
+    if (typeof userStartAudio === "function") {
+      userStartAudio();
+    }
+  }
+
+  handleSoundNode(node) {
+    const soundType = this.normalizeSoundType(node.soundType || node.kind || "effect");
+    const action = node.action || "play";
+
+    if (soundType === "bgm") {
+      this.handleBgmNode(node, action);
+      return;
+    }
+
+    if (action === "stop") {
+      this.stopSound(node.name, "effects");
+      return;
+    }
+
+    this.playSoundEffect(node);
+  }
+
+  normalizeSoundType(soundType) {
+    if (soundType === "music") return "bgm";
+    if (soundType === "sfx" || soundType === "effects") return "effect";
+    return soundType;
+  }
+
+  handleBgmNode(node, action) {
+    if (action === "stop") {
+      this.stopCurrentBgm();
+      return;
+    }
+
+    const sound = this.getSoundAsset(node.name, "bgm");
+    if (!sound) {
+      console.warn("Missing bgm asset: " + node.name);
+      return;
+    }
+
+    if (this.state.currentBgm === node.name && sound.isPlaying()) return;
+
+    this.stopCurrentBgm();
+    this.state.currentBgm = node.name;
+    this.setSoundVolume(sound, node.volume);
+
+    if (node.loop === false) {
+      sound.play();
+    } else {
+      sound.loop();
+    }
+  }
+
+  playSoundEffect(node) {
+    const sound = this.getSoundAsset(node.name, "effects");
+    if (!sound) {
+      console.warn("Missing sound effect asset: " + node.name);
+      return;
+    }
+
+    this.setSoundVolume(sound, node.volume);
+    if (node.restart !== false && sound.isPlaying()) {
+      sound.stop();
+    }
+    sound.play();
+  }
+
+  getSoundAsset(name, group) {
+    if (!name || !this.assets.sounds || !this.assets.sounds[group]) return null;
+    return this.assets.sounds[group][name] || null;
+  }
+
+  setSoundVolume(sound, volume) {
+    if (typeof sound.setVolume === "function" && typeof volume === "number") {
+      sound.setVolume(constrain(volume, 0, 1));
+    }
+  }
+
+  stopCurrentBgm() {
+    const currentBgm = this.state.currentBgm;
+    const sound = this.getSoundAsset(currentBgm, "bgm");
+    if (sound && sound.isPlaying()) {
+      sound.stop();
+    }
+    this.state.currentBgm = null;
+  }
+
+  stopSound(name, group) {
+    const sound = this.getSoundAsset(name, group);
+    if (sound && sound.isPlaying()) {
+      sound.stop();
+    }
   }
 
   moveTo(next = null, nextNode = null) {
@@ -278,21 +684,6 @@ class Game {
     this.state.pendingNodes = [];
     this.state.episodeId = targetEpisodeId;
     this.state.nodeIndex = targetNodeIndex;
-  }
-
-  getStartEpisodeId() {
-    if (typeof DOPA_STORY_START_EPISODE_ID !== "undefined" && EPISODES[DOPA_STORY_START_EPISODE_ID]) {
-      return DOPA_STORY_START_EPISODE_ID;
-    }
-
-    if (EPISODES.EP1) return "EP1";
-
-    const episodeIds = Object.keys(EPISODES);
-    if (episodeIds.length > 0) return episodeIds[0];
-
-    console.warn("No episodes found. Creating empty EP1 fallback.");
-    EPISODES.EP1 = [];
-    return "EP1";
   }
 
   getNodeIndexById(episodeId, nodeId) {
@@ -325,10 +716,15 @@ class Game {
   }
 
   handleStoryClick() {
+    if (this.saveButton.contains(mouseX, mouseY)) {
+      this.saveButton.mousePressed();
+      return;
+    }
+
     const node = this.getCurrentNode();
-    if (!node) return;
 
     if (node.type === NODE_TYPES.DIALOGUE) {
+      this.applyEffects(node.effects);
       this.advanceCurrentNode();
       this.refreshChoices();
       return;
@@ -342,13 +738,7 @@ class Game {
       return this.state.pendingNodes[0];
     }
 
-    const nodes = EPISODES[this.state.episodeId];
-    if (!Array.isArray(nodes)) {
-      console.warn("Missing current episode: " + this.state.episodeId);
-      return null;
-    }
-
-    return nodes[this.state.nodeIndex];
+    return EPISODES[this.state.episodeId][this.state.nodeIndex];
   }
 
   advanceCurrentNode() {
@@ -360,209 +750,6 @@ class Game {
     this.state.nodeIndex += 1;
   }
 
-  validateStoryData() {
-    const validNodeTypes = Object.values(NODE_TYPES);
-
-    Object.entries(EPISODES).forEach(([episodeId, nodes]) => {
-      if (!Array.isArray(nodes)) {
-        console.warn("Episode is not an array: " + episodeId);
-        return;
-      }
-
-      const nodeIds = new Set();
-
-      nodes.forEach((node, index) => {
-        const location = episodeId + "[" + index + "]";
-
-        if (!node || typeof node !== "object") {
-          console.warn("Invalid node at " + location);
-          return;
-        }
-
-        if (node.id !== undefined) {
-          if (typeof node.id !== "number") {
-            console.warn("Node id must be a number at " + location + ": " + node.id);
-          } else if (nodeIds.has(node.id)) {
-            console.warn("Duplicate node id at " + location + ": " + this.getNodeKey(episodeId, node.id));
-          } else {
-            nodeIds.add(node.id);
-          }
-        }
-
-        if (!validNodeTypes.includes(node.type)) {
-          console.warn("Unknown node type at " + location + ": " + node.type);
-        }
-
-        this.validateCondition(node.condition, location);
-
-        if (node.type === NODE_TYPES.BACKGROUND && !ASSET_MANIFEST.backgrounds[node.name]) {
-          console.warn("Unknown background at " + location + ": " + node.name);
-        }
-
-        if (node.type === NODE_TYPES.CHARACTER_IN) {
-          this.validateCharacterAsset(node.name, node.emotion, location);
-        }
-
-        if (node.type === NODE_TYPES.MOVE) {
-          this.validateMoveTarget(node.next, node.nextNode, location);
-          this.validateSubGameTarget(node.minigame || node.subGame, node.next, location);
-          this.validateSubGameReturn(node.after, node.afterNode, node.next, location);
-        }
-
-        if (node.type === NODE_TYPES.DIALOGUE) {
-          if (!node.speaker) console.warn("Dialogue has no speaker at " + location);
-          if (!node.text) console.warn("Dialogue has no text at " + location);
-        }
-
-        if (node.type === NODE_TYPES.CHOICE) {
-          if (!Array.isArray(node.choices) || node.choices.length === 0) {
-            console.warn("Choice has no choices at " + location);
-            return;
-          }
-
-          node.choices.forEach((choice, choiceIndex) => {
-            const choiceLocation = location + ".choices[" + choiceIndex + "]";
-            if (!choice.text) console.warn("Choice option has no text at " + choiceLocation);
-            this.validateFollowNodes(choice.follow, choiceLocation);
-            this.validateChoiceTarget(choice.nextNode, episodeId, choiceLocation);
-            if (choice.next) {
-              console.warn("Choice should use nextNode instead of next at " + choiceLocation);
-              this.validateNextTarget(choice.next, choiceLocation);
-            }
-            this.validateCondition(choice.condition, choiceLocation);
-          });
-        }
-      });
-    });
-  }
-
-  validateCharacterAsset(name, emotion, location) {
-    const character = ASSET_MANIFEST.characters[name];
-    if (!character) {
-      console.warn("Unknown character at " + location + ": " + name);
-      return;
-    }
-
-    if (emotion && !character[emotion] && !character.default) {
-      console.warn("Unknown character emotion at " + location + ": " + name + " / " + emotion);
-    }
-  }
-
-  validateNextTarget(next, location) {
-    if (!next) {
-      console.warn("Missing next target at " + location);
-      return;
-    }
-
-    if (next === NEXT_TARGETS.MINIGAME) return;
-
-    if (!EPISODES[next]) {
-      console.warn("Unknown next episode at " + location + ": " + next);
-    }
-  }
-
-  validateMoveTarget(next, nextNode, location) {
-    if (!next && (nextNode === null || nextNode === undefined)) {
-      console.warn("Missing move target at " + location);
-      return;
-    }
-
-    if (next) {
-      this.validateNextTarget(next, location);
-    }
-
-    if (next === NEXT_TARGETS.MINIGAME) return;
-
-    const targetEpisodeId = next || location.split("[")[0];
-    if (nextNode !== null && nextNode !== undefined) {
-      this.validateNodeTarget(targetEpisodeId, nextNode, location);
-    }
-  }
-
-  validateChoiceTarget(nextNode, episodeId, location) {
-    if (nextNode === null || nextNode === undefined) {
-      console.warn("Choice option has no nextNode at " + location);
-      return;
-    }
-
-    this.validateNodeTarget(episodeId, nextNode, location);
-  }
-
-  validateNodeTarget(episodeId, nextNode, location) {
-    if (typeof nextNode !== "number") {
-      console.warn("Node target must be a number at " + location + ": " + nextNode);
-      return;
-    }
-
-    if (this.getNodeIndexById(episodeId, nextNode) === -1) {
-      console.warn("Unknown node target at " + location + ": " + this.getNodeKey(episodeId, nextNode));
-    }
-  }
-
-  validateSubGameTarget(subGameId, next, location) {
-    if (next !== NEXT_TARGETS.MINIGAME) return;
-
-    if (!subGameId) {
-      console.warn("Missing sub game id at " + location + ". Using default: " + SUB_GAMES.BRICK_BREAKER);
-      return;
-    }
-
-    if (!SUB_GAME_MANIFEST[subGameId]) {
-      console.warn("Unknown sub game at " + location + ": " + subGameId);
-    }
-  }
-
-  validateSubGameReturn(after, afterNode, next, location) {
-    if (next !== NEXT_TARGETS.MINIGAME || !after) return;
-
-    if (!EPISODES[after]) {
-      console.warn("Unknown sub game return episode at " + location + ": " + after);
-      return;
-    }
-
-    if (afterNode !== null && afterNode !== undefined) {
-      this.validateNodeTarget(after, afterNode, location);
-    }
-  }
-
-  validateCondition(condition, location) {
-    if (!condition) return;
-
-    const validConditionKeys = ["dopamineMin", "dopamineMax", "affectionMin", "affectionMax"];
-
-    Object.keys(condition).forEach((key) => {
-      if (!validConditionKeys.includes(key)) {
-        console.warn("Unknown condition key at " + location + ": " + key);
-      }
-    });
-
-    validConditionKeys.forEach((key) => {
-      if (condition[key] !== undefined && typeof condition[key] !== "number") {
-        console.warn("Condition value must be a number at " + location + ": " + key);
-      }
-    });
-  }
-
-  validateFollowNodes(follow, location) {
-    if (follow === undefined) return;
-
-    if (!Array.isArray(follow)) {
-      console.warn("Choice follow must be an array at " + location);
-      return;
-    }
-
-    follow.forEach((line, index) => {
-      const lineLocation = location + ".follow[" + index + "]";
-      if (!line || typeof line !== "object") {
-        console.warn("Invalid follow line at " + lineLocation);
-        return;
-      }
-
-      if (!line.speaker) console.warn("Follow line has no speaker at " + lineLocation);
-      if (!line.text) console.warn("Follow line has no text at " + lineLocation);
-    });
-  }
-
   refreshChoices() {
     const node = this.getCurrentNode();
     this.choiceButtons = [];
@@ -570,13 +757,31 @@ class Game {
     if (!node || node.type !== NODE_TYPES.CHOICE) return;
 
     const choices = node.choices.filter((choice) => this.canChoose(choice));
+    const buttonW = 700;
+    const buttonH = 56;
+    const gap = 12;
+    const blockH = choices.length * buttonH + max(0, choices.length - 1) * gap;
+    const startY = constrain(720 - 98 - blockH, 398, 486);
 
     choices.forEach((choice, index) => {
-      const button = new Button(340, 360 + index * 88, 600, 64, choice.text, () => {
+      const choiceNumber = String(index + 1).padStart(2, "0");
+      const button = new Button((width - buttonW) / 2, startY + index * (buttonH + gap), buttonW, buttonH, `${choiceNumber}   ${this.formatStoryText(choice.text)}`, () => {
         this.applyEffects(choice.effects);
         this.queueChoiceFollow(choice.follow);
 
         this.goToChoiceTarget(choice);
+      }, {
+        fill: "rgba(9, 11, 20, 0.66)",
+        hoverFill: "rgba(238, 63, 115, 0.86)",
+        stroke: "rgba(255, 255, 255, 0.26)",
+        hoverStroke: "rgba(255, 255, 255, 0.85)",
+        text: "#ffffff",
+        hoverText: "#ffffff",
+        radius: 12,
+        textSize: 19,
+        align: "left",
+        paddingX: 28,
+        suffix: ">"
       });
 
       this.choiceButtons.push(button);
@@ -623,7 +828,7 @@ class Game {
       this.state.selectedSubGame = subGameId || SUB_GAMES.BRICK_BREAKER;
       this.state.selectedSubGameReturn = after || "EP_AFTER_MINIGAME";
       this.state.selectedSubGameReturnNode = null;
-      this.changeScene(SCENES.MINIGAME);
+      this.changeScene(SCENES.DOPAMINE_READY);
       return;
     }
 
@@ -639,7 +844,8 @@ class Game {
     this.state.pendingNodes = follow.map((line) => ({
       type: NODE_TYPES.DIALOGUE,
       speaker: line.speaker,
-      text: line.text
+      text: line.text,
+      effects: line.effects
     }));
   }
 
@@ -673,11 +879,11 @@ class Game {
   }
 
   applyEffects(effects = {}) {
-    if (effects.dopamine) {
+    if (effects.dopamine !== undefined) {
       this.addDopamine(effects.dopamine);
     }
 
-    if (effects.affection) {
+    if (effects.affection !== undefined) {
       this.state.affection = constrain(this.state.affection + effects.affection, 0, 100);
     }
   }
@@ -694,20 +900,105 @@ class Game {
   }
 
   drawStatus() {
-    this.drawMeter(32, 28, "도파민", this.state.dopamine, "#f06a7a");
+    this.drawMeter(32, 28, "도파민", this.state.dopamine, "#e94c8a");
     // this.drawMeter(32, 74, "호감도", this.state.affection, "#6cc4a1");
   }
 
   drawMeter(x, y, label, value, colorHex) {
     noStroke();
+    fill("#2f2d5d");
+    rect(x, y, 318, 38, 4);
     fill("#f5f2ea");
     textAlign(LEFT, CENTER);
+    textStyle(BOLD);
     textSize(18);
-    text(`${label} ${Math.round(value)}`, x, y + 12);
+    text(label, x + 12, y + 19);
+    textStyle(NORMAL);
 
-    fill("#2a303d");
-    rect(x + 110, y, 220, 24, 4);
+    fill("#f0f2fa");
+    rect(x + 126, y + 12, 154, 14, 7);
     fill(colorHex);
-    rect(x + 110, y, map(value, 0, 100, 0, 220), 24, 4);
+    rect(x + 126, y + 12, map(value, 0, 100, 0, 154), 14, 7);
+    fill("#f5f2ea");
+    textAlign(RIGHT, CENTER);
+    textSize(18);
+    text(Math.round(value), x + 112, y + 19);
+  }
+
+  shouldShowDopamineMeter() {
+    return this.getEpisodeNumber() >= 2 || this.state.episodeId.includes("ENDING") || this.state.episodeId.includes("엔딩");
+  }
+
+  getEpisodeLabel() {
+    const match = this.state.episodeId.match(/EP(\d+)/);
+    if (!match) return "END";
+    return `EP.${match[1]}`;
+  }
+
+  getEpisodeNumber() {
+    const match = this.state.episodeId.match(/EP(\d+)/);
+    return match ? Number(match[1]) : 99;
+  }
+
+  getEpisodeProgress() {
+    const nodes = EPISODES[this.state.episodeId] || [];
+    if (!nodes.length) return 0;
+    return constrain((this.state.nodeIndex / max(1, nodes.length - 1)) * 100, 0, 100);
+  }
+
+  formatSpeaker(speaker) {
+    if (speaker === "주인공") return this.state.playerName || "주인공";
+    return speaker || "";
+  }
+
+  formatStoryText(text) {
+    const playerName = this.state.playerName || "현수";
+    return (text || "").replace(/000|OO/g, playerName);
+  }
+
+  saveSnapshot() {
+    if (this.state.scene !== SCENES.STORY && this.state.scene !== SCENES.DOPAMINE_READY) return;
+    const snapshot = {
+      episodeId: this.state.episodeId,
+      nodeIndex: this.state.nodeIndex,
+      dopamine: this.state.dopamine,
+      affection: this.state.affection,
+      playerName: this.state.playerName || "현수",
+      background: this.state.background,
+      characters: this.state.characters
+    };
+    localStorage.setItem("dopaSave", JSON.stringify(snapshot));
+    localStorage.setItem("dopaPlayerName", snapshot.playerName);
+  }
+
+  loadSnapshot() {
+    const raw = localStorage.getItem("dopaSave");
+    if (!raw) {
+      this.showNameEntry();
+      return;
+    }
+
+    try {
+      const snapshot = JSON.parse(raw);
+      this.state.episodeId = EPISODES[snapshot.episodeId] ? snapshot.episodeId : this.getStartEpisodeId();
+      this.state.nodeIndex = snapshot.nodeIndex || 0;
+      this.state.dopamine = snapshot.dopamine ?? CONFIG.initialDopamine;
+      this.state.affection = snapshot.affection ?? CONFIG.initialAffection;
+      this.state.playerName = snapshot.playerName || "현수";
+      this.state.pendingNodes = [];
+      this.state.characters = Array.isArray(snapshot.characters) ? snapshot.characters : [];
+      this.character = {};
+      this.state.characters.forEach((name) => {
+        const image = this.getCharacterAsset(name, "일반");
+        this.character[name] = image ? new CharacterImage(image) : null;
+      });
+      this.state.background = snapshot.background || null;
+      const image = this.assets.backgrounds[this.state.background];
+      this.backgroundImage = image ? new BackgroundImage(image) : null;
+      this.changeScene(SCENES.STORY);
+    } catch (error) {
+      console.warn("Cannot load save data", error);
+      this.showNameEntry();
+    }
   }
 }
