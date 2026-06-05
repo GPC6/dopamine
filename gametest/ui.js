@@ -2,12 +2,18 @@ const SPEAKER_COLORS = {
   수진: "#f48fb1",
   혜지: "#b39ddb",
   건호: "#90caf9",
+  파미니: "#ffb86c",
   주인공: "#ffffff",
   나레이션: "#cfd8dc",
   독백: "#ffffff",
   선택: "#ffd166",
   default: "#fff7dc"
 };
+
+function useGameFont(role) {
+  if (typeof assets === "undefined" || !assets.fonts || !assets.fonts[role]) return;
+  textFont(assets.fonts[role]);
+}
 
 class Button {
   constructor(x, y, w, h, label, onClick, options = {}) {
@@ -40,6 +46,7 @@ class Button {
     noStroke();
     fill(hover ? (this.options.hoverText || "#ffffff") : (this.options.text || "#242947"));
     textStyle(this.options.bold === false ? NORMAL : BOLD);
+    useGameFont(this.options.fontRole || (this.options.bold === false ? "ui" : "uiBold"));
     textSize(this.options.textSize || 22);
     if (this.options.align === "left") {
       const paddingX = this.options.paddingX || 24;
@@ -87,11 +94,13 @@ class TextBox {
     fill(speakerColor);
     textAlign(LEFT, TOP);
     textStyle(BOLD);
+    useGameFont("dialogueBold");
     textSize(18);
     text(speaker || "", this.x + 76, this.y + 74);
     textStyle(NORMAL);
 
     fill("#ffffff");
+    useGameFont("dialogue");
     textSize(25);
     textLeading(38);
     text(bodyText || "", this.x + 76, this.y + 108, this.w - 152, this.h - 130);
@@ -122,10 +131,10 @@ class CharacterImage {
     imageMode(CENTER)
   }
 
-  draw(i, char_len) {
+  draw(i, char_len, yOffset = 0) {
     let w = 250;
     let h = w * this.img.height / this.img.width;
-    const y = height / 1.5;
+    const y = height / 1.5 + yOffset;
     if (char_len == 1) {
       image(this.img, width / 2, y, w, h);
     }
@@ -138,5 +147,31 @@ class CharacterImage {
         image(this.img, width * 0.5, y, w, h);
     }
 
+  }
+
+  drawChatBustLeft() {
+    const clipX = 0;
+    const clipY = 96;
+    const clipW = 328;
+    const clipH = 356;
+    const drawW = 292;
+    const drawH = drawW * this.img.height / this.img.width;
+    const drawX = 154;
+    const imageTop = 128;
+    const drawY = imageTop + drawH / 2;
+
+    drawingContext.save();
+    drawingContext.beginPath();
+    drawingContext.rect(clipX, clipY, clipW, clipH);
+    drawingContext.clip();
+
+    push();
+    imageMode(CENTER);
+    translate(drawX, drawY);
+    scale(-1, 1);
+    image(this.img, 0, 0, drawW, drawH);
+    pop();
+
+    drawingContext.restore();
   }
 }

@@ -1,765 +1,1338 @@
-// Generated from ../??????_????_follow.xlsx.
+// Generated from ../도파민때문에_시나리오_proto_2.xlsx.
 const STORY_START_EPISODE = "EP1 첫만남";
 const EPISODES = {
   "EP1 첫만남": [
     {
-      "id": 1,
-      "type": "scene reset"
+      "type": "scene reset",
+      "id": 1
     },
     {
-      "id": 2,
       "type": "background",
       "name": "도서관 열람실",
-      "transition": "fadeBlack"
+      "transition": "fadeBlack",
+      "id": 2
     },
     {
-      "id": 3,
+      "type": "sound",
+      "soundType": "bgm",
+      "action": "play",
+      "name": "ep14",
+      "id": 3
+    },
+    {
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "…하 내일까지 제출인데."
+      "text": "하 내일까지 제출인데 언제 다 끝내지..",
+      "id": 4
     },
     {
-      "id": 4,
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "몬스터라도 마셔야겠다."
+      "text": "음료수라도 마셔야겠다.",
+      "id": 5
     },
     {
-      "id": 5,
       "type": "choice",
-      "prompt": "몬스터라도 마셔야겠다.",
+      "prompt": "음료수라도 마셔야겠다.",
       "choices": [
         {
           "text": "(망고맛 에너지 드링크를 고른다)",
-          "nextNode": 6,
-          "follow": []
+          "follow": [],
+          "sound": {
+            "soundType": "effect",
+            "action": "play",
+            "name": "ep1Ding"
+          },
+          "nextNode": 7
         },
         {
           "text": "(스누피 커피맛을 고른다)",
-          "nextNode": 6,
-          "follow": []
+          "follow": [],
+          "nextNode": 7
         }
-      ]
+      ],
+      "id": 6
     },
     {
-      "id": 6,
       "type": "background",
       "name": "편의점",
-      "transition": "fadeBlack"
+      "transition": "fadeBlack",
+      "id": 7
     },
     {
       "type": "dialogue",
       "speaker": "주인공",
       "text": "저기 계산...",
-      "id": 7
+      "id": 8
     },
     {
-      "id": 8,
-      "type": "clear characters"
-    },
-    {
-      "id": 9,
       "type": "background",
-      "name": "(CG) 수진이 편의점 계산대에서 졸고 있음",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right"
-      }
+      "name": "(CG) 졸고 있는 수진",
+      "id": 9
     },
     {
       "type": "clear characters",
       "id": 10
     },
     {
-      "id": 11,
       "type": "dialogue",
       "speaker": "독백",
-      "text": "…예쁘다."
+      "text": "(…예쁘다.)",
+      "id": 11
     },
     {
-      "id": 12,
       "type": "choice",
       "prompt": "(…예쁘다.)",
       "choices": [
         {
           "text": "저기요…",
-          "nextNode": 13,
-          "follow": []
+          "follow": [],
+          "nextNode": 13
         },
         {
           "text": "(그냥 빤히 쳐다본다)",
-          "nextNode": 13,
-          "follow": []
+          "follow": [],
+          "nextNode": 13
         }
-      ]
+      ],
+      "id": 12
     },
     {
-      "id": 13,
-      "type": "clear characters"
-    },
-    {
-      "id": 14,
       "type": "background",
-      "name": "(CG) 수진이 편의점 계산대에서 화들짝 깨어남",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right"
-      }
-    },
-    {
-      "type": "clear characters",
-      "id": 15
-    },
-    {
-      "id": 16,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "아, 네! 죄송합니다…!"
-    },
-    {
-      "id": 17,
-      "type": "sound",
-      "soundType": "effect",
-      "action": "play",
-      "name": "바코드 찍는 효과음"
-    },
-    {
-      "id": 18,
-      "type": "dialogue",
-      "speaker": "나레이션",
-      "text": "1500원입니다…!"
-    },
-    {
-      "id": 19,
-      "type": "choice",
-      "prompt": "1500원입니다…!",
-      "choices": [
-        {
-          "text": "…아. 감사합니다",
-          "nextNode": 20,
-          "follow": []
-        },
-        {
-          "text": "안녕히계세요~",
-          "nextNode": 20,
-          "follow": []
-        }
-      ]
-    },
-    {
-      "id": 20,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "...잠 덜 깬 얼굴인데도 엄청 예쁘네."
-    },
-    {
-      "id": 21,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "이제 집에 가서 공부하다 자야겠다..."
-    },
-    {
-      "type": "clear background",
-      "id": 22
-    },
-    {
-      "type": "move",
-      "next": "MINIGAME",
-      "minigame": "brickBreaker",
-      "after": "EP2 동아리 OT",
-      "id": 23
-    }
-  ],
-  "EP2 동아리 OT": [
-    {
-      "id": 1,
-      "type": "scene reset"
-    },
-    {
-      "id": 2,
-      "type": "background",
-      "name": "강의실 혹은 동아리방",
-      "transition": "fadeBlack"
-    },
-    {
-      "id": 3,
-      "type": "sound",
-      "soundType": "effect",
-      "action": "play",
-      "name": "웅성웅성 효과음"
-    },
-    {
-      "id": 4,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "동아리는 처음이라 긴장되네..."
-    },
-    {
-      "id": 5,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "어디 앉지?"
-    },
-    {
-      "id": 6,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Happy"
-    },
-    {
-      "id": 7,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "수진이 저 끝에 앉아있다.",
-      "effects": {
-        "dopamine": 5
-      }
-    },
-    {
-      "id": 8,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "…어?"
-    },
-    {
-      "id": 9,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "설마…"
-    },
-    {
-      "id": 10,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Surprised"
-    },
-    {
-      "id": 11,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "?"
-    },
-    {
-      "id": 12,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "운명인가?"
-    },
-    {
-      "id": 13,
-      "type": "choice",
-      "prompt": "(운명인가?)",
-      "choices": [
-        {
-          "text": "(수진의 옆자리에 앉는다)",
-          "nextNode": 14
-        },
-        {
-          "text": "(수진의 뒷자리에 앉는다)",
-          "nextNode": 14
-        }
-      ]
-    },
-    {
-      "id": 14,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Happy"
-    },
-    {
-      "id": 15,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "안녕하세요."
-    },
-    {
-      "id": 16,
-      "type": "choice",
-      "prompt": "안녕하세요.",
-      "choices": [
-        {
-          "text": "(당연히 기억 못하겠지…) 안녕하세요~ 건축학과 000입니다",
-          "condition": {
-            "dopamineMax": 50
-          },
-          "effects": {
-            "affection": 10
-          },
-          "nextNode": 17
-        },
-        {
-          "text": "여기 앉아도 될까요?",
-          "condition": {
-            "dopamineMax": 50
-          },
-          "effects": {
-            "affection": 15
-          },
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "네~"
-            },
-            {
-              "speaker": "주인공",
-              "text": "저는 건축학과 000이라고 합니다."
-            }
-          ],
-          "nextNode": 17
-        },
-        {
-          "text": "여기 앉아도 될까요?",
-          "condition": {
-            "dopamineMin": 50,
-            "dopamineMax": 80
-          },
-          "effects": {
-            "affection": 15
-          },
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "네~"
-            },
-            {
-              "speaker": "주인공",
-              "text": "저는 건축학과 000이라고 합니다."
-            }
-          ],
-          "nextNode": 17
-        },
-        {
-          "text": "그때 혹시 편의점… 기억하세요?",
-          "condition": {
-            "dopamineMin": 50,
-            "dopamineMax": 80
-          },
-          "effects": {
-            "affection": 20
-          },
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "앗…저희가 뵌 적이 있을까요?"
-            },
-            {
-              "speaker": "주인공",
-              "text": "아하… 하긴 손님이 많으니…"
-            },
-            {
-              "speaker": "주인공",
-              "text": "하하 저는 건축학과 000입니다."
-            },
-            {
-              "speaker": "수진",
-              "text": "이제 기억할게요!"
-            }
-          ],
-          "nextNode": 17
-        },
-        {
-          "text": "그때 혹시 편의점… 기억하세요?",
-          "condition": {
-            "dopamineMin": 80
-          },
-          "effects": {
-            "affection": 20
-          },
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "앗…저희가 뵌 적이 있을까요?"
-            },
-            {
-              "speaker": "주인공",
-              "text": "아하… 하긴 손님이 많으니…"
-            },
-            {
-              "speaker": "주인공",
-              "text": "하하 저는 건축학과 000입니다."
-            },
-            {
-              "speaker": "수진",
-              "text": "이제 기억할게요!"
-            }
-          ],
-          "nextNode": 17
-        },
-        {
-          "text": "오 또만났네요!",
-          "condition": {
-            "dopamineMin": 80
-          },
-          "effects": {
-            "affection": 10
-          },
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "누구…?"
-            },
-            {
-              "speaker": "주인공",
-              "text": "앗… 민망…"
-            },
-            {
-              "speaker": "주인공",
-              "text": "저는 건축학과 000이에요…"
-            }
-          ],
-          "nextNode": 17
-        }
-      ]
-    },
-    {
-      "id": 17,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "저는 피아노과 윤수진이에요. 무대제작부로 지원했어요!"
-    },
-    {
-      "id": 18,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "헉 나도 무대제작부인데… 이런 우연이!!"
-    },
-    {
-      "id": 19,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "오 저도 무대제작부에요!"
-    },
-    {
-      "id": 20,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Happy"
-    },
-    {
-      "id": 21,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "건축학과시면, 무대 제작 잘하시겠다!"
-    },
-    {
-      "id": 22,
-      "type": "choice",
-      "prompt": "건축학과시면, 무대 제작 잘하시겠다!",
-      "choices": [
-        {
-          "text": "…아니에요. 저 해본 적은 없어요ㅎㅎ",
-          "nextNode": 23
-        },
-        {
-          "text": "무대 만드는 건 처음이에요…",
-          "nextNode": 23
-        }
-      ]
-    },
-    {
-      "id": 23,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "(싱긋 웃으며) 그래도 든든하다."
-    },
-    {
-      "id": 24,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "앞으로 잘 해봐요~"
-    },
-    {
-      "id": 25,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "내 첫사랑… 시작되는 건가?"
-    },
-    {
-      "type": "clear background",
-      "id": 26
-    },
-    {
-      "type": "move",
-      "next": "MINIGAME",
-      "minigame": "sideShooter",
-      "after": "EP3 동아리 MT",
-      "id": 27
-    }
-  ],
-  "EP3 동아리 MT": [
-    {
-      "id": 1,
-      "type": "scene reset"
-    },
-    {
-      "id": 2,
-      "type": "background",
-      "name": "(CG) MT 장소에 둘러앉은 주인공, 수진, 건호, 혜지",
-      "transition": "fadeBlack"
-    },
-    {
-      "type": "clear characters",
-      "id": 3
-    },
-    {
-      "id": 4,
-      "type": "sound",
-      "soundType": "bgm",
-      "action": "play",
-      "name": "BGM 시작"
-    },
-    {
-      "id": 5,
-      "type": "dialogue",
-      "speaker": "모두",
-      "text": "건호가 좋아하는 랜덤 게임! 랜덤 게임! 게임 스타트!"
-    },
-    {
-      "id": 6,
-      "type": "background",
-      "name": "MT 장소",
-      "transition": "fadeBlack"
-    },
-    {
-      "id": 7,
-      "type": "character in",
-      "name": "건호",
-      "emotion": "Happy"
-    },
-    {
-      "id": 8,
-      "type": "dialogue",
-      "speaker": "건호",
-      "text": "아이엠그라운드 지금부터 시작! 수진 넷!"
-    },
-    {
-      "id": 9,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Surprised"
-    },
-    {
-      "id": 10,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "?! 아악 집중 안 하고 있었어!"
-    },
-    {
-      "id": 11,
-      "type": "character in",
-      "name": "혜지",
-      "emotion": "Happy"
-    },
-    {
-      "id": 12,
-      "type": "dialogue",
-      "speaker": "혜지",
-      "text": "와 수진이 걸렸다!"
-    },
-    {
-      "id": 13,
-      "type": "background",
-      "name": "소주병을 향해 뻗는 수진의 손",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right"
-      }
+      "name": "(CG) 화들짝 깨는 수진",
+      "id": 13
     },
     {
       "type": "clear characters",
       "id": 14
     },
     {
-      "id": 15,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "아씨 또 걸렸네ㅜ (잔을 집어든다)"
+      "text": "아, 네! 죄송합니다…!",
+      "id": 15
     },
     {
-      "id": 16,
+      "type": "sound",
+      "soundType": "effect",
+      "action": "play",
+      "name": "ep1Barcode",
+      "id": 16
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "1500원입니다…!",
+      "id": 17
+    },
+    {
+      "type": "choice",
+      "prompt": "1500원입니다…!",
+      "choices": [
+        {
+          "text": "아 감사합니다.",
+          "follow": [],
+          "nextNode": 19
+        },
+        {
+          "text": "안녕히계세요~",
+          "follow": [],
+          "nextNode": 19
+        }
+      ],
+      "id": 18
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(...잠 덜 깬 얼굴인데도 엄청 예쁘네.)",
+      "id": 19
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(이제 집에 가서 공부 좀 더 하다 자야겠다...)",
+      "id": 20
+    },
+    {
+      "type": "background",
+      "name": "(CG) 침실 앞 책상에서 과제를 하는 주인공",
+      "transition": "fadeBlack",
+      "id": 21
+    },
+    {
+      "type": "clear characters",
+      "id": 22
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "후… 드디어 끝냈다. 과제 제출 완료.",
+      "id": 23
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "유튜브나 좀 보다 자야겠다~",
+      "id": 24
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "헉… 미친, 쇼츠 좀 봤다고 세 시간이 지났어?!",
+      "id": 25
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "지금 아침 6시라고?!",
+      "id": 26
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "아, 진짜 나 요즘 도파민 중독인가 봐…",
+      "id": 27
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "아까 마신 카페인 때문에 잠은 안 오고, 가슴은 쓸데없이 뛰네.",
+      "id": 28
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "이러다 몇 시간 뒤 동아리 OT 가서 눈도 제대로 못 뜨고 대형 실수하는 거 아니겠지…",
+      "id": 29
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "조금이라도 자야겠다...",
+      "id": 30
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "(휴대폰을 끄고 눕는다)",
+      "id": 31
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "눈꺼풀이 무겁다. 아까까지 머릿속을 떠다니던 영상들이 흐릿하게 녹아내린다.",
+      "id": 1007
+    },
+    {
+      "type": "clear characters",
+      "id": 1008
+    },
+    {
+      "type": "background",
+      "name": "검은 배경",
+      "transition": "fadeBlack",
+      "id": 1004
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "…잠깐만. 나 분명 눈을 감았는데, 여긴 어디지?",
+      "id": 1009
+    },
+    {
+      "type": "background",
+      "name": "꿈속",
+      "transition": {
+        "type": "fadeBlack",
+        "duration": 900
+      },
+      "id": 1010
+    },
+    {
+      "type": "character in",
+      "name": "파미니",
+      "emotion": "Normal",
+      "id": 1005
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "드디어 연결됐다! 안녕, OO. 여기는 네 꿈속이야.",
+      "id": 32
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "꿈속…? 그리고 넌 누구야?",
+      "id": 33
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "나는 도파민. 정확히는 네가 설레고, 집중하고, 가끔은 쓸데없이 각성하는 그 흐름을 관리하는 존재지.",
+      "id": 34
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "내 도파민이… 말도 해?",
+      "id": 35
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "오늘은 특별히 비상 호출이야. 밤샘 과제, 카페인, 세 시간짜리 쇼츠 콤보로 네 뇌가 꽤 흔들렸거든.",
+      "id": 36
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "그거… 부정할 수가 없네.",
+      "id": 37
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "앞으로 너는 매일 밤 이 꿈속으로 오게 될 거야. 여기서 네 도파민 상태가 미니게임으로 정해지고, 그 수치가 다음 날의 행동에 영향을 줄 거야.",
+      "id": 38
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "다음 날의 행동이라면… 내가 말하거나 움직이는 방식도 달라진다는 뜻이야?",
+      "id": 1011
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "맞아. 너무 낮으면 기운이 빠져서 타이밍을 놓치고, 너무 높으면 감정이 앞서서 실수할 수 있어.",
+      "id": 1012
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "가장 좋은 건 적당히 설레고, 적당히 차분한 상태. 대략 50에서 80 사이를 기억해 둬.",
+      "id": 1013
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "그러니까 지금부터… 내 마음 상태를 직접 조절해보라는 거네.",
+      "id": 1014
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "정답. 내일은 첫 동아리 OT잖아. 무기력하게 굳어버리거나, 과하게 들떠서 폭주하지 않게 균형을 맞춰보자.",
+      "id": 1015
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "자, 첫 번째 밤의 도파민 조절을 시작할게.",
+      "id": 1016
+    },
+    {
+      "type": "clear characters",
+      "id": 1006
+    },
+    {
+      "type": "clear background",
+      "id": 39
+    },
+    {
+      "type": "move",
+      "next": "MINIGAME",
+      "minigame": "brickBreaker",
+      "after": "EP2 동아리 OT",
+      "id": 40,
+      "options": {
+        "maxTurns": 8,
+        "tutorial": [
+          "여기는 꿈속 도파민 훈련장이야. 공을 조준해서 클릭하면 발사돼.",
+          "목표는 도파민을 무조건 많이 올리는 게 아니야. 50에서 80 사이를 노려봐.",
+          "아이템과 블록 효과를 보면서 짧게 버티면 돼. 준비됐으면 시작하자!"
+        ]
+      }
+    }
+  ],
+  "EP2 동아리 OT": [
+    {
+      "type": "scene reset",
+      "id": 1
+    },
+    {
+      "type": "background",
+      "name": "동아리방",
+      "transition": "fadeBlack",
+      "id": 2
+    },
+    {
+      "type": "sound",
+      "soundType": "bgm",
+      "action": "play",
+      "name": "ep25",
+      "id": 3
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(으악 아직도 정신을 못 차리겠네… 실수하지 않게 조심해야겠다..)",
+      "condition": {
+        "dopamineMin": 81
+      },
+      "id": 4
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(휴… 다행히 짧게라도 푹 잤다… 오늘 예감이 좋은데?)",
+      "condition": {
+        "dopamineMin": 51,
+        "dopamineMax": 80
+      },
+      "id": 5
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(하암… 영 집중이 잘 안 된다. 온몸에 기운이 하나도 없네. 대충 구석에 박혀 있다 가야지… )",
+      "condition": {
+        "dopamineMax": 50
+      },
+      "id": 6
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(그나저나 동아리는 처음이라 엄청 긴장되네…)",
+      "id": 7
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(다들 벌써 친해진 것 같고. 난 어디 앉지?)",
+      "id": 8
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Happy",
+      "id": 9
+    },
+    {
+      "type": "dialogue",
+      "speaker": "나레이션",
+      "text": "(수진이 저 끝에 앉아있다.)",
+      "effects": {
+        "dopamine": 5
+      },
+      "id": 10
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "어? 설마 어제 편의점에서 만난...?",
+      "id": 11
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Normal",
+      "id": 12
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "?",
+      "id": 13
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "(운명인가?)",
+      "id": 14
+    },
+    {
+      "type": "choice",
+      "prompt": "(운명인가?)",
+      "choices": [
+        {
+          "text": "(수진의 옆자리에 앉는다)",
+          "follow": [],
+          "effects": {
+            "dopamine": 7
+          },
+          "sound": {
+            "soundType": "effect",
+            "action": "play",
+            "name": "chair"
+          },
+          "nextNode": 16
+        },
+        {
+          "text": "(수진의 뒷자리에 앉는다)",
+          "follow": [],
+          "effects": {
+            "dopamine": 3
+          },
+          "sound": {
+            "soundType": "effect",
+            "action": "play",
+            "name": "chair"
+          },
+          "nextNode": 16
+        }
+      ],
+      "id": 15
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Happy",
+      "id": 16
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "안녕하세요!",
+      "id": 17
+    },
+    {
+      "type": "choice",
+      "prompt": "안녕하세요!",
+      "choices": [
+        {
+          "text": "(당연히 기억 못하겠지) 안녕하세요~ 건축학과 000입니다",
+          "follow": [],
+          "nextNode": 19
+        },
+        {
+          "text": "그때 혹시 편의점… 기억하세요?",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "앗…저희가 뵌 적이 있을까요?"
+            },
+            {
+              "speaker": "주인공",
+              "text": "아하… 하긴 손님이 많으니…"
+            },
+            {
+              "speaker": "주인공",
+              "text": "하하 저는 건축학과 000입니다."
+            }
+          ],
+          "effects": {
+            "dopamine": 7
+          },
+          "nextNode": 19
+        }
+      ],
+      "id": 18
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Happy",
+      "id": 19
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "저는 피아노과 윤수진이에요. 무대제작부로 지원했어요!",
+      "id": 20
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(헉 나도 무대제작부인데… 이런 우연이!!)",
+      "id": 21
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "오 저도 무대제작부에요!",
+      "id": 22
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Happy",
+      "id": 23
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "건축학과시면 무대 제작 잘하시겠다!",
+      "id": 24
+    },
+    {
+      "type": "choice",
+      "prompt": "건축학과시면 무대 제작 잘하시겠다!",
+      "choices": [
+        {
+          "text": "아니에요. 직접 해본 적은 없어요ㅎㅎ",
+          "follow": [],
+          "nextNode": 26
+        },
+        {
+          "text": "무대 만드는 건 처음이에요…",
+          "follow": [],
+          "nextNode": 26
+        }
+      ],
+      "id": 25
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Happy",
+      "id": 26
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "(싱긋 웃으며) 그래도 든든하다. 앞으로 잘 해봐요!",
+      "id": 27
+    },
+    {
+      "type": "sound",
+      "soundType": "effect",
+      "action": "play",
+      "name": "crowd",
+      "id": 28
+    },
+    {
+      "type": "dialogue",
+      "speaker": "나레이션",
+      "text": "(시끄러운 소리가 들린다)",
+      "id": 29
+    },
+    {
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Happy",
+      "id": 30
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "야, 황건호! 여기 무대부 신입들은 벌써 도란도란 친해진 거 같은데?",
+      "id": 31
+    },
+    {
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Happy",
+      "id": 32
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "안녕하세요! 저는 연기부 신입 1학년 김혜지에요! 우리 다 동기 맞지?",
+      "id": 33
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Happy",
+      "id": 34
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "어, 윤수진! 너 아까 음료수 사러 간다더니 여기 있었어?",
+      "id": 35
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Happy",
+      "id": 36
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "안녕, 나도 이번에 무대부 신입으로 들어왔어. 잘 부탁해!",
+      "id": 37
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Surprised",
+      "id": 38
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "아, 깜짝이야! 건호 너 언제 왔어?",
+      "id": 39
+    },
+    {
+      "type": "choice",
+      "prompt": "아, 깜짝이야! 건호 너 언제 왔어?",
+      "choices": [
+        {
+          "text": "두 분은 원래 아는 사이에요?",
+          "follow": [],
+          "nextNode": 41
+        },
+        {
+          "text": "수진 씨는 친구가 많네요…",
+          "follow": [],
+          "nextNode": 41
+        }
+      ],
+      "id": 40
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Normal",
+      "id": 41
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "건호는 제 고등학교 동창인데 어쩌다보니 동아리도 같이 들어왔어요.",
+      "id": 42
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Happy",
+      "id": 43
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "건호야, 이쪽은 건축학과 OO님이야.",
+      "id": 44
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Surprised",
+      "id": 45
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "오, 건축학과! 대박이다.",
+      "id": 46
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Happy",
+      "id": 47
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "난 몸 쓰는 거 말곤 젬병인데 도면 같은 건 OO이 네가 다 짜주는 거지? 든든하다 야!",
+      "id": 48
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(고등학교 동창? 되게 편해 보이네. 신경 쓰이게…)",
+      "id": 49
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Normal",
+      "id": 50
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "OO님, 건호 얘 운동하는 애라 목소리만 크지 착해요.",
+      "id": 51
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Normal",
+      "id": 52
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "너무 부담 갖지 마요, 알았죠?",
+      "id": 53
+    },
+    {
+      "type": "choice",
+      "prompt": "너무 부담 갖지 마요, 알았죠?",
+      "choices": [
+        {
+          "text": "활발하시고 좋네요.... (피곤하다)",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "하하, 맞아요. 건호가 원래 저래요."
+            }
+          ],
+          "condition": {
+            "dopamineMax": 50
+          },
+          "nextNode": 55
+        },
+        {
+          "text": "네.... 에너지가 조금 많이 넘치시네요....",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "OO씨 기 빨렸죠?"
+            },
+            {
+              "speaker": "수진",
+              "text": "저도 가끔 그래요."
+            },
+            {
+              "speaker": "건호",
+              "text": "야! 내가 무슨 발전기냐?"
+            }
+          ],
+          "condition": {
+            "dopamineMax": 50
+          },
+          "nextNode": 55
+        },
+        {
+          "text": "걱정 마세요ㅎㅎ",
+          "follow": [],
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "nextNode": 55
+        },
+        {
+          "text": "네, 저희 다같이 잘 지내봐요~",
+          "follow": [],
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "nextNode": 55
+        },
+        {
+          "text": "두 분 되게 친해 보이시네요?!!?",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "아, 워낙 오래 알아서 그런가봐요..ㅎㅎ"
+            }
+          ],
+          "condition": {
+            "dopamineMin": 81
+          },
+          "nextNode": 55
+        },
+        {
+          "text": "전 또 남자친구인 줄 알았네요.",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "네???"
+            },
+            {
+              "speaker": "수진",
+              "text": "쟤랑요?"
+            },
+            {
+              "speaker": "건호",
+              "text": "야, 왜 그렇게 놀라는데!"
+            },
+            {
+              "speaker": "수진",
+              "text": "아무튼 아니에요. 진짜 아니에요."
+            }
+          ],
+          "condition": {
+            "dopamineMin": 81
+          },
+          "nextNode": 55
+        }
+      ],
+      "id": 54
+    },
+    {
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Normal",
+      "id": 55
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "암튼! 이렇게 만난 것도 인연인데! 앞으로 동아리 잘 해보자~",
+      "id": 56
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Happy",
+      "id": 57
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "그래! 기대된다 ㅎㅎ",
+      "id": 58
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(수진씨… 예쁘다)",
+      "id": 59
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Happy",
+      "id": 60
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(…내 첫사랑, 정말로 시작되는 건가?)",
+      "id": 61
+    },
+    {
+      "type": "clear background",
+      "id": 62
+    },
+    {
+      "type": "move",
+      "next": "MINIGAME",
+      "minigame": "sideShooter",
+      "after": "EP3 동아리 MT",
+      "id": 63,
+      "options": {
+        "difficulty": 1,
+        "durationSeconds": 75,
+        "tutorial": [
+          "이번엔 뉴럴 슈터야. 네 기체는 왼쪽에서 시작하고, 오른쪽에서 밀려오는 생각들을 버티면 돼.",
+          "방향키나 WASD로 움직여. 위아래로 피하고, 너무 몰리면 앞뒤로도 살짝 움직일 수 있어.",
+          "Space나 왼쪽 클릭으로 공격해. 적을 쓰러뜨리면 도파민이 조금 오르고, 가끔 캡슐이 떨어져.",
+          "노란 P 캡슐은 파워 단계야. 모은 뒤 Shift, X, 또는 오른쪽 클릭을 누르면 현재 단계의 강화가 켜져.",
+          "초록 - 캡슐은 도파민을 낮추고, 분홍 + 캡슐은 도파민을 올려. 초록색 원형 게이트는 도파민을 안정 구간 쪽으로 당겨줘.",
+          "도파민이 90 이상으로 오래 유지되면 과열로 끝나고, 맞으면 라이프가 줄면서 도파민이 10 올라. 무리해서 들이받지는 마.",
+          "목표는 제한 시간 동안 살아남으면서 도파민을 50에서 80 사이에 가깝게 맞추는 거야. 이제 짧게 해보자!"
+        ]
+      }
+    }
+  ],
+  "EP3 동아리 MT": [
+    {
+      "type": "scene reset",
+      "id": 1
+    },
+    {
+      "type": "background",
+      "name": "(CG) 동아리방에 둘러앉은 넷",
+      "transition": "fadeBlack",
+      "id": 2
+    },
+    {
+      "type": "clear characters",
+      "id": 3
+    },
+    {
+      "type": "sound",
+      "soundType": "bgm",
+      "action": "play",
+      "name": "ep36",
+      "id": 4
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "너네 톡방에 공지 올라온 거 봤어?",
+      "id": 5
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "어떤 공지?",
+      "id": 6
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "지금 봐봐! 방금 올라왔어.",
+      "id": 7
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "오! MT 있구나 우리.",
+      "id": 8
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "와 재밌겠다! 갈 거지 너네 다?",
+      "id": 9
+    },
+    {
+      "type": "choice",
+      "prompt": "와 재밌겠다! 갈 거지 너네 다?",
+      "choices": [
+        {
+          "text": "난 수진이 가면 갈거야.",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "ㅋㅋㅋ 그래 우리 그럼 같이 가자."
+            }
+          ],
+          "effects": {
+            "dopamine": 7
+          },
+          "nextNode": 11
+        },
+        {
+          "text": "당연히 가야지! 수진아 너도 가자.",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "좋아좋아!"
+            }
+          ],
+          "effects": {
+            "dopamine": 3
+          },
+          "nextNode": 11
+        }
+      ],
+      "id": 10
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "근데 수진이 너 술 잘 못 먹지 않나?",
+      "id": 11
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "음.. 약간?",
+      "id": 12
+    },
+    {
+      "type": "choice",
+      "prompt": "음.. 약간?",
+      "choices": [
+        {
+          "text": "MT 가서도 적당히만 마시고 우리끼리 놀면 되지 뭐.",
+          "follow": [],
+          "effects": {
+            "dopamine": 3
+          },
+          "nextNode": 14
+        },
+        {
+          "text": "에이 그래도 MT인데, 술게임도 하고 그래야 재밌지.",
+          "follow": [
+            {
+              "speaker": "건호",
+              "text": "술게임 싫어하는 사람들도 있잖아. 자기 스타일대로 즐기는 거지."
+            }
+          ],
+          "effects": {
+            "dopamine": 7
+          },
+          "nextNode": 14
+        }
+      ],
+      "id": 13
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "나 그래도 마시려면 마실 수 있으니까 괜찮아.",
+      "id": 14
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "그래도 놀다가 힘들면 나한테 얘기해ㅋㅋ",
+      "effects": {
+        "dopamine": 5
+      },
+      "id": 15
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "ㅎㅎ그래 고마워.",
+      "id": 16
+    },
+    {
+      "type": "background",
+      "name": "(CG) MT 장소에 둘러앉은 넷",
+      "transition": "fadeBlack",
+      "id": 17
+    },
+    {
+      "type": "clear characters",
+      "id": 18
+    },
+    {
+      "type": "sound",
+      "soundType": "effect",
+      "action": "play",
+      "name": "crowd",
+      "id": 19
+    },
+    {
+      "type": "dialogue",
+      "speaker": "모두",
+      "text": "건호가 좋아하는 랜덤 게임! 랜덤 게임! 게임 스타트!",
+      "id": 20
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "아이엠그라운드 지금부터 시작! 수진 넷!",
+      "id": 21
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "?! 아악 집중 안 하고 있었어!",
+      "id": 22
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "와 수진이 걸렸다!",
+      "id": 23
+    },
+    {
+      "type": "background",
+      "name": "소주병을 향해 뻗는 수진의 손",
+      "transition": {
+        "type": "fadeSlide",
+        "duration": 700,
+        "direction": "right"
+      },
+      "id": 1001
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "아씨 또 걸렸네ㅜ (잔을 집어든다)",
+      "id": 24
+    },
+    {
       "type": "choice",
       "prompt": "아씨 또 걸렸네ㅜ (잔을 집어든다)",
       "choices": [
         {
-          "text": "ㅋㅋㅋ수진아 오늘 왜 그래!",
-          "nextNode": 17,
-          "follow": []
+          "text": "수진아 집중했어야지!",
+          "follow": [],
+          "nextNode": 1002
         },
         {
-          "text": "ㅋㅋㅋ수진아 괜찮겠어?",
-          "nextNode": 17,
-          "follow": []
+          "text": "수진아 너 괜찮아?",
+          "follow": [],
+          "nextNode": 1002
         }
-      ]
+      ],
+      "id": 25
     },
     {
-      "id": 17,
       "type": "background",
       "name": "소주병을 향해 뻗는 수진의 손을 잡는 건호의 손",
       "transition": {
         "type": "fadeSlide",
         "duration": 700,
         "direction": "right"
-      }
+      },
+      "id": 1002
     },
     {
-      "id": 18,
       "type": "dialogue",
       "speaker": "건호",
       "text": "(잔을 낚아채며) 야야 오늘 수진이 많이 마셨다, 좀 쉬어. (대신 마신다)",
       "effects": {
-        "dopamine": 3
-      }
+        "dopamine": 5
+      },
+      "id": 26
     },
     {
-      "id": 19,
       "type": "background",
       "name": "MT 장소",
       "transition": {
         "type": "fadeSlide",
         "duration": 700,
         "direction": "right"
-      }
+      },
+      "id": 1003
     },
     {
-      "type": "character in",
-      "name": "수진",
-      "emotion": "hopeful",
-      "id": 20
-    },
-    {
-      "type": "character in",
-      "name": "건호",
-      "emotion": "default",
-      "id": 21
-    },
-    {
-      "id": 22,
-      "type": "character in",
-      "name": "혜지",
-      "emotion": "Surprised"
-    },
-    {
-      "id": 23,
       "type": "dialogue",
       "speaker": "혜지",
-      "text": "오오 황건호 흑기사 뭐야?"
+      "text": "오오 황건호 흑기사 뭐야?",
+      "id": 27
     },
     {
-      "id": 24,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Flustered"
-    },
-    {
-      "id": 25,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "(건호의 어깨를 툭 치며) 아 뭘 그렇게까지ㅎ 고마워!"
+      "text": "(건호의 어깨를 툭 치며) 아 뭘 그렇게까지ㅎ 고마워!",
+      "id": 28
     },
     {
-      "id": 26,
       "type": "dialogue",
       "speaker": "독백",
-      "text": "수진이는 건호가 많이 편해보인다. 건호도 수진이를 잘 챙겨준다..",
+      "text": "(수진이는 건호가 많이 편해보인다. 건호도 수진이를 잘 챙겨준다..)",
       "effects": {
         "dopamine": -5
-      }
+      },
+      "id": 29
     },
     {
-      "id": 27,
-      "type": "character in",
-      "name": "건호",
-      "emotion": "Normal"
-    },
-    {
-      "id": 28,
       "type": "dialogue",
       "speaker": "건호",
-      "text": "술 더 가져올게. 소주?맥주?"
+      "text": "술 더 가져올게. 소주?맥주?",
+      "id": 30
     },
     {
-      "id": 29,
-      "type": "character in",
-      "name": "혜지",
-      "emotion": "Normal"
-    },
-    {
-      "id": 30,
       "type": "dialogue",
       "speaker": "혜지",
-      "text": "맥주! 야 그럼 나도 잠깐 화장실."
+      "text": "맥주! 야 그럼 나도 잠깐 화장실.",
+      "id": 31
     },
     {
-      "id": 31,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Happy"
-    },
-    {
-      "id": 32,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "아 MT 재밌다! 건호랑 혜지 진짜 재밌다, 그지 OO아?"
+      "text": "아 MT 재밌다! 건호랑 혜지 진짜 재밌다, 그지 OO아?",
+      "id": 32
     },
     {
-      "id": 33,
       "type": "choice",
       "prompt": "아 MT 재밌다! 건호랑 혜지 진짜 재밌다, 그지 OO아?",
       "choices": [
         {
-          "text": "응..ㅎ 좋네.",
-          "condition": {
-            "dopamineMax": 50
-          },
+          "text": "응..ㅎ 좋네",
           "follow": [
             {
               "speaker": "수진",
               "text": "ㅋㅋㅋ OO아 힘들어? 왤케 피곤해보여ㅜ"
+            },
+            {
+              "speaker": "주인공",
+              "text": "아 그냥 오늘 하루종일 놀아서ㅎ"
+            },
+            {
+              "speaker": "수진",
+              "text": "하긴 오늘 계속 사람 많은 데서 있어서 기빨렸을 수도 있겠다."
+            },
+            {
+              "speaker": "수진",
+              "text": "우리 나중에 그럼 넷이서만 한 번 만나서 놀자 어때?"
+            },
+            {
+              "speaker": "주인공",
+              "text": "오 좋아!",
+              "effects": {
+                "affection": 7
+              }
             }
           ],
-          "nextNode": 34
-        },
-        {
-          "text": "응 그니까 넷이 노니까 재밌다ㅎㅎ \n우리 아예 MT 끝나고 넷이 한번 모여서 놀래? 어때?",
           "condition": {
             "dopamineMax": 50
           },
-          "effects": {
-            "affection": 15
-          },
+          "nextNode": 34
+        },
+        {
+          "text": "응? 뭐라고?",
           "follow": [
             {
               "speaker": "수진",
-              "text": "오 완전 좋다! 건호랑 혜지 들어오면 얘기해보자."
+              "text": "아, 넷이 노니까 너무 재밌다구."
+            },
+            {
+              "speaker": "수진",
+              "text": "우리 MT 끝나고도 한 번 만나서 놀자 어때?"
+            },
+            {
+              "speaker": "주인공",
+              "text": "오 그래!",
+              "effects": {
+                "affection": 3
+              }
             }
           ],
-          "nextNode": 35
+          "condition": {
+            "dopamineMax": 50
+          },
+          "nextNode": 36
         },
         {
-          "text": "응 그니까 넷이 노니까 재밌다ㅎㅎ \n우리 아예 MT 끝나고 넷이 한번 모여서 놀래? 어때?",
+          "text": "응 그니까 넷이 노니까 재밌다ㅎㅎ",
+          "follow": [
+            {
+              "speaker": "주인공",
+              "text": "우리 아예 MT 끝나고 넷이 만나서 놀래?",
+              "effects": {
+                "affection": 15
+              }
+            },
+            {
+              "speaker": "수진",
+              "text": "오 완전 좋아! 건호랑 혜지 들어오면 얘기해보자."
+            }
+          ],
           "condition": {
-            "dopamineMin": 51
+            "dopamineMin": 51,
+            "dopamineMax": 80
           },
-          "effects": {
-            "affection": 15
-          },
+          "nextNode": 38
+        },
+        {
+          "text": "그러게, 몇십명이 다 같이 놀다가 이렇게 우리끼리니까 좋다ㅎ",
           "follow": [
             {
               "speaker": "수진",
-              "text": "오 완전 좋다! 건호랑 혜지 들어오면 얘기해보자."
+              "text": "ㅋㅋㅋ그니까 난 여기가 제일 부담없고 좋은 거 같아."
+            },
+            {
+              "speaker": "주인공",
+              "text": "나도 동아리에서 네가 제일 편해."
+            },
+            {
+              "speaker": "수진",
+              "text": "와 나도!"
+            },
+            {
+              "speaker": "주인공",
+              "text": "우리 그럼 MT 끝나고 나중에 둘이 한 번 만나서 놀까?",
+              "effects": {
+                "affection": 20
+              }
+            },
+            {
+              "speaker": "수진",
+              "text": "너무 좋지!"
             }
           ],
-          "nextNode": 37
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "nextNode": 40
         },
         {
-          "text": "그러게 재밌다ㅎㅎ 근데 수진아, 우리 MT 끝나고 한번 만나서 놀지 않을래?",
-          "condition": {
-            "dopamineMin": 51
-          },
+          "text": "그러게ㅎㅎ 근데 수진아, 우리 MT 끝나고 따로 한 번 또 놀자.",
           "follow": [
             {
               "speaker": "수진",
@@ -769,7 +1342,7 @@ const EPISODES = {
               "speaker": "주인공",
               "text": "아니 그냥 너랑 나랑.",
               "effects": {
-                "affection": 20
+                "affection": 10
               }
             },
             {
@@ -777,623 +1350,1115 @@ const EPISODES = {
               "text": "오? 그래 좋아!"
             }
           ],
-          "nextNode": 41
-        }
-      ]
-    },
-    {
-      "id": 34,
-      "type": "choice",
-      "prompt": "ㅋㅋㅋ OO아 힘들어? 왤케 피곤해보여ㅜ",
-      "choices": [
-        {
-          "text": "아 아니야ㅎ",
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "하긴 오늘 계속 사람 많은 데서 있어서 기빨렸을 수도 있겠다."
-            },
-            {
-              "speaker": "수진",
-              "text": "우리 나중에 그럼 넷이서 약속 한 번 잡아서 놀자 어때?"
-            },
-            {
-              "speaker": "주인공",
-              "text": "오 좋다!",
-              "effects": {
-                "affection": 5
-              }
-            }
-          ],
-          "nextNode": 39
+          "condition": {
+            "dopamineMin": 81
+          },
+          "nextNode": 42
         },
         {
-          "text": "아 그냥 오늘 하루종일 놀아서ㅎ",
+          "text": "건호랑 혜지? 근데 솔직히 난 건호 좀 오버스러운 거 같긴 해.",
           "follow": [
             {
               "speaker": "수진",
-              "text": "하긴 오늘 계속 사람 많은 데서 있어서 기빨렸을 수도 있겠다."
-            },
-            {
-              "speaker": "수진",
-              "text": "우리 나중에 그럼 넷이서 약속 한 번 잡아서 놀자 어때?"
+              "text": "아 진짜?"
             },
             {
               "speaker": "주인공",
-              "text": "오 좋다!",
+              "text": "응ㅋㅋ 우리 나중에 둘이서 한 번 놀자."
+            },
+            {
+              "speaker": "수진",
+              "text": "오 그것도 좋지!"
+            },
+            {
+              "speaker": "주인공",
+              "text": "MT 끝나고 내가 연락 한 번 할게! 약속 잡자.",
               "effects": {
-                "affection": 5
+                "affection": 10
               }
+            },
+            {
+              "speaker": "수진",
+              "text": "그래 좋아!"
             }
           ],
-          "nextNode": 39
+          "condition": {
+            "dopamineMin": 81
+          },
+          "effects": {
+            "affection": -5
+          },
+          "nextNode": 44
         }
-      ]
+      ],
+      "id": 33
     },
     {
       "type": "clear background",
-      "id": 35
+      "id": 34
     },
     {
       "type": "move",
       "next": "MINIGAME",
       "minigame": "brickBreaker",
       "after": "EP4-A 넷이",
+      "id": 35,
+      "options": {
+        "maxTurns": 10
+      }
+    },
+    {
+      "type": "clear background",
       "id": 36
     },
     {
-      "type": "clear background",
-      "id": 37
-    },
-    {
       "type": "move",
       "next": "MINIGAME",
       "minigame": "brickBreaker",
       "after": "EP4-A 넷이",
+      "id": 37,
+      "options": {
+        "maxTurns": 10
+      }
+    },
+    {
+      "type": "clear background",
       "id": 38
     },
     {
-      "type": "clear background",
-      "id": 39
-    },
-    {
       "type": "move",
       "next": "MINIGAME",
       "minigame": "brickBreaker",
       "after": "EP4-A 넷이",
-      "id": 40
+      "id": 39,
+      "options": {
+        "maxTurns": 10
+      }
     },
     {
       "type": "clear background",
-      "id": 41
+      "id": 40
     },
     {
       "type": "move",
       "next": "MINIGAME",
       "minigame": "brickBreaker",
       "after": "EP4-B 둘이",
+      "id": 41,
+      "options": {
+        "maxTurns": 10
+      }
+    },
+    {
+      "type": "clear background",
       "id": 42
+    },
+    {
+      "type": "move",
+      "next": "MINIGAME",
+      "minigame": "brickBreaker",
+      "after": "EP4-B 둘이",
+      "id": 43,
+      "options": {
+        "maxTurns": 10
+      }
+    },
+    {
+      "type": "clear background",
+      "id": 44
+    },
+    {
+      "type": "move",
+      "next": "MINIGAME",
+      "minigame": "brickBreaker",
+      "after": "EP4-B 둘이",
+      "id": 45,
+      "options": {
+        "maxTurns": 10
+      }
     }
   ],
   "EP4-A 넷이": [
     {
-      "id": 1,
-      "type": "scene reset"
+      "type": "scene reset",
+      "id": 1
     },
     {
-      "id": 2,
       "type": "background",
-      "name": "공포방탈출 입구",
-      "transition": "fadeBlack"
+      "name": "카톡방 화면",
+      "transition": "fadeBlack",
+      "id": 2
     },
     {
-      "id": 3,
       "type": "sound",
       "soundType": "bgm",
       "action": "play",
-      "name": "BGM 시작"
+      "name": "ep14",
+      "id": 3
     },
     {
-      "id": 4,
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "다음주 금요일에 그래서 뭐하고 놀아 우리?",
+      "id": 4
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Normal",
+      "id": 5
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "방탈출 하자! 추천받은 곳 있어.",
+      "id": 6
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Normal",
+      "id": 7
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "오 어딘데?",
+      "id": 8
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Normal",
+      "id": 9
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "○○이스케이프에 XX테마가 진짜 잘 만들었대.",
+      "id": 10
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "오 네 명이면 방탈출 딱 좋다.",
+      "id": 11
+    },
+    {
       "type": "character in",
       "name": "혜지",
-      "emotion": "Frightened"
+      "emotion": "Flustered",
+      "id": 12
     },
     {
-      "id": 5,
       "type": "dialogue",
       "speaker": "혜지",
-      "text": "와 여기 분위기 미쳤다.."
+      "text": "야 근데 여기 공포방탈출 같은데?",
+      "id": 13
     },
     {
-      "id": 6,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "생각보다 무서운데...?"
-    },
-    {
-      "id": 7,
       "type": "character in",
       "name": "수진",
-      "emotion": "Frightened"
+      "emotion": "Flustered",
+      "id": 14
     },
     {
-      "id": 8,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "야 벌써부터 무서운데 어떡해... 내가 다른 테마 가자고 했잖아!"
+      "text": "엥 진짜??",
+      "id": 15
     },
     {
-      "id": 9,
       "type": "character in",
       "name": "건호",
-      "emotion": "Normal"
+      "emotion": "Normal",
+      "id": 16
     },
     {
-      "id": 10,
       "type": "dialogue",
       "speaker": "건호",
-      "text": "에이~ 방탈출 와서 안 무서우면 재미없지. 걱정 마. 내가 다 풀어줄게."
+      "text": "아 맞아 좀 무서운 게 들어있다고 하긴 했어.",
+      "id": 17
     },
     {
-      "id": 11,
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Frightened",
+      "id": 18
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "나 공포방탈출은 싫어..",
+      "id": 19
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Normal",
+      "id": 20
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "아냐 근데 공포영화 못 보는 내 친구도 해봤는데 괜찮았대.",
+      "id": 21
+    },
+    {
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Normal",
+      "id": 22
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "아 진짜? 그럼 나쁘지 않겠다 뭐.",
+      "id": 23
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Flustered",
+      "id": 24
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "그런가...?",
+      "id": 25
+    },
+    {
+      "type": "choice",
+      "prompt": "그런가...?",
+      "choices": [
+        {
+          "text": "그래도 수진이 불안한데 그냥 일반 테마로 찾아보는 건 어때?",
+          "follow": [
+            {
+              "speaker": "건호",
+              "text": "아 근데 여기 지금 딱 금요일 8시에 자리도 비어서 완벽한데.."
+            },
+            {
+              "speaker": "혜지",
+              "text": "그래 한 번 공포테마 해보자 수진아!"
+            },
+            {
+              "speaker": "수진",
+              "text": "흠... 그래 알겠어.."
+            }
+          ],
+          "effects": {
+            "dopamine": 3
+          },
+          "nextNode": 27
+        },
+        {
+          "text": "그래 이렇게 같이 할 때 공포 테마도 한 번 해보자 수진아.",
+          "follow": [
+            {
+              "speaker": "건호",
+              "text": "충분히 할 만할 거야 진짜로."
+            },
+            {
+              "speaker": "수진",
+              "text": "ㅜ알겠어.. 심장 터지면 너네 책임이야."
+            }
+          ],
+          "effects": {
+            "dopamine": 7
+          },
+          "nextNode": 27
+        }
+      ],
+      "id": 26
+    },
+    {
       "type": "background",
-      "name": "공포방탈출 내부",
-      "transition": "fadeBlack"
+      "name": "공포방탈출 입구",
+      "transition": "fadeBlack",
+      "id": 27
     },
     {
-      "id": 12,
       "type": "sound",
       "soundType": "bgm",
       "action": "play",
-      "name": "공포테마 음악 시작"
+      "name": "escapeRoom",
+      "id": 28
     },
     {
-      "id": 13,
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Flustered",
+      "id": 29
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "와 여기 분위기 미쳤다..",
+      "id": 30
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(생각보다 무서운데...?)",
+      "id": 31
+    },
+    {
       "type": "character in",
       "name": "수진",
-      "emotion": "Frightened"
+      "emotion": "Frightened",
+      "id": 32
     },
     {
-      "id": 14,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "끄악! 건호야 뭐하는 거야!"
+      "text": "야 벌써부터 무서운데 어떡해... 내가 다른 테마 가자고 했잖아!",
+      "id": 33
     },
     {
-      "id": 15,
       "type": "character in",
       "name": "건호",
-      "emotion": "Focused"
+      "emotion": "Normal",
+      "id": 34
     },
     {
-      "id": 16,
       "type": "dialogue",
       "speaker": "건호",
-      "text": "잠깐만 있어봐 여기 아래 보면 뭐가 있는 거 같단 말야… 찾았다!"
+      "text": "에이~ 방탈출 와서 안 무서우면 재미없지. 걱정 마. 내가 다 풀어줄게.",
+      "id": 35
     },
     {
-      "id": 17,
+      "type": "dialogue",
+      "speaker": "직원",
+      "text": "오늘 8시 예약하신 네 분 맞으실까요?",
+      "id": 36
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Focused",
+      "id": 37
+    },
+    {
       "type": "dialogue",
       "speaker": "건호",
-      "text": "(발견한 버튼을 누른다)"
+      "text": "넵 맞습니다!",
+      "id": 38
     },
     {
-      "id": 18,
+      "type": "dialogue",
+      "speaker": "직원",
+      "text": "안쪽으로 안내 도와드릴게요.",
+      "id": 39
+    },
+    {
+      "type": "dialogue",
+      "speaker": "직원",
+      "text": "아시다시피 저희 테마는 공포 테마여서 갑작스럽게 \n조명이 꺼지거나 큰 소리가 날 수 있다는 점 숙지하시고요,",
+      "effects": {
+        "dopamine": 3
+      },
+      "id": 40
+    },
+    {
+      "type": "dialogue",
+      "speaker": "직원",
+      "text": "예상하지 못한 곳에서 사물이 튀어나오거나 떨어질 수도 있으니 유의하시기 바랍니다.",
+      "effects": {
+        "dopamine": 3
+      },
+      "id": 41
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Frightened",
+      "id": 42
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "(귓속말로) 어떡해....",
+      "id": 43
+    },
+    {
+      "type": "dialogue",
+      "speaker": "직원",
+      "text": "다들 그러면 준비 되셨을까요?",
+      "id": 44
+    },
+    {
+      "type": "choice",
+      "prompt": "다들 그러면 준비 되셨을까요?",
+      "choices": [
+        {
+          "text": "네..!",
+          "follow": [],
+          "nextNode": 46
+        },
+        {
+          "text": "아니요..!",
+          "follow": [],
+          "nextNode": 46
+        }
+      ],
+      "id": 45
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Happy",
+      "id": 46
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "넵!",
+      "id": 47
+    },
+    {
+      "type": "dialogue",
+      "speaker": "직원",
+      "text": "네, 그러면 모두 눈을 감아주시고 저를 따라오시면 되겠습니다.",
+      "id": 48
+    },
+    {
+      "type": "background",
+      "name": "공포방탈출 내부",
+      "transition": "fadeBlack",
+      "id": 49
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Frightened",
+      "id": 50
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "끄악! 건호야 뭐하는 거야!",
+      "id": 51
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Focused",
+      "id": 52
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "잠깐만 있어봐 여기 아래 보면 뭐가 있는 거 같단 말야… 찾았다!",
+      "id": 53
+    },
+    {
+      "type": "character in",
+      "name": "건호",
+      "emotion": "Focused",
+      "id": 54
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "(발견한 버튼을 누른다)",
+      "id": 55
+    },
+    {
       "type": "background",
       "name": "(CG) 천장에서 귀신이 떨어지는 걸 보고 놀라는 수진",
       "transition": {
         "type": "fadeSlide",
         "duration": 700,
         "direction": "right"
-      }
+      },
+      "id": 56
     },
     {
       "type": "clear characters",
-      "id": 19
+      "id": 57
     },
     {
-      "id": 20,
+      "type": "sound",
+      "soundType": "effect",
+      "action": "play",
+      "name": "horror",
+      "id": 58
+    },
+    {
       "type": "dialogue",
       "speaker": "수진",
-      "text": "으아아악!! (OO의 팔을 붙잡는다)"
+      "text": "으아아악!! (주인공의 팔을 붙잡는다)",
+      "effects": {
+        "dopamine": 5
+      },
+      "id": 59
     },
     {
-      "id": 21,
       "type": "choice",
-      "prompt": "으아아악!! (OO의 팔을 붙잡는다)",
+      "prompt": "으아아악!! (주인공의 팔을 붙잡는다)",
       "choices": [
         {
           "text": "(당황해 거리를 두며) 아이구 깜짝아 너무 무섭잖아 여기..",
-          "condition": {
-            "dopamineMax": 50
-          },
-          "effects": {
-            "affection": -5
-          },
           "follow": [
             {
               "speaker": "수진",
               "text": "아 그러니까ㅜㅜ 빨리 탈출하자."
             }
           ],
-          "nextNode": 22
-        },
-        {
-          "text": "(붙잡아주며) 오 괜찮아? 무서운게 너무 많다 여기.. 혹시 힘들면 얘기해 수진아.",
-          "condition": {
-            "dopamineMax": 50
-          },
-          "effects": {
-            "affection": 20
-          },
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "아냐 그래도 끝까지 해보긴 해야지.. 빨리 풀어서 탈출하자."
-            }
-          ],
-          "nextNode": 22
-        },
-        {
-          "text": "(붙잡아주며) 오 괜찮아? 무서운게 너무 많다 여기.. 혹시 힘들면 얘기해 수진아.",
-          "condition": {
-            "dopamineMin": 51
-          },
-          "effects": {
-            "affection": 20
-          },
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "아냐 그래도 끝까지 해보긴 해야지.. 빨리 풀어서 탈출하자."
-            }
-          ],
-          "nextNode": 22
-        },
-        {
-          "text": "(어깨를 감싸며) 오 괜찮아? 아니 건호가 너무 무서운 데를 찾아왔는데?",
-          "condition": {
-            "dopamineMin": 51
-          },
-          "effects": {
-            "affection": 10
-          },
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "그니까ㅜㅜ 내가 다른 테마 가자고 했잖아 건호야"
-            },
-            {
-              "speaker": "건호",
-              "text": "아 미안 나도 이 정도일 줄은 몰랐지.. 혹시 너무 힘들면 얘기해 수진아"
-            },
-            {
-              "speaker": "수진",
-              "text": "아냐 그래도 끝까지 해보긴 해야지.. 빨리 풀어서 탈출하자."
-            }
-          ],
-          "nextNode": 22
-        }
-      ]
-    },
-    {
-      "id": 22,
-      "type": "background",
-      "name": "공포방탈출 외부",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right",
-        "slideSpeed": 0.7
-      }
-    },
-    {
-      "id": 23,
-      "type": "sound",
-      "soundType": "bgm",
-      "action": "play",
-      "name": "BGM 다시 시작"
-    },
-    {
-      "id": 24,
-      "type": "character in",
-      "name": "혜지",
-      "emotion": "Flustered"
-    },
-    {
-      "id": 25,
-      "type": "dialogue",
-      "speaker": "혜지",
-      "text": "와 진짜 죽는 줄 알았네."
-    },
-    {
-      "id": 26,
-      "type": "character in",
-      "name": "건호",
-      "emotion": "Happy"
-    },
-    {
-      "id": 27,
-      "type": "dialogue",
-      "speaker": "건호",
-      "text": "그래도 재밌지 않았어?"
-    },
-    {
-      "id": 28,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Normal"
-    },
-    {
-      "id": 29,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "너 때문에 수명 줄었어 진짜."
-    },
-    {
-      "id": 30,
-      "type": "character in",
-      "name": "건호",
-      "emotion": "Happy"
-    },
-    {
-      "id": 31,
-      "type": "dialogue",
-      "speaker": "건호",
-      "text": "에이 그래도 마지막 문제 네가 풀었잖아. 수진이 은근 잘해."
-    },
-    {
-      "id": 32,
-      "type": "choice",
-      "prompt": "에이 그래도 마지막 문제 네가 풀었잖아. 수진이 은근 잘해.",
-      "choices": [
-        {
-          "text": "맞아 수진이 아니었으면 우리 탈출 못했어.",
-          "nextNode": 33
-        },
-        {
-          "text": "맞아 그거 진짜 어려운 문제였는데 대단해!",
-          "nextNode": 33
-        }
-      ]
-    },
-    {
-      "id": 33,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Happy"
-    },
-    {
-      "id": 34,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "ㅎ.. 그건 좀 뿌듯하긴 했어."
-    },
-    {
-      "id": 35,
-      "type": "character in",
-      "name": "건호",
-      "emotion": "Happy"
-    },
-    {
-      "id": 36,
-      "type": "dialogue",
-      "speaker": "건호",
-      "text": "(수진의 어깨를 두드린다) 다음에도 또 만나서 놀자 얘들아."
-    },
-    {
-      "id": 37,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "좋아. (건호가 수진이를 대하는 방식이 조금 신경쓰인다)"
-    },
-    {
-      "type": "clear background",
-      "id": 38
-    },
-    {
-      "type": "move",
-      "next": "MINIGAME",
-      "minigame": "sideShooter",
-      "after": "EP5 미팅사건",
-      "id": 39
-    }
-  ],
-  "EP4-B 둘이": [
-    {
-      "id": 1,
-      "type": "scene reset"
-    },
-    {
-      "id": 2,
-      "type": "background",
-      "name": "(CG) 예쁜 파스타집에 있는 주인공과 수진",
-      "transition": "fadeBlack"
-    },
-    {
-      "type": "clear characters",
-      "id": 3
-    },
-    {
-      "id": 4,
-      "type": "sound",
-      "soundType": "bgm",
-      "action": "play",
-      "name": "BGM 시작"
-    },
-    {
-      "id": 5,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "이제 정기공연 얼마 안 남았는데, 기분이 어때?"
-    },
-    {
-      "id": 6,
-      "type": "background",
-      "name": "예쁜 파스타집",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right"
-      }
-    },
-    {
-      "id": 7,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Normal"
-    },
-    {
-      "id": 8,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "사실 걱정이 좀 많아. 항상 무대가 무서워서..ㅎ"
-    },
-    {
-      "id": 9,
-      "type": "choice",
-      "prompt": "사실 걱정이 좀 많아. 항상 무대가 무서워서..ㅎ",
-      "choices": [
-        {
-          "text": "왜? 피아노과면 무대 되게 많이 서지 않아?",
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "그래도 익숙해지지가 않더라고.. 특히 피아노는 틀리면 티가 바로 나잖아.",
-              "effects": {
-                "dopamine": 3
-              }
-            }
-          ],
-          "nextNode": 10
-        },
-        {
-          "text": "에이, 너 공연도 엄청 자주 하고 잘 하잖아!",
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "ㅎㅎ고마워. 그래도.. 피아노는 틀리면 바로 티가 나니까 항상 떨리지.",
-              "effects": {
-                "dopamine": 5
-              }
-            }
-          ],
-          "nextNode": 10
-        }
-      ]
-    },
-    {
-      "id": 10,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "무대 많이 서는 너도 그런 생각 하는구나."
-    },
-    {
-      "id": 11,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Focused"
-    },
-    {
-      "id": 12,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "그래서 항상 공연 앞두면 예민해지고 주변 사람들한테 날카롭게 굴기도 하고.."
-    },
-    {
-      "id": 13,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "네가 피아노도, 연극도 다 진심으로 해서 그래. 그니까 더 잘하고 멋있는거지."
-    },
-    {
-      "id": 14,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Happy"
-    },
-    {
-      "id": 15,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "ㅎㅎ 그런 얘기는 처음 들어보는데. 고마워.",
-      "effects": {
-        "dopamine": 5
-      }
-    },
-    {
-      "id": 16,
-      "type": "background",
-      "name": "(CG) 파스타집을 나와 걸어가는 주인공과 수진",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right",
-        "slideSpeed": 0.7
-      }
-    },
-    {
-      "type": "clear characters",
-      "id": 17
-    },
-    {
-      "id": 18,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "근데 OO아, 나 궁금한 거 있어."
-    },
-    {
-      "id": 19,
-      "type": "background",
-      "name": "길거리",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right",
-        "slideSpeed": 0.7
-      }
-    },
-    {
-      "id": 20,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Normal"
-    },
-    {
-      "id": 21,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "음? 뭔데?"
-    },
-    {
-      "id": 22,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Normal"
-    },
-    {
-      "id": 23,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "오늘 만날 때 왜 건호랑 혜지랑 같이 보는게 아니라 우리 둘이 보자고 한거야?",
-      "effects": {
-        "dopamine": 7
-      }
-    },
-    {
-      "id": 24,
-      "type": "choice",
-      "prompt": "오늘 만날 때 왜 건호랑 혜지랑 같이 보는게 아니라 우리 둘이 보자고 한거야?",
-      "choices": [
-        {
-          "text": "아… 음 그냥 뭐 건호랑 혜지는 바쁜 거 같아서..",
           "condition": {
             "dopamineMax": 50
           },
           "effects": {
             "affection": 5
           },
+          "nextNode": 61
+        },
+        {
+          "text": "(당황해 거리를 두며) 어우 야 너 때문에 더 놀랐잖아",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "아 미안해... 황건호 이거 어떡할 거야!!"
+            },
+            {
+              "speaker": "건호",
+              "text": "그래도 저기 문 열렸잖아! 빨리 탈출하자."
+            }
+          ],
+          "condition": {
+            "dopamineMax": 50
+          },
+          "effects": {
+            "affection": -5
+          },
+          "nextNode": 61
+        },
+        {
+          "text": "(붙잡아주며) 오 괜찮아? 무서운게 너무 많다 여기.. 혹시 힘들면 얘기해 수진아.",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "아냐 그래도 끝까지 해보긴 해야지.. 빨리 풀어서 탈출하자."
+            }
+          ],
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "effects": {
+            "affection": 20
+          },
+          "nextNode": 61
+        },
+        {
+          "text": "(붙잡아주며) 괜찮아? 옆 방까지 비명 소리 들리겠다ㅋㅋ 그래도 저기 문 열렸어!",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "ㅎㅎ고마워.. 빨리 가자."
+            }
+          ],
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "effects": {
+            "affection": 15
+          },
+          "nextNode": 61
+        },
+        {
+          "text": "(어깨를 감싸며) 오 괜찮아? 아니 건호가 너무 무서운 데를 찾아왔는데?",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "그니까ㅜㅜ 내가 다른 테마 가자고 했잖아 건호야."
+            },
+            {
+              "speaker": "건호",
+              "text": "아 미안 나도 이 정도일 줄은 몰랐지.. 혹시 너무 힘들면 얘기해 수진아."
+            },
+            {
+              "speaker": "수진",
+              "text": "아냐 그래도 끝까지 해보긴 해야지.. 빨리 풀어서 탈출하자."
+            }
+          ],
+          "condition": {
+            "dopamineMin": 81
+          },
+          "effects": {
+            "affection": 10
+          },
+          "nextNode": 61
+        },
+        {
+          "text": "(붙잡아주며) 오 야야 저기 문 열렸다! 보여?",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "아 진짜 심장 떨어지는 줄 알았네.."
+            },
+            {
+              "speaker": "건호",
+              "text": "아 미안 나도 저렇게 떨어질 줄은 몰랐네 괜찮아?"
+            },
+            {
+              "speaker": "수진",
+              "text": "응.. 빨리 넘어가자 저쪽으로."
+            }
+          ],
+          "condition": {
+            "dopamineMin": 81
+          },
+          "effects": {
+            "affection": -5
+          },
+          "nextNode": 61
+        }
+      ],
+      "id": 60
+    },
+    {
+      "type": "sound",
+      "soundType": "bgm",
+      "action": "play",
+      "name": "ep14",
+      "id": 61
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "와 진짜 죽는 줄 알았네.",
+      "id": 62
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "그래도 재밌지 않았어?",
+      "id": 63
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "너 때문에 수명 줄었어 진짜",
+      "id": 64
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "에이 그래도 마지막 문제 네가 풀었잖아. 수진이 은근 잘해",
+      "id": 65
+    },
+    {
+      "type": "choice",
+      "prompt": "에이 그래도 마지막 문제 네가 풀었잖아. 수진이 은근 잘해",
+      "choices": [
+        {
+          "text": "맞아 수진이 아니었으면 우리 탈출 못했어",
+          "follow": [],
+          "nextNode": 67
+        },
+        {
+          "text": "맞아 그거 진짜 어려운 문제였는데 대단해!",
+          "follow": [],
+          "nextNode": 67
+        }
+      ],
+      "id": 66
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "ㅎ.. 그건 좀 뿌듯하긴 했어",
+      "id": 67
+    },
+    {
+      "type": "dialogue",
+      "speaker": "건호",
+      "text": "(수진의 어깨를 두드린다) 다음에도 또 만나서 놀자 얘들아",
+      "id": 68
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "좋아!",
+      "id": 69
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(건호가 수진이를 대하는 방식이 조금 신경 쓰인다)",
+      "id": 70
+    },
+    {
+      "type": "clear background",
+      "id": 71
+    },
+    {
+      "type": "move",
+      "next": "MINIGAME",
+      "minigame": "sideShooter",
+      "after": "EP5 미팅사건",
+      "id": 72,
+      "options": {
+        "difficulty": 3,
+        "durationSeconds": 90
+      }
+    }
+  ],
+  "EP4-B 둘이": [
+    {
+      "type": "scene reset",
+      "id": 1
+    },
+    {
+      "type": "background",
+      "name": "카톡방 화면",
+      "transition": "fadeBlack",
+      "id": 2
+    },
+    {
+      "type": "sound",
+      "soundType": "bgm",
+      "action": "play",
+      "name": "ep25",
+      "id": 3
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Normal",
+      "id": 4
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "OO아, 내일 어디서 만날래?",
+      "id": 5
+    },
+    {
+      "type": "choice",
+      "prompt": "OO아, 내일 어디서 만날래?",
+      "choices": [
+        {
+          "text": "그러게, 혹시 뭐 먹고 싶은 거 있어?",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "음.. 다 상관없는데 파스타는 어때?",
+              "effects": {
+                "dopamine": 3
+              }
+            },
+            {
+              "speaker": "주인공",
+              "text": "파스타 좋지! 학교 앞에 ○○음식점이 파스타 맛있다던데 어때?"
+            },
+            {
+              "speaker": "수진",
+              "text": "좋아!"
+            }
+          ],
+          "nextNode": 7
+        },
+        {
+          "text": "너 파스타 좋아한다고 했었지?",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "오 맞아! 내가 말했었나?",
+              "effects": {
+                "dopamine": 7
+              }
+            },
+            {
+              "speaker": "주인공",
+              "text": "전에 한 번 얘기했던 거 같애."
+            },
+            {
+              "speaker": "주인공",
+              "text": "학교 앞에 ○○음식점이 파스타 맛있다던데 어때?"
+            },
+            {
+              "speaker": "수진",
+              "text": "그래 좋아!"
+            }
+          ],
+          "nextNode": 7
+        }
+      ],
+      "id": 6
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "그럼 내일 6시에 거기서 보자!",
+      "id": 7
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Happy",
+      "id": 8
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "그래 내일 봐!",
+      "id": 9
+    },
+    {
+      "type": "background",
+      "name": "(CG) 예쁜 파스타집에 앉은 수진",
+      "transition": "fadeBlack",
+      "id": 10
+    },
+    {
+      "type": "clear characters",
+      "id": 11
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "와 여기 너무 예쁘다! 어떻게 알게 된 데야?",
+      "id": 12
+    },
+    {
+      "type": "choice",
+      "prompt": "와 여기 너무 예쁘다! 어떻게 알게 된 데야?",
+      "choices": [
+        {
+          "text": "친구한테 추천받았어, 분위기도 좋고 맛있다길래.",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "와 기대된다!",
+              "effects": {
+                "dopamine": 3
+              }
+            }
+          ],
+          "nextNode": 14
+        },
+        {
+          "text": "내가 열심히 후기까지 검색해서 찾았지ㅎ",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "오 뭐야ㅋㅋ 완전 잘 찾았다 너.",
+              "effects": {
+                "dopamine": 7
+              }
+            }
+          ],
+          "nextNode": 14
+        }
+      ],
+      "id": 13
+    },
+    {
+      "type": "dialogue",
+      "speaker": "종업원",
+      "text": "주문하신 메뉴 나왔습니다~",
+      "id": 14
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "와 잘 먹겠습니다!",
+      "id": 15
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "맛있겠다!",
+      "id": 16
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "넌 우리 동아리 어떤 거 같아?",
+      "id": 17
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "난 들어오기 너무 잘한 거 같아. 들어와서 건호랑 혜지랑 너도 만나고.",
+      "id": 18
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "나도! 처음에는 낯도 많이 가리고 긴장했었는데ㅎ",
+      "id": 19
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "와 나도.. 내가 새로운 사람 사귀는 게 좀 어색해서.",
+      "id": 20
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "네가? 전혀 아닌 거 같은데?",
+      "id": 21
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "근데 생각해보니 너랑은 좀 빨리 친해진 거 같기는 하다!",
+      "effects": {
+        "dopamine": 5
+      },
+      "id": 22
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "그런거야? 다행이네.",
+      "id": 23
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "근데 어느새 한 학기가 거의 지났다 OO아.",
+      "id": 24
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "그러게.. 처음 만난지 얼마 되지도 않은 거 같은데.",
+      "id": 25
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "이제 정기공연도 얼마 안 남았는데, 기분 어때?",
+      "id": 26
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "나 사실 걱정이 좀 많아..",
+      "id": 27
+    },
+    {
+      "type": "choice",
+      "prompt": "나 사실 걱정이 좀 많아..",
+      "choices": [
+        {
+          "text": "왜? 피아노과면 그래도 무대 경험 많지 않아?",
+          "follow": [],
+          "nextNode": 29
+        },
+        {
+          "text": "에이, 너 공연도 엄청 자주 하고 잘 하잖아!",
+          "follow": [],
+          "nextNode": 29
+        }
+      ],
+      "id": 28
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "피아노도 항상 무대 오르면 떨리는데, 게다가 무대 스태프는 처음이잖아.",
+      "id": 29
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "음 그럴 수 있겠다.",
+      "id": 30
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "무대는 항상 완벽하게 하고 싶은 욕심이 커서 공연 앞두고 맨날 예민해지고..",
+      "id": 31
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "네가 피아노도, 연극도 다 진심으로 해서 그래. 그니까 더 잘하고 멋있는거지.",
+      "id": 32
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "ㅎㅎ 그런 얘기는 처음 들어보는데. 고마워.",
+      "effects": {
+        "dopamine": 5
+      },
+      "id": 33
+    },
+    {
+      "type": "background",
+      "name": "(CG) 파스타집을 나와 걸어가는 주인공과 수진",
+      "transition": {
+        "type": "fadeSlide",
+        "duration": 700,
+        "direction": "right"
+      },
+      "id": 34
+    },
+    {
+      "type": "clear characters",
+      "id": 35
+    },
+    {
+      "type": "background",
+      "name": "길거리",
+      "transition": {
+        "type": "fadeSlide",
+        "duration": 700,
+        "direction": "right",
+        "slideDuration": 900
+      },
+      "id": 36
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Normal",
+      "id": 37
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "근데 OO아, 나 궁금한 거 있어.",
+      "id": 38
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "음? 뭔데?",
+      "id": 39
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Normal",
+      "id": 40
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "오늘 만날 때 왜 건호랑 혜지랑 같이 보는게 아니라 우리 둘이 보자고 한거야?",
+      "effects": {
+        "dopamine": 5
+      },
+      "id": 41
+    },
+    {
+      "type": "choice",
+      "prompt": "오늘 만날 때 왜 건호랑 혜지랑 같이 보는게 아니라 우리 둘이 보자고 한거야?",
+      "choices": [
+        {
+          "text": "아… 음 그냥 뭐 건호랑 혜지는 바쁜 거 같아서..",
           "follow": [
             {
               "speaker": "수진",
@@ -1404,40 +2469,36 @@ const EPISODES = {
               "text": "그래! 다음에 또 봐!"
             }
           ],
-          "nextNode": 25
-        },
-        {
-          "text": "둘이 있으면 좀 더 대화도 길게 할 수 있고 좋잖아.",
           "condition": {
             "dopamineMax": 50
           },
           "effects": {
-            "affection": 15
+            "affection": 5
           },
+          "nextNode": 43
+        },
+        {
+          "text": "아 그냥 둘이서 봐도 좋을 거 같아서..? 별 생각은 없었어.",
           "follow": [
             {
               "speaker": "수진",
-              "text": "아 그렇구나! 그러게, 나도 오늘 이렇게 얘기 많이 해서 좋은 거 같아."
+              "text": "아 그렇구나ㅎ 오늘 재밌었어. 공연도 화이팅하자!"
             },
             {
               "speaker": "주인공",
-              "text": "다음에도 또 보자!"
-            },
-            {
-              "speaker": "수진",
-              "text": "좋아! 우리 공연도 화이팅!"
+              "text": "그래! 다음에 또 봐!"
             }
           ],
-          "nextNode": 25
+          "condition": {
+            "dopamineMax": 50
+          },
+          "effects": {
+            "affection": 3
+          },
+          "nextNode": 43
         },
         {
           "text": "둘이 있으면 좀 더 대화도 길게 할 수 있고 좋잖아.",
-          "condition": {
-            "dopamineMin": 51
-          },
-          "effects": {
-            "affection": 15
-          },
           "follow": [
             {
               "speaker": "수진",
@@ -1445,23 +2506,24 @@ const EPISODES = {
             },
             {
               "speaker": "주인공",
-              "text": "다음에도 또 보자!"
+              "text": "우리 다음에도 또 보자!"
             },
             {
               "speaker": "수진",
               "text": "좋아! 우리 공연도 화이팅!"
             }
           ],
-          "nextNode": 25
-        },
-        {
-          "text": "너랑 단둘이 있어보고 싶었거든. 우리 맨날 넷이서만 봤잖아.",
           "condition": {
-            "dopamineMin": 51
+            "dopamineMin": 51,
+            "dopamineMax": 80
           },
           "effects": {
-            "affection": 20
+            "affection": 15
           },
+          "nextNode": 43
+        },
+        {
+          "text": "너랑 단둘이도 만나보고 싶었거든. 우리 맨날 넷이서만 봤잖아.",
           "follow": [
             {
               "speaker": "수진",
@@ -1476,221 +2538,306 @@ const EPISODES = {
               "text": "완전! 다음에 또 보자!"
             }
           ],
-          "nextNode": 25
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "effects": {
+            "affection": 20
+          },
+          "nextNode": 43
+        },
+        {
+          "text": "너랑 데이트하고 싶었거든ㅎ",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "아? 갑자기 왜 그래ㅋㅋ"
+            },
+            {
+              "speaker": "주인공",
+              "text": "둘이어도 오늘 재밌지 않았어?"
+            },
+            {
+              "speaker": "수진",
+              "text": "응 괜찮았어. 다음주에 봐!"
+            }
+          ],
+          "condition": {
+            "dopamineMin": 81
+          },
+          "effects": {
+            "affection": 10
+          },
+          "nextNode": 43
+        },
+        {
+          "text": "왜? 혹시 어색하거나 그랬어?",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "아 아냐아냐 그냥 궁금해서 물어봤어."
+            },
+            {
+              "speaker": "수진",
+              "text": "오늘 재밌었어! 우리 다음주에 보자 그럼."
+            }
+          ],
+          "condition": {
+            "dopamineMin": 81
+          },
+          "effects": {
+            "affection": 5
+          },
+          "nextNode": 43
         }
-      ]
+      ],
+      "id": 42
     },
     {
       "type": "clear background",
-      "id": 25
+      "id": 43
     },
     {
       "type": "move",
-      "next": "EP5 미팅사건",
-      "id": 26
+      "next": "MINIGAME",
+      "minigame": "sideShooter",
+      "after": "EP5 미팅사건",
+      "options": {
+        "difficulty": 3,
+        "durationSeconds": 90
+      },
+      "id": 44
     }
   ],
   "EP5 미팅사건": [
     {
-      "id": 1,
-      "type": "scene reset"
+      "type": "scene reset",
+      "id": 1
     },
     {
-      "id": 2,
       "type": "background",
       "name": "야외 교내",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right",
-        "slideSpeed": 0.7
-      }
+      "transition": "fadeBlack",
+      "id": 2
     },
     {
-      "id": 3,
+      "type": "sound",
+      "soundType": "bgm",
+      "action": "play",
+      "name": "ep25",
+      "id": 3
+    },
+    {
       "type": "dialogue",
       "speaker": "독백",
-      "text": "공강인데 동아리방 가볼까? 수진이 있으려나?"
+      "text": "(공강인데 동아리방 가볼까? 수진이 있으려나?)",
+      "id": 4
     },
     {
-      "id": 4,
       "type": "background",
-      "name": "동아리 앞",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right",
-        "slideSpeed": 0.7
-      }
+      "name": "동아리방",
+      "transition": "fadeBlack",
+      "id": 5
     },
     {
-      "id": 5,
       "type": "sound",
       "soundType": "effect",
       "action": "play",
-      "name": "걸어가는 효과음"
+      "name": "door",
+      "id": 6
     },
     {
-      "id": 6,
-      "type": "sound",
-      "soundType": "effect",
-      "action": "play",
-      "name": "문여는 효과음"
-    },
-    {
-      "id": 7,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "동아리방으로 향하며 문을 연다"
-    },
-    {
-      "id": 8,
-      "type": "background",
-      "name": "동아리실 안",
-      "transition": "fadeBlack"
-    },
-    {
-      "id": 9,
-      "type": "character in",
-      "name": "혜지",
-      "emotion": "Normal"
-    },
-    {
-      "id": 10,
-      "type": "dialogue",
-      "speaker": "혜지",
-      "text": "근데 수진아, 진짜 나가는 거야?"
-    },
-    {
-      "id": 11,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Flustered"
-    },
-    {
-      "id": 12,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "아 몰라.. 아직 고민 중이야"
-    },
-    {
-      "id": 13,
-      "type": "character in",
-      "name": "혜지",
-      "emotion": "Normal"
-    },
-    {
-      "id": 14,
-      "type": "dialogue",
-      "speaker": "혜지",
-      "text": "야, 대학와서 미팅 한 번 쯤은 해봐야지~"
-    },
-    {
-      "id": 15,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "잠시만.. 수진이가 미팅 나간다고?"
-    },
-    {
-      "id": 16,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Surprised"
-    },
-    {
-      "id": 17,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "OO이 왔네, 안녕"
-    },
-    {
-      "id": 18,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "어.. 안녕"
-    },
-    {
-      "id": 19,
-      "type": "character in",
-      "name": "혜지",
-      "emotion": "Happy"
-    },
-    {
-      "id": 20,
-      "type": "dialogue",
-      "speaker": "혜지",
-      "text": "야 OO아, 수진이 이번 주에 미팅 나간대",
-      "effects": {
-        "dopamine": 5
-      }
-    },
-    {
-      "id": 21,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "아.. 진짜?"
-    },
-    {
-      "id": 22,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Focused"
-    },
-    {
-      "id": 23,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "아니, 그냥 친구가 대차 필요하다고 계속 부탁해서.. \n거의 반강제로 끌려가는 분위기야ㅠ"
-    },
-    {
-      "id": 24,
-      "type": "character in",
-      "name": "혜지",
-      "emotion": "Happy"
-    },
-    {
-      "id": 25,
-      "type": "dialogue",
-      "speaker": "혜지",
-      "text": "근데 은근 그런 생각지도 못한 곳에서 잘 된다니까?\n와, 나 곧 수업 시작이다. 갈게, 잘해 봐!!"
-    },
-    {
-      "id": 26,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Flustered"
-    },
-    {
-      "id": 27,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "에이 무슨 소리야ㅠ"
-    },
-    {
-      "id": 28,
       "type": "dialogue",
       "speaker": "나레이션",
-      "text": "(혜지가 가고 둘만 남는다, 주인공은 표정이 조금 굳는다)"
+      "text": "(동아리방 문을 연다)",
+      "id": 7
     },
     {
-      "id": 29,
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Normal",
+      "id": 8
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "그래서 너 나갈거야 안 나갈거야?",
+      "id": 9
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Flustered",
+      "id": 10
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "아 몰라.. 아직 고민 중이야.",
+      "id": 11
+    },
+    {
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Happy",
+      "id": 12
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "야, 대학와서 미팅 한 번 쯤은 해봐야지!",
+      "effects": {
+        "dopamine": 3
+      },
+      "id": 13
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(잠시만.. 수진이가 미팅 나간다고?)",
+      "id": 14
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Surprised",
+      "id": 15
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "OO이 왔네, 안녕",
+      "id": 16
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "어.. 안녕",
+      "id": 17
+    },
+    {
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Happy",
+      "id": 18
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "야 OO아, 수진이 이번 주에 미팅 나간대!",
+      "effects": {
+        "dopamine": 10
+      },
+      "id": 19
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "아.. 진짜?",
+      "id": 20
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Focused",
+      "id": 21
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "아니, 그냥 친구가 대타 필요하다고 계속 부탁해서..",
+      "id": 22
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Flustered",
+      "id": 23
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "나도 막 가고 싶은 거 아닌데..",
+      "id": 24
+    },
+    {
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Happy",
+      "id": 25
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "근데 은근 그런 생각지도 못한 곳에서 잘 된다니까?",
+      "id": 26
+    },
+    {
+      "type": "character in",
+      "name": "혜지",
+      "emotion": "Happy",
+      "id": 27
+    },
+    {
+      "type": "dialogue",
+      "speaker": "혜지",
+      "text": "와, 나 곧 수업 시작이다. 갈게, 잘해 봐!!",
+      "id": 28
+    },
+    {
+      "type": "character in",
+      "name": "수진",
+      "emotion": "Flustered",
+      "id": 29
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "에이 무슨 소리야ㅠ",
+      "id": 30
+    },
+    {
+      "type": "dialogue",
+      "speaker": "나레이션",
+      "text": "(혜지가 가고 둘만 남는다)",
+      "id": 31
+    },
+    {
       "type": "choice",
-      "prompt": "(혜지가 가고 둘만 남는다, 주인공은 표정이 조금 굳는다)",
+      "prompt": "(혜지가 가고 둘만 남는다)",
       "choices": [
         {
-          "text": "(무덤덤하게) 에이, 미팅 그냥 재미로 나가는 거지",
-          "effects": {
-            "dopamine": 0,
-            "affection": 5
-          },
+          "text": "(말을 돌리며) 오늘 날씨가 참 꿀꿀하네..",
           "follow": [
             {
               "speaker": "수진",
-              "text": "그렇지, 진짜 어쩔 수 없이 나가는 거라"
+              "text": "아..? 그런가"
             },
             {
               "speaker": "주인공",
-              "text": "미팅 한번 쯤 대학 온 김에 나가볼 수 있지"
+              "text": "아 맞다, 나도 친구 만나기로 해서 먼저 가볼게..!"
+            },
+            {
+              "speaker": "수진",
+              "text": "음? 응 잘가.."
+            }
+          ],
+          "condition": {
+            "dopamineMax": 50
+          },
+          "nextNode": 33
+        },
+        {
+          "text": "(무덤덤하게) 에이, 미팅은 뭐 그냥 재미로 나가는 거지",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "그지, 진짜 어쩔 수 없이 나가는 거라."
+            },
+            {
+              "speaker": "주인공",
+              "text": "미팅 한 번쯤 대학 온 김에 나가볼 수 있지"
             },
             {
               "speaker": "수진",
@@ -1698,16 +2845,73 @@ const EPISODES = {
             },
             {
               "speaker": "주인공",
-              "text": "ㅋㅋ그래"
+              "text": "ㅋㅋㅋ그래"
             }
           ],
-          "nextNode": 30
+          "condition": {
+            "dopamineMax": 50
+          },
+          "effects": {
+            "affection": 5
+          },
+          "nextNode": 33
+        },
+        {
+          "text": "미팅, 가고 싶은거야?",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "아냐 막 가고 싶은 건 아닌데.."
+            },
+            {
+              "speaker": "주인공",
+              "text": "가기 싫으면 안 가도 좋지만 재미삼아 나가봐도 상관없지 뭐",
+              "effects": {
+                "affection": 10
+              }
+            },
+            {
+              "speaker": "수진",
+              "text": "나도 잘 모르겠어.. 고민 좀 해봐야지."
+            },
+            {
+              "speaker": "주인공",
+              "text": "그래 뭐 네 선택이니까 편하게 생각해."
+            }
+          ],
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "nextNode": 33
+        },
+        {
+          "text": "너 정말 미팅 나가?",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "응 그럴 거 같아.. 대타 때문에 진짜 어쩔 수 없는 거라."
+            },
+            {
+              "speaker": "주인공",
+              "text": "아 그래? 혹시나 뭐.. 미팅에서 너무 취하면 얘기하고, 위험할 수도 있으니까.",
+              "effects": {
+                "affection": 20
+              }
+            },
+            {
+              "speaker": "수진",
+              "text": "어? 어.. 고마워"
+            }
+          ],
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "nextNode": 33
         },
         {
           "text": "(살짝 삐진 목소리로).. 꼭 가야하는 거야?",
-          "effects": {
-            "affection": 20
-          },
           "follow": [
             {
               "speaker": "수진",
@@ -1715,133 +2919,120 @@ const EPISODES = {
             },
             {
               "speaker": "주인공",
-              "text": "아 그래? 혹시나 뭐.. 미팅에서 너무 취하면 얘기하고, 위험할 수도 있으니까"
+              "text": "조금 서운하네ㅎㅎ",
+              "effects": {
+                "affection": 5
+              }
             },
             {
               "speaker": "수진",
-              "text": "어?어.. 고마워"
+              "text": "....응?"
+            },
+            {
+              "speaker": "주인공",
+              "text": "아 장난이야ㅎ"
+            },
+            {
+              "speaker": "수진",
+              "text": "어? 알겠..어."
             }
           ],
-          "nextNode": 30
+          "condition": {
+            "dopamineMin": 81
+          },
+          "nextNode": 33
         },
         {
           "text": "(당황하며 빠르게) 조금 너무하다",
-          "effects": {
-            "affection": -15
-          },
           "follow": [
             {
               "speaker": "수진",
-              "text": "(당황하며) 미팅은 진짜 어쩔 수 없이 나가는 거야"
+              "text": "(당황하며) 미팅은 진짜 어쩔 수 없이 나가는 거야."
             },
             {
               "speaker": "주인공",
-              "text": "(까칠하게) 됐다. 그냥 재밌게 놀다 와"
+              "text": "(까칠하게) 됐다. 그냥 재밌게 놀다 와",
+              "effects": {
+                "affection": -10
+              }
             },
             {
               "speaker": "수진",
-              "text": "야, 내가 알아서 할게!",
-              "effects": {
-                "dopamine": 5
-              }
+              "text": "뭐야, 내가 알아서 할게!"
             }
           ],
-          "nextNode": 30
+          "condition": {
+            "dopamineMin": 81
+          },
+          "nextNode": 33
         }
-      ]
+      ],
+      "id": 32
     },
     {
-      "id": 30,
-      "type": "dialogue",
-      "speaker": "나레이션",
-      "text": "<다음 날 카톡>"
-    },
-    {
-      "id": 31,
       "type": "background",
-      "name": "카톡창 안",
-      "transition": "fadeBlack"
+      "name": "카톡방 화면",
+      "transition": "fadeBlack",
+      "id": 33
     },
     {
-      "id": 32,
       "type": "character in",
       "name": "수진",
-      "emotion": "Happy"
+      "emotion": "Happy",
+      "id": 34
     },
     {
-      "id": 33,
       "type": "dialogue",
       "speaker": "수진",
       "text": "나 미팅 안 나가기로 했어!",
-      "effects": {
-        "dopamine": 3
-      }
+      "id": 35
     },
     {
-      "id": 34,
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "어? 왜?"
+      "text": "어? 왜?",
+      "id": 36
     },
     {
-      "id": 35,
       "type": "character in",
       "name": "수진",
-      "emotion": "Normal"
+      "emotion": "Normal",
+      "id": 37
     },
     {
-      "id": 36,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "생각해보니까 괜히 더 피곤할 것 같아서ㅋㅋ\n공연 준비도 해야하고"
+      "text": "생각해보니까 괜히 더 피곤할 것 같아서ㅋㅋ 공연 준비도 해야하고",
+      "id": 38
     },
     {
-      "id": 37,
       "type": "choice",
-      "prompt": "나 미팅 안 나가기로 했어!",
+      "prompt": "생각해보니까 괜히 더 피곤할 것 같아서ㅋㅋ 공연 준비도 해야하고",
       "choices": [
         {
-          "text": "그렇구나. 공연날 보자!",
-          "effects": {
-            "dopamine": 0,
-            "affection": 0
-          },
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "응응"
-            }
-          ],
-          "nextNode": 38
-        },
-        {
           "text": "잘됐다..! 다행이야",
-          "effects": {
-            "dopamine": 0,
-            "affection": 10
-          },
           "follow": [
             {
               "speaker": "수진",
-              "text": "ㅋㅌㅋㅌㅌㅋ너는 왜 다행이야"
+              "text": "ㅋㅋㅋㅋㅋ너는 왜 다행이야"
             },
             {
               "speaker": "주인공",
-              "text": "아 그냥..ㅎㅎ 공연 날 보자!"
+              "text": "아 그냥..ㅎㅎ 마음이 조금 놓이네"
             },
             {
               "speaker": "수진",
-              "text": "그랭!"
+              "text": "뭐야..ㅋㅋ 공연날 보자!"
+            },
+            {
+              "speaker": "주인공",
+              "text": "응! 컨디션 관리 잘하고!"
             }
           ],
-          "nextNode": 38
+          "nextNode": 40
         },
         {
           "text": "맞아, 솔직히 공연 다가오는데 미팅 좀 그렇다고 생각했어.",
-          "effects": {
-            "dopamine": 0,
-            "affection": -5
-          },
           "follow": [
             {
               "speaker": "수진",
@@ -1853,636 +3044,761 @@ const EPISODES = {
             },
             {
               "speaker": "수진",
-              "text": "응응"
+              "text": "응응!"
             }
           ],
-          "nextNode": 38
+          "nextNode": 40
         }
-      ]
+      ],
+      "id": 39
     },
     {
       "type": "clear background",
-      "id": 38
+      "id": 40
     },
     {
       "type": "move",
       "next": "MINIGAME",
       "minigame": "brickBreaker",
       "after": "EP6 정기공연",
-      "id": 39
+      "id": 41,
+      "options": {
+        "maxTurns": 12
+      }
     }
   ],
   "EP6 정기공연": [
     {
-      "id": 1,
-      "type": "scene reset"
+      "type": "scene reset",
+      "id": 1
     },
     {
-      "id": 2,
       "type": "background",
-      "name": "백스테이지",
-      "transition": "fadeBlack"
+      "name": "(CG) 백스테이지에 있는 주인공과 수진",
+      "transition": "fadeBlack",
+      "id": 2
     },
     {
-      "id": 3,
+      "type": "clear characters",
+      "id": 3
+    },
+    {
+      "type": "sound",
+      "soundType": "bgm",
+      "action": "play",
+      "name": "ep36",
+      "id": 4
+    },
+    {
       "type": "dialogue",
-      "speaker": "나레이션",
-      "text": "(공연은 시작되었고, 스탭들은 대기실에서 무대 상황을 지켜보고 있다.)\n(건호가 급하게 뛰어온다.)"
+      "speaker": "수진",
+      "text": "(귓속말로) 오늘 순조롭게 잘되고 있다!",
+      "id": 5
     },
     {
-      "id": 4,
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "그러게 다행이다.. 얼른 무사히 끝났으면!",
+      "id": 6
+    },
+    {
       "type": "sound",
       "soundType": "effect",
       "action": "play",
-      "name": "달려오는 소리"
+      "name": "running",
+      "id": 7
     },
     {
-      "id": 5,
-      "type": "character in",
-      "name": "건호",
-      "emotion": "Surprised"
-    },
-    {
-      "id": 6,
       "type": "dialogue",
       "speaker": "건호",
-      "text": "큰일났어요, 2막 문 세트 나사 빠졌어요!"
+      "text": "큰일났어요, 2막 문 세트 나사 빠졌어요!",
+      "id": 8
     },
     {
-      "id": 7,
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "...뭐?"
+      "text": "...뭐?",
+      "id": 9
     },
     {
-      "id": 8,
-      "type": "character in",
-      "name": "선배1",
-      "emotion": "Focused"
-    },
-    {
-      "id": 9,
       "type": "dialogue",
       "speaker": "선배1",
-      "text": "그거 누구 담당이지..?"
+      "text": "그거 누구 담당이지..?",
+      "id": 10
     },
     {
-      "id": 10,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Focused"
-    },
-    {
-      "id": 11,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "저요.."
+      "text": "저요..",
+      "id": 11
     },
     {
-      "id": 12,
-      "type": "character in",
-      "name": "선배1",
-      "emotion": "Focused"
-    },
-    {
-      "id": 13,
       "type": "dialogue",
       "speaker": "선배1",
-      "text": "지금 고쳐야 해"
+      "text": "공연 당일에 이런 실수가 나오는게 말이 돼!",
+      "effects": {
+        "dopamine": 5
+      },
+      "id": 12
     },
     {
-      "id": 14,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Focused"
-    },
-    {
-      "id": 15,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "넵, 선배 고칠게요"
+      "text": "죄송합니다..!",
+      "id": 13
     },
     {
-      "id": 16,
       "type": "dialogue",
-      "speaker": "나레이션",
-      "text": "(수진은 바로 공구박스를 들고 백스테이지로 간다. 주인공도 뒤따라간다\n수진은 손이 떨리지만 참고 나사를 조인다.)"
+      "speaker": "선배1",
+      "text": "지금 고쳐야 돼, 빨리!",
+      "id": 14
     },
     {
-      "id": 17,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "드라이버 좀"
+      "text": "네, 선배!",
+      "id": 15
     },
     {
-      "id": 18,
       "type": "sound",
       "soundType": "effect",
       "action": "play",
-      "name": "드라이버 소리"
+      "name": "running",
+      "id": 16
     },
     {
-      "id": 19,
       "type": "dialogue",
-      "speaker": "주인공",
-      "text": "여기"
+      "speaker": "나레이션",
+      "text": "(공구박스를 들고 백스테이지로 달려간다)",
+      "effects": {
+        "dopamine": 5
+      },
+      "id": 17
     },
     {
-      "id": 20,
-      "type": "character in",
-      "name": "선배1",
-      "emotion": "Flustered"
-    },
-    {
-      "id": 21,
-      "type": "dialogue",
-      "speaker": "선배1",
-      "text": "1분 뒤 세트 들어간다!"
-    },
-    {
-      "id": 22,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Flustered"
-    },
-    {
-      "id": 23,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "..아 이게 왜 안들어가지"
+      "text": "드라이버 좀!",
+      "id": 18
     },
     {
-      "id": 24,
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "여기.",
+      "id": 19
+    },
+    {
+      "type": "dialogue",
+      "speaker": "선배1",
+      "text": "1분 뒤 세트 들어간다!",
+      "id": 20
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "아 이게 왜 안들어가지..",
+      "id": 21
+    },
+    {
       "type": "choice",
-      "prompt": "..아 이게 왜 안들어가지",
+      "prompt": "아 이게 왜 안들어가지..",
       "choices": [
         {
-          "text": "좀 더 세게 돌려봐",
-          "effects": {
-            "dopamine": 0,
-            "affection": 5
-          },
+          "text": "나사를 이쪽으로 좀 더 세게 돌려봐봐",
           "follow": [
             {
               "speaker": "수진",
-              "text": "어, 아 됐다..!"
+              "text": "어, 알았어.."
             },
             {
-              "speaker": "주인공",
-              "text": "휴..다행이다"
-            }
-          ],
-          "nextNode": 25
-        },
-        {
-          "text": "내가 잡고 있을게, 차분하게 해보자",
-          "follow": [
-            {
               "speaker": "수진",
-              "text": "제발.. 아 됐다! (하이파이브를 하며 마주보고 웃는다)",
-              "effects": {
-                "dopamine": 10,
-                "affection": 20
+              "text": "와 됐다!",
+              "sound": {
+                "soundType": "effect",
+                "action": "play",
+                "name": "screwdriver"
               }
             },
             {
               "speaker": "주인공",
-              "text": "다행이다, 수고했어"
+              "text": "휴..다행이다, 해결됐어요 선배."
             }
           ],
-          "nextNode": 25
+          "condition": {
+            "dopamineMax": 50
+          },
+          "nextNode": 23
         },
         {
-          "text": "(불안해하며) 아 어떡하지.. 곧 시작인데",
-          "effects": {
-            "dopamine": 0,
-            "affection": 0
-          },
+          "text": "내가 이쪽 잡아줄게.",
           "follow": [
             {
               "speaker": "수진",
-              "text": "제발.. 아 됐다..!"
+              "text": "고마워.. 아 제발.."
+            },
+            {
+              "speaker": "수진",
+              "text": "휴 됐다..!",
+              "sound": {
+                "soundType": "effect",
+                "action": "play",
+                "name": "screwdriver"
+              }
             },
             {
               "speaker": "주인공",
-              "text": "와 다행이다"
+              "text": "다행이다!"
             }
           ],
-          "nextNode": 25
+          "condition": {
+            "dopamineMax": 50
+          },
+          "effects": {
+            "affection": 5
+          },
+          "nextNode": 23
+        },
+        {
+          "text": "내가 잘 잡고 있을게, 차분하게 하면 돼.",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "고마워ㅜ 제발.."
+            },
+            {
+              "speaker": "수진",
+              "text": "아 됐다! (하이파이브를 하며 웃는다)",
+              "sound": {
+                "soundType": "effect",
+                "action": "play",
+                "name": "screwdriver"
+              }
+            },
+            {
+              "speaker": "주인공",
+              "text": "다행이다, 수고했어!"
+            }
+          ],
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "effects": {
+            "affection": 15
+          },
+          "nextNode": 23
+        },
+        {
+          "text": "내가 해볼게, 이거 잘 잡고 있어줘.",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "어, 여기 구멍에 넣으면 돼!"
+            },
+            {
+              "speaker": "주인공",
+              "text": "(드르륵, 나사를 넣는다) 오 됐다!",
+              "effects": {
+                "affection": 20
+              },
+              "sound": {
+                "soundType": "effect",
+                "action": "play",
+                "name": "screwdriver"
+              }
+            },
+            {
+              "speaker": "수진",
+              "text": "와 정말 다행이다ㅠ 고마워!"
+            },
+            {
+              "speaker": "주인공",
+              "text": "아냐, 선배 여기 됐어요!"
+            }
+          ],
+          "condition": {
+            "dopamineMin": 51,
+            "dopamineMax": 80
+          },
+          "nextNode": 23
+        },
+        {
+          "text": "이리줘 내가 할게, 이거 잘 잡고 있어봐.",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "어, 여기 구멍에 넣으면 돼!"
+            },
+            {
+              "speaker": "주인공",
+              "text": "(드르륵, 나사를 넣는다) 오 됐다!",
+              "effects": {
+                "affection": 10
+              },
+              "sound": {
+                "soundType": "effect",
+                "action": "play",
+                "name": "screwdriver"
+              }
+            },
+            {
+              "speaker": "수진",
+              "text": "와 정말 다행이다ㅠ 고마워!"
+            },
+            {
+              "speaker": "주인공",
+              "text": "아니야, 선배 여기있어요!"
+            }
+          ],
+          "condition": {
+            "dopamineMin": 81
+          },
+          "nextNode": 23
+        },
+        {
+          "text": "(불안해하며) 아 어떡하지.. 곧 시작인데",
+          "follow": [
+            {
+              "speaker": "수진",
+              "text": "제발.."
+            },
+            {
+              "speaker": "주인공",
+              "text": "빨리 넣어봐, 곧 시작이야!"
+            },
+            {
+              "speaker": "수진",
+              "text": "와 드디어 됐다! 선배 여기요!",
+              "sound": {
+                "soundType": "effect",
+                "action": "play",
+                "name": "screwdriver"
+              }
+            },
+            {
+              "speaker": "주인공",
+              "text": "와 다행이다!"
+            }
+          ],
+          "condition": {
+            "dopamineMin": 81
+          },
+          "effects": {
+            "affection": -5
+          },
+          "nextNode": 23
         }
-      ]
+      ],
+      "id": 22
     },
     {
-      "id": 25,
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "와 진짜 심장 떨어지는 줄"
+      "text": "와 진짜 심장 떨어지는 줄..",
+      "id": 23
     },
     {
-      "id": 26,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Focused"
-    },
-    {
-      "id": 27,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "그러니까.."
+      "text": "어..(수진이 울먹거리며 눈물을 흘린다)",
+      "id": 24
     },
     {
-      "id": 28,
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "수진아. 공연 끝나고 잠깐 나랑 이야기 할래?"
+      "text": "수진아.. 울어?",
+      "id": 25
     },
     {
-      "id": 29,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Normal"
-    },
-    {
-      "id": 30,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "어? 그래."
+      "text": "아 너무 긴장했나봐, 나도 모르게 눈물이 나오네..",
+      "id": 26
+    },
+    {
+      "type": "choice",
+      "prompt": "아 너무 긴장했나봐, 나도 모르게 눈물이 나오네..",
+      "choices": [
+        {
+          "text": "(수진을 토닥여 준다) 무대 전에 돌발상황 생길 수 있지, 네 탓 아니야.",
+          "follow": [],
+          "nextNode": 28
+        },
+        {
+          "text": "(휴지를 건네 준 후 다른 곳을 본다)",
+          "follow": [],
+          "nextNode": 28
+        }
+      ],
+      "id": 27
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "OO아 정말 고마워...",
+      "id": 28
     },
     {
       "type": "clear background",
-      "id": 31,
-      "condition": {
-        "affectionMin": 100,
-        "dopamineMin": 35,
-        "dopamineMax": 80
-      }
+      "id": 29
     },
     {
       "type": "move",
       "next": "해피엔딩",
       "condition": {
-        "affectionMin": 100,
-        "dopamineMin": 35,
-        "dopamineMax": 80
+        "affectionMin": 60
       },
-      "id": 32
+      "id": 30
     },
     {
       "type": "clear background",
-      "id": 33
+      "id": 31
     },
     {
       "type": "move",
       "next": "베드엔딩",
-      "id": 34
+      "id": 32
     }
   ],
   "해피엔딩": [
     {
-      "id": 1,
-      "type": "scene reset"
+      "type": "scene reset",
+      "id": 1
     },
     {
-      "id": 2,
       "type": "background",
-      "name": "밤, 대학가",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right",
-        "slideSpeed": 0.7
-      }
+      "name": "(CG) 텅 빈 밤길을 걸어가는 둘",
+      "transition": "fadeBlack",
+      "id": 2
     },
     {
-      "id": 3,
-      "type": "dialogue",
-      "speaker": "나레이션",
-      "text": "(텅 빈 밤길. 둘은 천천히 걸어간다.)"
+      "type": "clear characters",
+      "id": 3
     },
     {
-      "id": 4,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Happy"
+      "type": "sound",
+      "soundType": "bgm",
+      "action": "play",
+      "name": "ep14",
+      "id": 4
     },
     {
-      "id": 5,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "와... 오늘 하루 진짜 길었다."
+      "text": "와... 오늘 하루 진짜 길었다.",
+      "id": 5
     },
     {
-      "id": 6,
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "그러게.."
+      "text": "그러게..",
+      "id": 6
     },
     {
-      "id": 7,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Focused"
-    },
-    {
-      "id": 8,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "아깐 너무 무서웠어. 내가 실수해서 공연 망가질까봐.\n근데 그때 네가 옆에 있어서 좀 안심됐어"
+      "text": "아깐 너무 무서웠어. 내가 실수해서 공연 망가질까봐.",
+      "id": 7
     },
     {
-      "id": 9,
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "그래도 네가 옆에 있어서 좀 안심됐어ㅎ",
+      "id": 8
+    },
+    {
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "다행이다..\n우리 이제 공연 끝났으니까 못보는 건가?"
+      "text": "내가 도움이 되었다니 다행이다..",
+      "id": 9
     },
     {
-      "id": 10,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Surprised"
-    },
-    {
-      "id": 11,
       "type": "dialogue",
       "speaker": "수진",
-      "text": "왜? 계속 보면 되잖아"
+      "text": "정말 고마워 OO아.",
+      "id": 10
     },
     {
-      "id": 12,
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "아니야, 너도 진짜 수고 많았어.",
+      "id": 11
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "이제 공연도 다 끝나고... 우리 앞으로 한동안 볼 일이 없으려나?",
+      "id": 12
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "왜? 계속 보면 되잖아",
+      "id": 13
+    },
+    {
       "type": "dialogue",
       "speaker": "나레이션",
-      "text": "(주인공은 잠깐 수진을 바라본다)"
+      "text": "(잠시 수진을 바라본다)",
+      "id": 14
     },
     {
-      "id": 13,
       "type": "choice",
-      "prompt": "(주인공은 잠깐 수진을 바라본다)",
+      "prompt": "(잠시 수진을 바라본다)",
       "choices": [
         {
-          "text": "아무래도 동아리 끝나면 볼 일이 많이 없긴 하지",
+          "text": "아무래도 동아리 끝나면 볼 기회가 줄어들지 않을까?",
           "follow": [
             {
               "speaker": "수진",
-              "text": "에이 우리는 계속 볼일이 있을거야"
+              "text": "에이 우리는 계속 만나면 되지."
             },
             {
               "speaker": "주인공",
               "text": "정말..?"
             }
           ],
-          "nextNode": 14
+          "nextNode": 16
         },
         {
-          "text": "그럼.. 우리 동아리 없어도 계속 볼래?",
+          "text": "사실.. 난 너 동아리 끝나도 계속 보고싶어",
           "follow": [
             {
               "speaker": "수진",
-              "text": "좋아..ㅎㅎ"
+              "text": "뭐야 갑자기 부끄럽게..ㅎㅎ"
             }
           ],
-          "nextNode": 14
-        },
-        {
-          "text": "나는 너 동아리 끝나도 계속 보고싶어",
-          "follow": [
-            {
-              "speaker": "수진",
-              "text": "뭐야 부끄럽게..ㅎㅎ"
-            }
-          ],
-          "nextNode": 14
+          "nextNode": 16
         }
-      ]
+      ],
+      "id": 15
     },
     {
-      "id": 14,
-      "type": "dialogue",
-      "speaker": "나레이션",
-      "text": "(잠깐 침묵)"
+      "type": "background",
+      "name": "(CG) 서로 바라보는 둘",
+      "transition": {
+        "type": "fadeSlide",
+        "duration": 700,
+        "direction": "right"
+      },
+      "id": 16
     },
     {
-      "id": 15,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "나 사실 너 좋아해.., 너는 나 어때?"
+      "type": "clear characters",
+      "id": 17
     },
     {
-      "id": 16,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "hopeful"
-    },
-    {
-      "id": 17,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "(수진이 걸음을 멈춘다..) 나도 너 좋아해"
-    },
-    {
-      "id": 18,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "얼어 붙는다"
-    },
-    {
-      "id": 19,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Happy"
-    },
-    {
-      "id": 20,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "왜 그렇게 놀라ㅋㅋ"
-    },
-    {
-      "id": 21,
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "아니.. 너무 좋아서ㅎㅎ"
+      "text": "수진아.. 사실 나 너 좋아하는데, 너는 나 어때?",
+      "id": 18
     },
     {
-      "id": 22,
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "(수진이 걸음을 멈춘다.)",
+      "id": 19
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "나도 너.. 좋아해!",
+      "id": 20
+    },
+    {
       "type": "dialogue",
       "speaker": "독백",
-      "text": "주인공은 조심스럽게 수진의 손을 잡는다"
+      "text": "(헉!)",
+      "id": 21
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "뭘 그렇게 놀라ㅋㅋ",
+      "id": 22
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "아니.. 다행이다ㅎ 너무 좋다.",
+      "id": 23
+    },
+    {
+      "type": "background",
+      "name": "(CG) 손을 잡는 둘",
+      "transition": {
+        "type": "fadeSlide",
+        "duration": 700,
+        "direction": "right"
+      },
+      "id": 24
+    },
+    {
+      "type": "clear characters",
+      "id": 25
+    },
+    {
+      "type": "clear background",
+      "id": 26
+    },
+    {
+      "type": "dialogue",
+      "speaker": "END",
+      "text": "해피엔딩",
+      "id": 27
+    }
+  ],
+  "베드엔딩": [
+    {
+      "type": "scene reset",
+      "id": 1
+    },
+    {
+      "type": "background",
+      "name": "(CG) 텅 빈 밤길을 걸어가는 둘",
+      "transition": "fadeBlack",
+      "id": 2
+    },
+    {
+      "type": "clear characters",
+      "id": 3
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "수진아, 잠깐 얘기할 수 있을까?",
+      "id": 4
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "어? 어..",
+      "id": 5
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "아까부터 하려고 했던 말인데..",
+      "id": 6
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "사실.. 나 너 좋아해.",
+      "id": 7
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "(수진이 어색하게 웃는다) ..아, 아하하 어..",
+      "id": 8
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "너무 갑작스러웠지.. 근데 공연 끝나면 더 말 못할 것 같아서..",
+      "id": 9
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "조금 생각할 시간을 줄까?",
+      "id": 10
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "아니야, 음 그게 나는... 미안해.",
+      "id": 11
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "OO아, 너는 정말 좋은 사람이야,",
+      "id": 12
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "같이 공연 준비하면서도 엄청 의지됐고..",
+      "id": 13
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "(애써 웃는다) 아.. 어..",
+      "id": 14
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "근데 나는.. 그냥 너를 좋은 동아리 사람으로 생각했던 것 같아.",
+      "id": 15
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "..그렇구나.",
+      "id": 16
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "우리 동아리에서 어색해지진 말자..!",
+      "id": 17
+    },
+    {
+      "type": "choice",
+      "prompt": "우리 동아리에서 어색해지진 말자..!",
+      "choices": [
+        {
+          "text": "그래.. 그럼 그냥 친구로 지내자..!",
+          "follow": [],
+          "nextNode": 19
+        },
+        {
+          "text": "음.. 그냥 이제 볼일 없을거야..",
+          "follow": [],
+          "nextNode": 19
+        }
+      ],
+      "id": 18
+    },
+    {
+      "type": "dialogue",
+      "speaker": "수진",
+      "text": "먼저 갈게..",
+      "id": 19
+    },
+    {
+      "type": "background",
+      "name": "(CG) 혼자 남은 주인공)",
+      "transition": {
+        "type": "fadeSlide",
+        "duration": 700,
+        "direction": "right"
+      },
+      "id": 20
+    },
+    {
+      "type": "clear characters",
+      "id": 21
+    },
+    {
+      "type": "dialogue",
+      "speaker": "독백",
+      "text": "(..어디서부터 잘못된 걸까.., 분명 처음엔 좋았는데..)",
+      "id": 22
     },
     {
       "type": "clear background",
       "id": 23
     },
     {
-      "id": 24,
       "type": "dialogue",
       "speaker": "END",
-      "text": "해피엔딩"
-    }
-  ],
-  "베드엔딩": [
-    {
-      "id": 1,
-      "type": "scene reset"
-    },
-    {
-      "id": 2,
-      "type": "background",
-      "name": "밤, 대학가",
-      "transition": {
-        "type": "fadeSlide",
-        "duration": 700,
-        "direction": "right",
-        "slideSpeed": 0.7
-      }
-    },
-    {
-      "id": 3,
-      "type": "dialogue",
-      "speaker": "나레이션",
-      "text": "(텅 빈 밤길. 둘은 천천히 걸어간다.)"
-    },
-    {
-      "id": 4,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Normal"
-    },
-    {
-      "id": 5,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "아까 한다는 말이 뭐야?"
-    },
-    {
-      "id": 6,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "그게.. 나 너 좋아해."
-    },
-    {
-      "id": 7,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Surprised"
-    },
-    {
-      "id": 8,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "(수진이 어색하게 웃는다) ..아, 아하하 어.."
-    },
-    {
-      "id": 9,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "너무 갑작스러웠지.. 근데 공연 끝나면 더 말 못할 것 같아서, \n조금 생각할 시간을 줄까?"
-    },
-    {
-      "id": 10,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Sad"
-    },
-    {
-      "id": 11,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "아니야, 음 그게 나는... 미안해"
-    },
-    {
-      "id": 12,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "OO아, 너는 정말 좋은 사람이야\n같이 공연 준비하면서 엄청 의지됐고"
-    },
-    {
-      "id": 13,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "(애써 웃는다) 아.. 어.."
-    },
-    {
-      "id": 14,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Focused"
-    },
-    {
-      "id": 15,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "근데 나는.. 그냥 너를 좋은 동아리 사람으로 생각했던 것 같아"
-    },
-    {
-      "id": 16,
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "..그렇구나"
-    },
-    {
-      "id": 17,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "hopeful"
-    },
-    {
-      "id": 18,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "우리 동아리에서 어색해지진 말자"
-    },
-    {
-      "id": 19,
-      "type": "choice",
-      "prompt": "우리 동아리에서 어색해지진 말자",
-      "choices": [
-        {
-          "text": "응..",
-          "nextNode": 20
-        },
-        {
-          "text": "그래 그냥 친구로 지내자..!",
-          "nextNode": 20
-        },
-        {
-          "text": "음.. 그냥 이제 볼일 없을거야",
-          "nextNode": 20
-        }
-      ]
-    },
-    {
-      "id": 20,
-      "type": "character in",
-      "name": "수진",
-      "emotion": "Normal"
-    },
-    {
-      "id": 21,
-      "type": "dialogue",
-      "speaker": "수진",
-      "text": "먼저 갈게.."
-    },
-    {
-      "id": 22,
-      "type": "dialogue",
-      "speaker": "나레이션",
-      "text": "(주인공 혼자 길거리에 남는다)"
-    },
-    {
-      "id": 23,
-      "type": "dialogue",
-      "speaker": "독백",
-      "text": "..어디서부터 잘못된 걸까.., 분명 처음엔 좋았는데.."
-    },
-    {
-      "type": "clear background",
+      "text": "베드엔딩",
       "id": 24
-    },
-    {
-      "id": 25,
-      "type": "dialogue",
-      "speaker": "END",
-      "text": "베드엔딩"
     }
   ]
 };

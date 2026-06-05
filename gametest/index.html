@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="ko">
 
 <head>
@@ -12,6 +12,14 @@
 </head>
 
 <body>
+  <div id="p5_loading" class="loading-screen">
+    <div class="loading-mark">도파민때문에</div>
+    <div class="loading-copy">로딩중</div>
+    <div class="loading-bar" aria-hidden="true">
+      <span></span>
+    </div>
+  </div>
+
   <div id="nameOverlay" class="name-overlay" hidden>
     <section class="name-card" id="nameEntry">
       <h1>너의 이름은?</h1>
@@ -33,6 +41,8 @@
   <script src="./config.js"></script>
   <script src="./story-runtime-data.js"></script>
   <script src="./story-validator.js"></script>
+  <script src="./minigame-tutorial.js"></script>
+  <script src="./libraries/korean-josa.js"></script>
   <script src="./ui.js"></script>
   <script src="./sub_games/breakblocks.js"></script>
   <script src="./sub_games/shooting.js"></script>
@@ -41,3 +51,4 @@
 </body>
 
 </html>
+

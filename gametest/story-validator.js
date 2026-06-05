@@ -53,6 +53,7 @@ function validateStoryData() {
         validateMoveTarget(node.next, node.nextNode, location);
         validateSubGameTarget(node.minigame || node.subGame, node.next, location);
         validateSubGameReturn(node.after, node.afterNode, node.next, location);
+        validateSubGameOptions(node, location);
       }
 
       if (node.type === NODE_TYPES.DIALOGUE) {
@@ -77,6 +78,7 @@ function validateChoiceNode(node, episodeId, location) {
     const choiceLocation = location + ".choices[" + choiceIndex + "]";
     if (!choice.text) console.warn("Choice option has no text at " + choiceLocation);
     validateFollowNodes(choice.follow, choiceLocation);
+    if (choice.sound) validateSoundNode(choice.sound, choiceLocation + ".sound");
     validateChoiceTarget(choice.nextNode, episodeId, choiceLocation);
     if (choice.next) {
       console.warn("Choice should use nextNode instead of next at " + choiceLocation);
@@ -118,7 +120,6 @@ function validateBackgroundTransition(node, location) {
   const duration = options.duration ?? node.transitionDuration;
   const direction = options.direction ?? node.transitionDirection;
   const slideDuration = options.slideDuration ?? options.revealDuration ?? node.transitionSlideDuration;
-  const slideSpeed = options.slideSpeed ?? options.speed ?? node.transitionSlideSpeed;
 
   if (!validTypes.includes(type)) {
     console.warn("Unknown background transition at " + location + ": " + type);
@@ -136,9 +137,6 @@ function validateBackgroundTransition(node, location) {
     console.warn("Background slide duration must be a number from 120 to 2000 at " + location);
   }
 
-  if (slideSpeed !== undefined && (typeof slideSpeed !== "number" || slideSpeed < 0.25 || slideSpeed > 4)) {
-    console.warn("Background slide speed must be a number from 0.25 to 4 at " + location);
-  }
 }
 
 function normalizeSoundType(soundType) {
@@ -224,6 +222,32 @@ function validateSubGameReturn(after, afterNode, next, location) {
   }
 }
 
+function validateSubGameOptions(node, location) {
+  if (node.next !== NEXT_TARGETS.MINIGAME) return;
+
+  const options = node.options || node.subGameOptions || node.minigameOptions;
+  if (options === undefined) return;
+
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    console.warn("Sub game options must be an object at " + location);
+    return;
+  }
+
+  validateOptionNumber(options, "maxTurns", 1, 30, location);
+  validateOptionNumber(options, "difficulty", 0, 10, location);
+  validateOptionNumber(options, "durationSeconds", 5, 180, location);
+  validateOptionNumber(options, "maxDuration", 5, 180, location);
+  validateOptionNumber(options, "maxSeconds", 5, 180, location);
+}
+
+function validateOptionNumber(options, key, min, max, location) {
+  if (options[key] === undefined) return;
+
+  if (typeof options[key] !== "number" || options[key] < min || options[key] > max) {
+    console.warn("Sub game option " + key + " must be a number from " + min + " to " + max + " at " + location);
+  }
+}
+
 function validateCondition(condition, location) {
   if (!condition) return;
 
@@ -259,6 +283,7 @@ function validateFollowNodes(follow, location) {
 
     if (!line.speaker) console.warn("Follow line has no speaker at " + lineLocation);
     if (!line.text) console.warn("Follow line has no text at " + lineLocation);
+    if (line.sound) validateSoundNode(line.sound, lineLocation + ".sound");
   });
 }
 

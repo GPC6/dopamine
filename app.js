@@ -239,7 +239,7 @@ function renderNodeFields(container, node) {
       makeNumberInput("미니게임 후 노드 번호", getAfterNodeId(node), (value) => setAfterNode(node, value))
     );
 
-    container.append(grid, returnGrid, createConditionEditor(node));
+    container.append(grid, returnGrid, createSubGameOptionsEditor(node), createConditionEditor(node));
     return;
   }
 
@@ -249,7 +249,7 @@ function renderNodeFields(container, node) {
     grid.append(
       makeSelectInput("사운드 종류", node.soundType || node.kind, ["bgm", "effect"], (value) => setOptionalString(node, "soundType", value)),
       makeSelectInput("동작", node.action, ["play", "stop"], (value) => setOptionalString(node, "action", value)),
-      makeTextInput("사운드 이름", node.name, (value) => setOptionalString(node, "name", value)),
+      makeComboInput("사운드 이름", node.name, (value) => setOptionalString(node, "name", value), getSuggestionOptions("sounds", node.soundType || node.kind || "effect")),
       makeNumberInput("볼륨", node.volume, (value) => setOptionalNumber(node, "volume", value))
     );
     container.append(grid, createConditionEditor(node));
@@ -326,6 +326,7 @@ function createChoiceItem(choice, choices, choiceIndex) {
     choice.follow.push({ speaker: "", text: "" });
     renderNodes();
   });
+  item.append(createEmbeddedSoundEditor(choice, "선택 효과음"));
 
   return item;
 }
@@ -340,7 +341,8 @@ function createFollowLine(lines, line, lineIndex) {
       lines.splice(lineIndex, 1);
       renderNodes();
     }),
-    createEffectsEditor(line)
+    createEffectsEditor(line),
+    createEmbeddedSoundEditor(line, "발화 효과음")
   );
   return row;
 }
@@ -365,15 +367,90 @@ function createBackgroundTransitionEditor(node) {
   const summary = document.createElement("summary");
   summary.textContent = "배경 전환";
   const grid = document.createElement("div");
-  grid.className = "field-grid five";
+  grid.className = "field-grid four";
   grid.append(
     makeSelectInput("전환 방식", getBackgroundTransitionType(node), ["fadeBlack", "fadeSlide", "none"], (value) => setBackgroundTransitionType(node, value)),
     makeNumberInput("전환 시간(ms)", getBackgroundTransitionDuration(node), (value) => setBackgroundTransitionDuration(node, value), 120),
     makeSelectInput("슬라이드 방향", getBackgroundTransitionDirection(node), ["right", "left"], (value) => setBackgroundTransitionDirection(node, value)),
-    makeNumberInput("슬라이드 시간(ms)", getBackgroundSlideDuration(node), (value) => setBackgroundSlideDuration(node, value), 120),
-    makeNumberInput("슬라이드 속도", getBackgroundSlideSpeed(node), (value) => setBackgroundSlideSpeed(node, value), 0.25)
+    makeNumberInput("슬라이드 시간(ms)", getBackgroundSlideDuration(node), (value) => setBackgroundSlideDuration(node, value), 120)
   );
   details.append(summary, grid);
+  return details;
+}
+
+function createEmbeddedSoundEditor(target, title) {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  const sound = target.sound || {};
+  const grid = document.createElement("div");
+  const getSoundType = () => target.sound?.soundType || target.sound?.kind || "effect";
+
+  summary.textContent = title;
+  grid.className = "field-grid four";
+  grid.append(
+    makeSelectInput("사운드 종류", sound.soundType || sound.kind, ["effect", "bgm"], (value) => setNestedSoundString(target, "soundType", value)),
+    makeSelectInput("동작", sound.action, ["play", "stop"], (value) => setNestedSoundString(target, "action", value)),
+    makeComboInput("사운드 이름", sound.name, (value) => setNestedSoundString(target, "name", value), getSuggestionOptions("sounds", getSoundType())),
+    makeNumberInput("볼륨", sound.volume, (value) => setNestedSoundNumber(target, "volume", value))
+  );
+  details.append(summary, grid);
+  return details;
+}
+
+function createSubGameOptionsEditor(node) {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  const options = getSubGameOptions(node);
+  const grid = document.createElement("div");
+
+  summary.textContent = "미니게임 옵션";
+  grid.className = "field-grid five";
+  grid.append(
+    makeNumberInput("최대 턴", options.maxTurns, (value) => setSubGameOptionNumber(node, "maxTurns", value), 1),
+    makeNumberInput("난이도", options.difficulty, (value) => setSubGameOptionNumber(node, "difficulty", value), 0),
+    makeNumberInput("진행 시간(초)", options.durationSeconds, (value) => setSubGameOptionNumber(node, "durationSeconds", value), 5),
+    makeNumberInput("최대 시간(초)", options.maxDuration, (value) => setSubGameOptionNumber(node, "maxDuration", value), 5),
+    makeNumberInput("최대 초", options.maxSeconds, (value) => setSubGameOptionNumber(node, "maxSeconds", value), 5)
+  );
+  details.append(summary, grid, createSubGameTutorialEditor(node));
+  return details;
+}
+
+function createSubGameTutorialEditor(node) {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  const tutorial = getSubGameTutorial(node);
+  const list = document.createElement("div");
+  const addButton = makeButton("튜토리얼 발화 추가", "secondary-button", () => {
+    const next = getSubGameTutorial(node);
+    next.steps.push("");
+    writeSubGameTutorial(node, next);
+    renderNodes();
+  });
+
+  summary.textContent = "미니게임 튜토리얼";
+  list.className = "choice-items";
+  tutorial.steps.forEach((text, index) => {
+    const row = document.createElement("div");
+    row.className = "follow-line";
+    row.append(
+      makeTextarea("발화", text, (value) => setSubGameTutorialStep(node, index, value)),
+      makeButton("삭제", "danger-button small-button", () => {
+        const next = getSubGameTutorial(node);
+        next.steps.splice(index, 1);
+        writeSubGameTutorial(node, next);
+        renderNodes();
+      })
+    );
+    list.append(row);
+  });
+
+  details.append(
+    summary,
+    makeComboInput("안내 화자", tutorial.speaker, (value) => setSubGameTutorialSpeaker(node, value), getSuggestionOptions("characters"), "파미니"),
+    list,
+    addButton
+  );
   return details;
 }
 
@@ -532,7 +609,7 @@ function makeButton(text, className, onClick) {
   return button;
 }
 
-function getSuggestionOptions(kind, characterName = "") {
+function getSuggestionOptions(kind, option = "") {
   const values = [];
 
   if (kind === "backgrounds") {
@@ -546,12 +623,18 @@ function getSuggestionOptions(kind, characterName = "") {
 
   if (kind === "emotions") {
     const characterAssets = gameAssetManifest.characters || {};
-    const emotionGroups = characterName && characterAssets[characterName]
-      ? [characterAssets[characterName]]
+    const emotionGroups = option && characterAssets[option]
+      ? [characterAssets[option]]
       : Object.values(characterAssets);
     emotionGroups.forEach((emotions) => {
       values.push(...Object.keys(emotions || {}));
     });
+  }
+
+  if (kind === "sounds") {
+    const sounds = gameAssetManifest.sounds || {};
+    const soundType = option === "bgm" ? "bgm" : "effects";
+    values.push(...Object.keys(sounds[soundType] || {}));
   }
 
   Object.values(episodes).forEach((nodes) => {
@@ -571,10 +654,30 @@ function getSuggestionOptions(kind, characterName = "") {
       }
 
       if (kind === "emotions" && node.emotion) values.push(node.emotion);
+
+      if (kind === "sounds" && node.type === "sound" && node.name) {
+        collectSoundSuggestion(values, option, node);
+      }
+
+      if (kind === "sounds" && node.type === "choice" && Array.isArray(node.choices)) {
+        node.choices.forEach((choice) => {
+          collectSoundSuggestion(values, option, choice.sound);
+          (choice.follow || []).forEach((line) => collectSoundSuggestion(values, option, line.sound));
+        });
+      }
     });
   });
 
   return uniqueSorted(values);
+}
+
+function collectSoundSuggestion(values, option, sound) {
+  if (!sound || !sound.name) return;
+
+  const soundType = sound.soundType || sound.kind || "effect";
+  if ((option === "bgm" && soundType === "bgm") || (option !== "bgm" && soundType !== "bgm")) {
+    values.push(sound.name);
+  }
 }
 
 function uniqueSorted(values) {
@@ -675,12 +778,6 @@ function getBackgroundSlideDuration(node) {
   return options && options.slideDuration !== undefined ? options.slideDuration : node.transitionSlideDuration;
 }
 
-function getBackgroundSlideSpeed(node) {
-  const options = getBackgroundTransitionObject(node);
-  const optionValue = options && (options.slideSpeed ?? options.speed);
-  return optionValue !== undefined ? optionValue : node.transitionSlideSpeed;
-}
-
 function setBackgroundTransitionType(node, rawValue) {
   const value = rawValue.trim();
   const options = getBackgroundTransitionObject(node);
@@ -728,17 +825,6 @@ function setBackgroundSlideDuration(node, rawValue) {
   setOptionalNumber(node, "transitionSlideDuration", rawValue);
 }
 
-function setBackgroundSlideSpeed(node, rawValue) {
-  const options = getBackgroundTransitionObject(node);
-  if (options) {
-    if (rawValue === "") delete options.slideSpeed;
-    else options.slideSpeed = Number(rawValue);
-    return;
-  }
-
-  setOptionalNumber(node, "transitionSlideSpeed", rawValue);
-}
-
 function setOptionalString(target, key, rawValue) {
   const value = rawValue.trim();
   if (!value) delete target[key];
@@ -748,6 +834,95 @@ function setOptionalString(target, key, rawValue) {
 function setOptionalNumber(target, key, rawValue) {
   if (rawValue === "") delete target[key];
   else target[key] = Number(rawValue);
+}
+
+function setNestedSoundString(target, key, rawValue) {
+  if (!target.sound) target.sound = {};
+  setOptionalString(target.sound, key, rawValue);
+  cleanupEmptyObject(target, "sound");
+}
+
+function setNestedSoundNumber(target, key, rawValue) {
+  if (!target.sound) target.sound = {};
+  setOptionalNumber(target.sound, key, rawValue);
+  cleanupEmptyObject(target, "sound");
+}
+
+function getSubGameOptions(node) {
+  if (node.options && typeof node.options === "object") return node.options;
+  if (node.subGameOptions && typeof node.subGameOptions === "object") return node.subGameOptions;
+  if (node.minigameOptions && typeof node.minigameOptions === "object") return node.minigameOptions;
+  return {};
+}
+
+function ensureSubGameOptions(node) {
+  if (!node.options || typeof node.options !== "object") {
+    node.options = { ...getSubGameOptions(node) };
+    delete node.subGameOptions;
+    delete node.minigameOptions;
+  }
+
+  return node.options;
+}
+
+function setSubGameOptionNumber(node, key, rawValue) {
+  const options = ensureSubGameOptions(node);
+  setOptionalNumber(node.options, key, rawValue);
+  cleanupEmptyObject(node, "options");
+}
+
+function getSubGameTutorial(node) {
+  const tutorial = getSubGameOptions(node).tutorial;
+  if (Array.isArray(tutorial)) {
+    return {
+      speaker: "",
+      steps: tutorial.map((step) => typeof step === "string" ? step : step?.text || "")
+    };
+  }
+
+  if (tutorial && typeof tutorial === "object") {
+    const rawSteps = Array.isArray(tutorial.steps) ? tutorial.steps : [];
+    return {
+      speaker: tutorial.speaker || "",
+      steps: rawSteps.map((step) => typeof step === "string" ? step : step?.text || "")
+    };
+  }
+
+  return { speaker: "", steps: [] };
+}
+
+function setSubGameTutorialSpeaker(node, rawValue) {
+  const tutorial = getSubGameTutorial(node);
+  tutorial.speaker = rawValue.trim();
+  writeSubGameTutorial(node, tutorial);
+}
+
+function setSubGameTutorialStep(node, index, rawValue) {
+  const tutorial = getSubGameTutorial(node);
+  tutorial.steps[index] = rawValue;
+  writeSubGameTutorial(node, tutorial);
+}
+
+function writeSubGameTutorial(node, tutorial) {
+  const options = ensureSubGameOptions(node);
+  const steps = tutorial.steps.filter((step) => typeof step === "string");
+  const speaker = tutorial.speaker.trim();
+
+  if (!steps.length && !speaker) {
+    delete options.tutorial;
+  } else if (speaker) {
+    options.tutorial = { speaker, steps };
+  } else {
+    options.tutorial = steps;
+  }
+
+  cleanupEmptyObject(node, "options");
+}
+
+function cleanupEmptyObject(target, key) {
+  if (target[key] && typeof target[key] === "object" && !Object.keys(target[key]).length) {
+    delete target[key];
+  }
 }
 
 function setChoiceNextNode(choice, rawValue) {

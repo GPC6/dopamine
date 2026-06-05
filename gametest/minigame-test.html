@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>도파민때문에 미니게임 테스트</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    .minigame-test-panel {
+      position: fixed;
+      top: 14px;
+      left: 50%;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-sizing: border-box;
+      max-width: calc(100vw - 28px);
+      min-height: 44px;
+      padding: 8px 10px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      border-radius: 8px;
+      background: rgba(17, 19, 24, 0.86);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+      color: #f5f2ea;
+      transform: translateX(-50%);
+      backdrop-filter: blur(10px);
+    }
+
+    .minigame-test-panel strong {
+      white-space: nowrap;
+      font-size: 14px;
+    }
+
+    .minigame-test-panel label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+      color: #dfe4f4;
+      font-size: 12px;
+    }
+
+    .minigame-test-panel select,
+    .minigame-test-panel input,
+    .minigame-test-panel button,
+    .minigame-test-panel a {
+      box-sizing: border-box;
+      min-height: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 6px;
+      font: inherit;
+      font-size: 12px;
+    }
+
+    .minigame-test-panel select,
+    .minigame-test-panel input {
+      background: #f5f5f7;
+      color: #20242c;
+    }
+
+    .minigame-test-panel select {
+      width: 160px;
+      padding: 0 8px;
+    }
+
+    .minigame-test-panel input {
+      width: 70px;
+      padding: 0 8px;
+    }
+
+    .minigame-test-panel button,
+    .minigame-test-panel a {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      background: #4f78e8;
+      color: #fff;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    .minigame-test-panel a {
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .minigame-test-panel output {
+      min-width: 138px;
+      color: #f8e7a2;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    @media (max-width: 760px) {
+      .minigame-test-panel {
+        align-items: stretch;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+  </style>
+  <script src="libraries/p5.min.js"></script>
+  <script src="libraries/p5.sound.min.js"></script>
+</head>
+
+<body>
+  <nav class="minigame-test-panel" aria-label="미니게임 테스트">
+    <strong>미니게임 테스트</strong>
+    <label>
+      게임
+      <select id="testGameSelect"></select>
+    </label>
+    <label>
+      도파민
+      <input id="testDopamineInput" type="number" min="0" max="100" step="1" value="50" />
+    </label>
+    <label>
+      턴/시간
+      <input id="testTurnsInput" type="number" min="1" max="180" step="1" value="10" />
+    </label>
+    <button id="testStartButton" type="button">시작</button>
+    <a href="./index.html">본게임</a>
+    <output id="testStatus">대기</output>
+  </nav>
+
+  <script src="./config.js"></script>
+  <script src="./sub_games/breakblocks.js"></script>
+  <script src="./sub_games/shooting.js"></script>
+  <script src="./minigame-test.js"></script>
+</body>
+
+</html>

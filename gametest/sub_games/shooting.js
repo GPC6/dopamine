@@ -1,14 +1,30 @@
 class SideShooterGame {
-  constructor(initialDopamine) {
+  constructor(initialDopamine, options = {}) {
     this.w = 980;
     this.h = 620;
-    this.skillAThreshold = 45;
-    this.skillBThreshold = 75;
-    this.skillACost = 25;
-    this.skillBCost = 45;
-    this.initialDopamine = initialDopamine;
+    this.maxDopamine = 100;
+    this.durationSeconds = this.parseDurationSeconds(options.durationSeconds || options.maxDuration || options.maxSeconds);
+    this.difficulty = this.parseDifficulty(options.difficulty);
+    this.overheatThreshold = 90;
+    this.overheatDurationMs = 5000;
+    this.enemyKillDopamine = 1;
+    this.powerDropChance = 0.22;
+    this.stimItemDopamine = 8;
+    this.calmItemDopamine = -10;
+    this.absorbSkillDopamine = -15;
+    this.initialDopamine = this.clampDopamine(initialDopamine);
     this.finished = false;
     this.resetGame();
+  }
+
+  parseDurationSeconds(value) {
+    if (!Number.isFinite(Number(value))) return 90;
+    return Math.max(5, Math.min(180, Math.round(Number(value))));
+  }
+
+  parseDifficulty(value) {
+    if (!Number.isFinite(Number(value))) return 0;
+    return Math.max(0, Math.min(10, Math.round(Number(value))));
   }
 
   resetGame() {
@@ -17,17 +33,28 @@ class SideShooterGame {
     this.enemies = [];
     this.bullets = [];
     this.gates = [];
+    this.items = [];
     this.dopamine = this.initialDopamine;
     this.lives = 3;
-    this.score = 0;
     this.startedAt = millis();
     this.spawnTimer = 0;
-    this.skillCooldown = 0;
+    this.nextEnemyId = 1;
     this.gameOver = false;
-    this.resultText = "Space 공격 / Shift 또는 X 기술 사용";
-    this.overloadStart = 0;
+    this.resultText = "Space/좌클릭 공격 / Shift/X/우클릭 강화";
+    this.overloadStart = this.dopamine >= this.overheatThreshold ? this.startedAt : null;
     this.skillFlash = 0;
+    this.lastActivatedUpgrade = null;
     this.finished = false;
+    this.powerLevel = 0;
+    this.upgrades = {
+      speed: false,
+      double: false,
+      absorb: false,
+      laser: false,
+      option: false,
+      shield: false
+    };
+    this.optionDrone = null;
   }
 
   update() {
@@ -46,7 +73,18 @@ class SideShooterGame {
   }
 
   mousePressed() {
-    if (this.gameOver) this.finished = true;
+    if (this.gameOver) {
+      this.finished = true;
+      return false;
+    }
+
+    if (typeof mouseButton !== "undefined" && mouseButton === RIGHT) {
+      this.useSkill();
+      return false;
+    }
+
+    this.fireShot();
+    return false;
   }
 
   keyPressed() {
@@ -62,39 +100,41 @@ class SideShooterGame {
   }
 
   updateGame() {
-    const speedBoost = map(constrain(this.dopamine, 0, 110), 0, 110, 2.5, 6.5);
-    if (keyIsDown(UP_ARROW) || keyIsDown(87)) this.player.y -= speedBoost;
-    if (keyIsDown(DOWN_ARROW) || keyIsDown(83)) this.player.y += speedBoost;
-    if (keyIsDown(LEFT_ARROW) || keyIsDown(65)) this.player.x -= speedBoost * 0.75;
-    if (keyIsDown(RIGHT_ARROW) || keyIsDown(68)) this.player.x += speedBoost * 0.75;
+    const speedBoost = this.getPlayerSpeed();
+    if (this.isKeyDown(UP_ARROW) || this.isKeyDown(87)) this.player.y -= speedBoost;
+    if (this.isKeyDown(DOWN_ARROW) || this.isKeyDown(83)) this.player.y += speedBoost;
+    if (this.isKeyDown(LEFT_ARROW) || this.isKeyDown(65)) this.player.x -= speedBoost * 0.75;
+    if (this.isKeyDown(RIGHT_ARROW) || this.isKeyDown(68)) this.player.x += speedBoost * 0.75;
     this.player.x = constrain(this.player.x, 40, this.w - 80);
     this.player.y = constrain(this.player.y, 92, this.h - 45);
+    this.updateOptionDrone();
 
-    this.skillCooldown = max(0, this.skillCooldown - 1);
-    this.skillFlash = max(0, this.skillFlash - 1);
+    this.skillFlash = Math.max(0, this.skillFlash - 1);
 
     this.spawnTimer--;
     if (this.spawnTimer <= 0) {
-      this.spawnEnemy();
-      if (random() < 0.2) this.gates.push({ x: this.w + 20, y: random(120, this.h - 70), r: 28 });
-      this.spawnTimer = this.dopamine > 70 ? 34 : 52;
+      this.spawnEnemyWave();
+      if (random() < 0.04) this.spawnGate();
+      this.spawnTimer = this.getSpawnInterval();
     }
 
-    for (const s of this.shots) s.x += s.vx;
-    this.shots = this.shots.filter((s) => s.x < this.w + 90);
+    for (const s of this.shots) {
+      s.x += s.vx;
+      s.y += s.vy || 0;
+    }
+    this.shots = this.shots.filter((s) => s.x < this.w + 90 && s.y < this.h + 50 && s.y > 70);
 
     for (const gate of this.gates) gate.x -= 3.5;
     this.gates = this.gates.filter((gate) => gate.x > -40);
 
     for (const enemy of this.enemies) {
       enemy.x -= enemy.speed;
-      if (enemy.type === "addict" && dist(this.player.x, this.player.y, enemy.x, enemy.y) < 130) {
-        this.dopamine = constrain(this.dopamine + 0.08, 0, 120);
+      if (enemy.pattern === "oscillate") {
+        enemy.y = constrain(enemy.baseY + Math.sin(frameCount * 0.045 + enemy.phase) * 46, 120, this.h - 70);
       }
-      if (frameCount % 65 === 0) {
-        this.bullets.push({ x: enemy.x - 12, y: enemy.y, vx: -4.2, vy: random(-1.2, 1.2) });
-      }
+      if (enemy.x < -60) this.recycleEnemy(enemy);
     }
+    this.updateEnemyBullets();
 
     for (const b of this.bullets) {
       b.x += b.vx;
@@ -102,80 +142,336 @@ class SideShooterGame {
     }
     this.bullets = this.bullets.filter((b) => b.x > -30);
 
+    this.updateItems();
+    this.collectItems();
     this.handleCollisions();
-    this.dopamine = constrain(this.dopamine - 0.012, 0, 120);
+    this.dopamine = this.clampDopamine(this.dopamine - 0.012);
 
     const elapsed = (millis() - this.startedAt) / 1000;
-    if (elapsed >= 90) this.endGame("90초 생존 성공");
-    if (this.dopamine > 105) this.overloadStart = this.overloadStart || millis();
-    else this.overloadStart = 0;
-    if (this.overloadStart && millis() - this.overloadStart > 4200) this.endGame("도파민 과부하");
-    if (this.lives <= 0) this.endGame("라이프 소진");
+    if (elapsed >= this.durationSeconds) {
+      this.endGame(`${this.durationSeconds}초 생존 성공`);
+      return;
+    }
+
+    if (this.dopamine >= this.overheatThreshold) {
+      if (this.overloadStart === null) this.overloadStart = millis();
+    } else {
+      this.overloadStart = null;
+    }
+
+    if (this.overloadStart !== null && millis() - this.overloadStart >= this.overheatDurationMs) {
+      this.endGame("도파민 과열");
+    }
+  }
+
+  isKeyDown(code) {
+    return typeof keyIsDown === "function" && keyIsDown(code);
+  }
+
+  getPlayerSpeed() {
+    const speedUpgrade = this.upgrades && this.upgrades.speed ? 0.7 : 0;
+    return this.getDopamineProfile().playerSpeed + speedUpgrade;
+  }
+
+  getElapsedRatio() {
+    const elapsed = Math.max(0, (millis() - this.startedAt) / 1000);
+    return constrain(elapsed / this.durationSeconds, 0, 1);
+  }
+
+  getDifficultyLevel() {
+    return Math.floor(this.getElapsedRatio() * 4);
+  }
+
+  getDopamineProfile() {
+    if (this.dopamine < 35) {
+      return {
+        playerSpeed: 2.7,
+        shotSpeedBonus: -1.2,
+        enemySpeedBonus: -0.15,
+        bulletIntervalBonus: 8,
+        spawnPressure: 0
+      };
+    }
+    if (this.dopamine < 70) {
+      return {
+        playerSpeed: 4.1,
+        shotSpeedBonus: 0,
+        enemySpeedBonus: 0,
+        bulletIntervalBonus: 0,
+        spawnPressure: 0
+      };
+    }
+    if (this.dopamine < 90) {
+      return {
+        playerSpeed: 5.6,
+        shotSpeedBonus: 1.4,
+        enemySpeedBonus: 0.35,
+        bulletIntervalBonus: -8,
+        spawnPressure: 12
+      };
+    }
+    return {
+      playerSpeed: 6.3,
+      shotSpeedBonus: 2,
+      enemySpeedBonus: 0.65,
+      bulletIntervalBonus: -14,
+      spawnPressure: 24
+    };
+  }
+
+  getSpawnInterval() {
+    const difficultyPressure = this.getDifficultyLevel() * 17;
+    return Math.max(62, 155 - difficultyPressure - this.getDopamineProfile().spawnPressure);
   }
 
   fireShot() {
-    this.shots.push({ x: this.player.x + 18, y: this.player.y, vx: 8.2, r: this.dopamine > 70 ? 8 : 5, beam: false });
-    this.dopamine = constrain(this.dopamine + 0.8, 0, 120);
+    const originX = this.player.x + 18;
+    const originY = this.player.y;
+
+    if (this.upgrades.double) {
+      this.shots.push(this.createShot(originX, originY - 7, { vy: -0.45 }));
+      this.shots.push(this.createShot(originX, originY + 7, { vy: 0.45 }));
+    } else {
+      this.shots.push(this.createShot(originX, originY));
+    }
+
+    if (this.upgrades.option && this.optionDrone) {
+      this.shots.push(this.createShot(this.optionDrone.x + 12, this.optionDrone.y, { owner: "option" }));
+    }
+  }
+
+  createShot(x, y, options = {}) {
+    const laser = Boolean(this.upgrades && this.upgrades.laser);
+    return {
+      x,
+      y,
+      vx: options.vx ?? (laser ? 13.5 : 8.2) + this.getDopamineProfile().shotSpeedBonus,
+      vy: options.vy ?? 0,
+      r: options.r ?? (laser ? 9 : 5),
+      beam: laser,
+      kind: options.kind || (laser ? "laser" : "normal"),
+      owner: options.owner || "player",
+      pierce: laser,
+      hitEnemyIds: []
+    };
   }
 
   useSkill() {
-    if (this.skillCooldown > 0) {
-      this.resultText = "기술 재사용 대기 중";
+    const selectedUpgrade = this.getSelectedUpgrade();
+    if (!selectedUpgrade) {
+      this.resultText = "파워 캡슐을 획득해 기술을 선택";
       return;
     }
 
-    if (this.dopamine >= this.skillBThreshold) {
-      this.useReceptorBeam();
+    if (selectedUpgrade.key === "absorb") {
+      this.useAbsorbSkill(selectedUpgrade);
       return;
     }
 
-    if (this.dopamine >= this.skillAThreshold) {
-      this.useReuptakePulse();
+    if (this.upgrades[selectedUpgrade.key]) {
+      this.resultText = `${selectedUpgrade.name} 이미 보유 중`;
       return;
     }
 
-    this.resultText = `도파민 ${this.skillAThreshold} 이상부터 기술 사용 가능`;
+    this.activateUpgrade(selectedUpgrade.key);
+    this.powerLevel = 0;
+    this.skillFlash = 24;
+    this.lastActivatedUpgrade = selectedUpgrade.key;
+    this.resultText = `${selectedUpgrade.name} 활성화`;
   }
 
-  useReuptakePulse() {
-    this.dopamine = constrain(this.dopamine - this.skillACost, 0, 120);
-    this.bullets = this.bullets.filter((b) => dist(this.player.x, this.player.y, b.x, b.y) > 160);
+  getUpgradeCatalog() {
+    return [
+      { key: "speed", name: "속도 증가", slot: 1 },
+      { key: "double", name: "더블 샷", slot: 2 },
+      { key: "absorb", name: "흡수 필터", slot: 3 },
+      { key: "laser", name: "관통 레이저", slot: 4 },
+      { key: "option", name: "보조 펫", slot: 5 },
+      { key: "shield", name: "실드", slot: 6 }
+    ];
+  }
+
+  getSelectedUpgrade() {
+    if (this.powerLevel <= 0) return null;
+    return this.getUpgradeCatalog()[this.powerLevel - 1] || null;
+  }
+
+  getNextUpgrade() {
+    return this.getUpgradeCatalog().find((upgrade) => upgrade.key !== "absorb" && !this.upgrades[upgrade.key]) || null;
+  }
+
+  activateUpgrade(key) {
+    this.upgrades[key] = true;
+    if (key === "shield") this.player.shield = Math.min(4, this.player.shield + 2);
+    if (key === "option") {
+      this.optionDrone = { x: this.player.x - 42, y: this.player.y, trail: [] };
+    }
+  }
+
+  useAbsorbSkill(upgrade) {
+    this.addDopamine(this.absorbSkillDopamine);
+    this.powerLevel = 0;
+    this.skillFlash = 24;
+    this.lastActivatedUpgrade = upgrade.key;
+    this.resultText = `${upgrade.name}: 도파민 ${this.absorbSkillDopamine}`;
+  }
+
+  advancePowerMeter() {
+    this.powerLevel = Math.min(this.getUpgradeCatalog().length, this.powerLevel + 1);
+  }
+
+  updateOptionDrone() {
+    if (!this.optionDrone) return;
+    this.optionDrone.trail.push({ x: this.player.x, y: this.player.y });
+    if (this.optionDrone.trail.length > 18) {
+      const target = this.optionDrone.trail.shift();
+      this.optionDrone.x = target.x - 42;
+      this.optionDrone.y = target.y;
+    }
+  }
+
+  getEnemyWaveTemplates() {
+    return [
+      {
+        name: "droneLine",
+        type: "drone",
+        pattern: "line",
+        members: [
+          { dx: 0, dy: 0 },
+          { dx: 48, dy: -18 },
+          { dx: 96, dy: 18 },
+          { dx: 144, dy: -18 },
+          { dx: 192, dy: 0 }
+        ]
+      },
+      {
+        name: "shooterWedge",
+        type: "shooter",
+        pattern: "wedge",
+        members: [
+          { dx: 0, dy: 0 },
+          { dx: 72, dy: -52 },
+          { dx: 72, dy: 52 }
+        ]
+      },
+      {
+        name: "tankOscillate",
+        type: "tank",
+        pattern: "oscillate",
+        members: [
+          { dx: 0, dy: -42 },
+          { dx: 92, dy: 42 }
+        ]
+      }
+    ];
+  }
+
+  spawnEnemyWave() {
+    const templates = this.getEnemyWaveTemplates();
+    const template = templates[Math.floor(random(templates.length))];
+    const baseY = random(150, this.h - 110);
+    const waveId = `${template.name}-${millis()}-${this.enemies.length}`;
+
+    const members = [...template.members];
+    const extraCount = Math.min(template.type === "tank" ? 1 : 2, this.getDifficultyLevel());
+    for (let i = 0; i < extraCount; i++) {
+      members.push({
+        dx: 230 + i * 50,
+        dy: i % 2 === 0 ? -34 : 34
+      });
+    }
+
+    for (const member of members) {
+      this.enemies.push(this.createEnemy({
+        x: this.w + 60 + member.dx,
+        y: constrain(baseY + member.dy, 120, this.h - 70),
+        type: template.type,
+        waveId,
+        pattern: template.pattern
+      }));
+    }
+  }
+
+  createEnemy(config) {
+    const stats = this.enemyStats(config.type);
+    return {
+      id: this.nextEnemyId++,
+      x: config.x,
+      y: config.y,
+      baseY: config.y,
+      r: stats.r,
+      hp: stats.hp + this.getEnemyHpBonus(config.type),
+      speed: stats.speed + this.dopamine / 160 + this.getDifficultyLevel() * 0.18 + this.getDopamineProfile().enemySpeedBonus,
+      type: config.type,
+      waveId: config.waveId,
+      pattern: config.pattern,
+      phase: random(0, Math.PI * 2)
+    };
+  }
+
+  enemyStats(type) {
+    if (type === "shooter") return { r: 20, hp: 5, speed: 2.55 };
+    if (type === "tank") return { r: 24, hp: 8, speed: 1.75 };
+    return { r: 18, hp: 4, speed: 2.75 };
+  }
+
+  getEnemyHpBonus(type) {
+    const baseBonus = this.difficulty + Math.floor(this.getElapsedRatio() * 3);
+    return type === "tank" ? baseBonus + Math.floor(this.getElapsedRatio() * 2) : baseBonus;
+  }
+
+  recycleEnemy(enemy) {
+    enemy.x = this.w + random(60, 180);
+    enemy.y = constrain(enemy.baseY + random(-35, 35), 120, this.h - 70);
+  }
+
+  spawnGate() {
+    this.gates.push({ x: this.w + 20, y: random(120, this.h - 70), r: 28 });
+  }
+
+  updateEnemyBullets() {
+    const interval = Math.max(34, 65 - this.getDifficultyLevel() * 5 + this.getDopamineProfile().bulletIntervalBonus);
+    if (frameCount % interval !== 0) return;
     for (const enemy of this.enemies) {
-      if (dist(this.player.x, this.player.y, enemy.x, enemy.y) < 175) {
-        enemy.hp -= enemy.type === "blocker" ? 1 : 2;
-        enemy.speed *= 0.55;
+      if (enemy.type !== "shooter") continue;
+      this.bullets.push({ x: enemy.x - 12, y: enemy.y, vx: -4.2, vy: random(-1.2, 1.2) });
+    }
+  }
+
+  updateItems() {
+    for (const item of this.items) item.x += item.vx;
+    this.items = this.items.filter((item) => item.x > -30);
+  }
+
+  collectItems() {
+    for (const item of this.items) {
+      if (dist(this.player.x, this.player.y, item.x, item.y) < this.player.r + item.r) {
+        this.collectItem(item);
       }
     }
-    this.skillCooldown = 110;
-    this.skillFlash = 26;
-    this.resultText = `A기술 재흡수 펄스 발동: 도파민 -${this.skillACost}`;
   }
 
-  useReceptorBeam() {
-    this.dopamine = constrain(this.dopamine - this.skillBCost, 0, 120);
-    this.shots.push({ x: this.player.x + 22, y: this.player.y, vx: 16, r: 17, beam: true });
-    this.skillCooldown = 145;
-    this.skillFlash = 34;
-    this.resultText = `B기술 수용체 빔 발동: 도파민 -${this.skillBCost}`;
-  }
-
-  spawnEnemy() {
-    const roll = random();
-    const type = roll < 0.55 ? "stim" : roll < 0.75 ? "stress" : roll < 0.9 ? "addict" : "blocker";
-    this.enemies.push({
-      x: this.w + 40,
-      y: random(120, this.h - 70),
-      r: type === "addict" ? 25 : 19,
-      hp: type === "addict" ? 3 : 2,
-      speed: random(2.0, 3.7) + this.dopamine / 100,
-      type
-    });
+  collectItem(item) {
+    item.x = -100;
+    if (item.type === "power") {
+      this.advancePowerMeter();
+      const selected = this.getSelectedUpgrade();
+      this.resultText = selected ? `파워 캡슐: ${selected.name} 선택 가능` : "파워 캡슐 획득";
+      return;
+    }
+    if (item.type === "calm") {
+      this.addDopamine(this.calmItemDopamine);
+      this.resultText = `안정 캡슐: 도파민 ${this.calmItemDopamine}`;
+      return;
+    }
+    this.addDopamine(this.stimItemDopamine);
+    this.resultText = `자극 캡슐: 도파민 +${this.stimItemDopamine}`;
   }
 
   handleCollisions() {
     for (const gate of this.gates) {
       if (dist(this.player.x, this.player.y, gate.x, gate.y) < gate.r + this.player.r) {
-        this.dopamine = lerp(this.dopamine, 55, 0.55);
+        this.dopamine = this.clampDopamine(lerp(this.dopamine, 55, 0.55));
         gate.x = -100;
         this.resultText = "수용체 게이트 통과: 도파민 안정화";
       }
@@ -184,24 +480,25 @@ class SideShooterGame {
     for (const s of this.shots) {
       for (const enemy of this.enemies) {
         if (dist(s.x, s.y, enemy.x, enemy.y) < s.r + enemy.r) {
-          enemy.hp -= s.beam ? 4 : 1;
-          if (!s.beam) s.x = this.w + 100;
+          const enemyId = this.ensureEnemyId(enemy);
+          if (s.pierce && s.hitEnemyIds.includes(enemyId)) continue;
+          if (s.pierce) s.hitEnemyIds.push(enemyId);
+          enemy.hp -= s.beam ? 2 : 1;
+          if (!s.pierce) s.x = this.w + 100;
         }
       }
     }
 
     const defeated = this.enemies.filter((enemy) => enemy.hp <= 0);
     for (const enemy of defeated) {
-      this.score += enemy.type === "addict" ? 80 : 40;
-      if (enemy.type === "stress") this.dopamine = constrain(this.dopamine - 8, 0, 120);
-      else this.dopamine = constrain(this.dopamine + (enemy.type === "stim" ? 5 : 8), 0, 120);
+      this.handleEnemyDefeat(enemy);
     }
-    this.enemies = this.enemies.filter((enemy) => enemy.hp > 0 && enemy.x > -60);
+    this.enemies = this.enemies.filter((enemy) => enemy.hp > 0);
 
     for (const enemy of this.enemies) {
       if (dist(this.player.x, this.player.y, enemy.x, enemy.y) < this.player.r + enemy.r) {
         this.takeHit();
-        enemy.x = -80;
+        this.recycleEnemy(enemy);
       }
     }
     for (const b of this.bullets) {
@@ -212,18 +509,50 @@ class SideShooterGame {
     }
   }
 
+  handleEnemyDefeat(enemy) {
+    this.addDopamine(this.enemyKillDopamine);
+    if (random() < this.powerDropChance) {
+      this.items.push({ x: enemy.x, y: enemy.y, r: 13, vx: -2.8, type: this.randomItemType() });
+    }
+  }
+
+  ensureEnemyId(enemy) {
+    if (enemy.id === undefined || enemy.id === null) enemy.id = this.nextEnemyId++;
+    return enemy.id;
+  }
+
+  randomItemType() {
+    const roll = random();
+    if (roll < 0.7) return "power";
+    if (roll < 0.85) return "calm";
+    return "stim";
+  }
+
   takeHit() {
     if (this.player.shield > 0) {
       this.player.shield--;
       return;
     }
     this.lives--;
-    this.dopamine = constrain(this.dopamine + 10, 0, 120);
+    this.addDopamine(10);
+    if (this.lives <= 0) {
+      this.dopamine = 0;
+      this.endGame("라이프 소진");
+    }
   }
 
   endGame(text) {
     this.gameOver = true;
     this.resultText = text;
+  }
+
+  clampDopamine(value) {
+    if (!Number.isFinite(Number(value))) return 50;
+    return Math.max(0, Math.min(this.maxDopamine, Number(value)));
+  }
+
+  addDopamine(amount) {
+    this.dopamine = this.clampDopamine(this.dopamine + amount);
   }
 
   drawStars() {
@@ -241,6 +570,19 @@ class SideShooterGame {
     fill("#e9fff4");
     circle(this.player.x - 4, this.player.y, 8);
 
+    if (this.player.shield > 0) {
+      noFill();
+      stroke("#68a7ff");
+      strokeWeight(2);
+      circle(this.player.x, this.player.y, 56);
+      noStroke();
+    }
+
+    if (this.optionDrone) {
+      fill("#68a7ff");
+      circle(this.optionDrone.x, this.optionDrone.y, 16);
+    }
+
     for (const gate of this.gates) {
       noFill();
       stroke("#7be0b7");
@@ -249,43 +591,89 @@ class SideShooterGame {
       noStroke();
     }
 
+    for (const item of this.items) {
+      fill(this.itemColor(item.type));
+      stroke("#f6f1df");
+      strokeWeight(2);
+      circle(item.x, item.y, item.r * 2);
+      noStroke();
+      fill("#111820");
+      textAlign(CENTER, CENTER);
+      textSize(10);
+      text(this.itemLabel(item.type), item.x, item.y);
+    }
+
     for (const s of this.shots) {
-      fill(s.beam ? "#ffd166" : "#f06c86");
-      ellipse(s.x, s.y, s.beam ? 72 : 18, s.beam ? 12 : 8);
+      fill(this.shotColor(s.kind));
+      if (s.kind === "laser") ellipse(s.x, s.y, 58, 8);
+      else ellipse(s.x, s.y, 18, 8);
     }
 
     for (const enemy of this.enemies) {
-      fill(this.enemyColor(enemy.type));
-      circle(enemy.x, enemy.y, enemy.r * 2);
-      fill("#101419");
-      textAlign(CENTER, CENTER);
-      textSize(12);
-      text(this.enemyLabel(enemy.type), enemy.x, enemy.y);
+      this.drawEnemy(enemy);
     }
 
     fill("#ffc857");
     for (const b of this.bullets) circle(b.x, b.y, 8);
 
-    if (this.skillFlash > 0) {
-      noFill();
-      stroke(this.dopamine >= this.skillAThreshold ? "#7be0b7" : "#ffd166");
-      strokeWeight(2);
-      circle(this.player.x, this.player.y, 320 - this.skillFlash * 3);
-      noStroke();
+  }
+
+  shotColor(kind) {
+    if (kind === "laser") return "#ffd166";
+    return "#f06c86";
+  }
+
+  itemColor(type) {
+    if (type === "calm") return "#7be0b7";
+    if (type === "stim") return "#ff7ba6";
+    return "#ffd166";
+  }
+
+  itemLabel(type) {
+    if (type === "calm") return "-";
+    if (type === "stim") return "+";
+    return "P";
+  }
+
+  drawEnemy(enemy) {
+    const x = enemy.x;
+    const y = enemy.y;
+    fill(this.enemyColor(enemy.type));
+    stroke("#101419");
+    strokeWeight(2);
+
+    if (enemy.type === "tank") {
+      rectMode(CENTER);
+      rect(x, y, enemy.r * 2.2, enemy.r * 1.55, 5);
+      rectMode(CORNER);
+    } else if (enemy.type === "shooter") {
+      circle(x, y, enemy.r * 2);
+      rect(x - enemy.r - 14, y - 5, 22, 10, 3);
+    } else {
+      beginShape();
+      vertex(x, y - enemy.r);
+      vertex(x + enemy.r, y);
+      vertex(x, y + enemy.r);
+      vertex(x - enemy.r, y);
+      endShape(CLOSE);
     }
+
+    noStroke();
+    fill("#101419");
+    textAlign(CENTER, CENTER);
+    textSize(12);
+    text(this.enemyLabel(enemy.type), x, y);
   }
 
   enemyColor(type) {
-    if (type === "stress") return "#77a8ff";
-    if (type === "addict") return "#ff7b54";
-    if (type === "blocker") return "#b48cff";
+    if (type === "shooter") return "#77a8ff";
+    if (type === "tank") return "#b48cff";
     return "#f06c86";
   }
 
   enemyLabel(type) {
-    if (type === "stress") return "-";
-    if (type === "addict") return "중";
-    if (type === "blocker") return "방";
+    if (type === "shooter") return "탄";
+    if (type === "tank") return "방";
     return "+";
   }
 
@@ -293,17 +681,18 @@ class SideShooterGame {
     fill("#f8e7a2");
     textAlign(LEFT, CENTER);
     textSize(27);
-    text("횡스크롤 슈팅게임", 28, 32);
+    text("뉴럴 사이드 슈터", 28, 32);
     fill("#dfe8e2");
     textSize(14);
-    text("WASD/방향키 이동, Space 공격, Shift/X 기술 사용", 28, 63);
+    text("WASD/방향키 이동, Space/좌클릭 공격, Shift/X/우클릭 강화", 28, 63);
     this.drawMeter(615, 28, 280, this.dopamine);
-    this.drawSkillState(615, 80);
+    this.drawPowerMeter(615, 78, 310);
+    this.drawOverheatTimer(this.w - 28, 106);
     fill("#eef4ee");
     textAlign(RIGHT, CENTER);
     textSize(16);
-    const remain = max(0, 90 - floor((millis() - this.startedAt) / 1000));
-    text(`라이프 ${this.lives}  점수 ${this.score}  남은 ${remain}s`, this.w - 28, 76);
+    const remain = Math.max(0, this.durationSeconds - Math.floor((millis() - this.startedAt) / 1000));
+    text(`라이프 ${this.lives}  남은 ${remain}s`, this.w - 28, 76);
     textAlign(CENTER, CENTER);
     text(this.resultText, this.w / 2, this.h - 22);
   }
@@ -311,28 +700,72 @@ class SideShooterGame {
   drawMeter(x, y, w, value) {
     fill("#24313b");
     rect(x, y, w, 18, 6);
-    fill(value < 31 ? "#69a8ff" : value < 71 ? "#63d6a6" : value < 101 ? "#ffbd5a" : "#ff5d73");
-    rect(x, y, constrain(map(value, 0, 120, 0, w), 0, w), 18, 6);
+    fill(this.getDopamineZoneColor(value));
+    rect(x, y, constrain(map(value, 0, this.maxDopamine, 0, w), 0, w), 18, 6);
+
     fill("#eef4ee");
     textAlign(LEFT, CENTER);
     textSize(14);
-    text(`도파민 ${round(value)}`, x, y + 35);
+    text(`도파민 ${Math.round(value)}`, x, y + 35);
   }
 
-  drawSkillState(x, y) {
-    const readyText = this.skillCooldown > 0 ? `대기 ${ceil(this.skillCooldown / 60)}초` : this.nextSkillName();
+  getDopamineZoneColor(value) {
+    if (value < 20) return "#69a8ff";
+    if (value < 50) return "#63d6a6";
+    if (value < 80) return "#ffbd5a";
+    return "#ff5d73";
+  }
+
+  drawPowerMeter(x, y, w) {
+    const upgrades = this.getUpgradeCatalog();
+    const cellW = w / upgrades.length;
     fill("#17222b");
-    rect(x, y, 280, 34, 6);
-    fill(this.skillCooldown > 0 ? "#99a4aa" : "#f8e7a2");
+    rect(x, y, w, 58, 6);
+
+    for (let i = 0; i < upgrades.length; i++) {
+      const upgrade = upgrades[i];
+      const cellX = x + i * cellW;
+      const selected = this.powerLevel === i + 1;
+      const activatedFlash = this.skillFlash > 0 && this.lastActivatedUpgrade === upgrade.key;
+      fill(this.upgrades[upgrade.key] ? "#7be0b7" : selected ? "#ffd166" : "#2a3843");
+      rect(cellX + 4, y + 8, cellW - 8, 20, 4);
+      if (activatedFlash) {
+        noFill();
+        stroke("#f8e7a2");
+        strokeWeight(2);
+        rect(cellX + 2, y + 6, cellW - 4, 24, 5);
+        noStroke();
+      }
+      fill("#111820");
+      textAlign(CENTER, CENTER);
+      textSize(10);
+      text(upgrade.name.slice(0, 2), cellX + cellW / 2, y + 18);
+    }
+
+    const selected = this.getSelectedUpgrade();
+    fill("#f8e7a2");
     textAlign(LEFT, CENTER);
     textSize(13);
-    text(`기술: ${readyText}`, x + 12, y + 17);
+    text(`POWER ${this.powerLevel}/${upgrades.length}  선택: ${selected ? selected.name : "없음"}`, x + 12, y + 42);
+    fill("#dfe8e2");
+    textAlign(RIGHT, CENTER);
+    text(`보유 ${this.getActiveUpgradeLabels().length}`, x + w - 12, y + 42);
   }
 
-  nextSkillName() {
-    if (this.dopamine >= this.skillBThreshold) return `B 수용체 빔 사용 가능 (${this.skillBCost} 소모)`;
-    if (this.dopamine >= this.skillAThreshold) return `A 재흡수 펄스 사용 가능 (${this.skillACost} 소모)`;
-    return `도파민 ${this.skillAThreshold} 필요`;
+  getActiveUpgradeLabels() {
+    return this.getUpgradeCatalog()
+      .filter((upgrade) => this.upgrades[upgrade.key])
+      .map((upgrade) => upgrade.name);
+  }
+
+  drawOverheatTimer(x, y) {
+    if (this.overloadStart === null) return;
+    const elapsed = millis() - this.overloadStart;
+    const remain = Math.max(0, (this.overheatDurationMs - elapsed) / 1000);
+    fill("#ff5d73");
+    textAlign(RIGHT, CENTER);
+    textSize(14);
+    text(`과열 ${remain.toFixed(1)}s`, x, y);
   }
 
   drawEnd() {
@@ -344,12 +777,12 @@ class SideShooterGame {
     text(this.resultText, this.w / 2, 255);
     fill("#eef4ee");
     textSize(22);
-    text(`최종 도파민 ${round(this.dopamine)} / 점수 ${this.score}`, this.w / 2, 315);
+    text(`최종 도파민 ${Math.round(this.dopamine)}`, this.w / 2, 315);
     text("클릭 또는 Enter 키로 스토리 복귀", this.w / 2, 370);
   }
 
   getDopamine() {
-    return this.dopamine;
+    return this.clampDopamine(this.dopamine);
   }
 }
 
