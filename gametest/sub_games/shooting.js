@@ -5,21 +5,21 @@ class SideShooterGame {
     this.maxDopamine = 100;
     this.durationSeconds = this.parseDurationSeconds(options.durationSeconds || options.maxDuration || options.maxSeconds);
     this.difficulty = this.parseDifficulty(options.difficulty);
-    this.overheatThreshold = 90;
-    this.overheatDurationMs = 5000;
     this.enemyKillDopamine = 1;
     this.powerDropChance = 0.22;
     this.stimItemDopamine = 8;
     this.calmItemDopamine = -10;
-    this.absorbSkillDopamine = -15;
+    this.absorbSkillDopamine = -25;
+    this.speedUpgradeBonus = 1.8;
+    this.speedUpgradeDecayBonus = 0.012;
     this.initialDopamine = this.clampDopamine(initialDopamine);
     this.finished = false;
     this.resetGame();
   }
 
   parseDurationSeconds(value) {
-    if (!Number.isFinite(Number(value))) return 90;
-    return Math.max(5, Math.min(180, Math.round(Number(value))));
+    if (!Number.isFinite(Number(value))) return 45;
+    return Math.max(10, Math.min(120, Math.round(Number(value))));
   }
 
   parseDifficulty(value) {
@@ -40,10 +40,10 @@ class SideShooterGame {
     this.spawnTimer = 0;
     this.nextEnemyId = 1;
     this.gameOver = false;
-    this.resultText = "Space/좌클릭 공격 / Shift/X/우클릭 강화";
-    this.overloadStart = this.dopamine >= this.overheatThreshold ? this.startedAt : null;
+    this.resultText = "마우스로 이동 / 좌클릭 공격 / 우클릭 기술";
     this.skillFlash = 0;
     this.lastActivatedUpgrade = null;
+    this.skillVisual = null;
     this.finished = false;
     this.powerLevel = 0;
     this.upgrades = {
@@ -100,6 +100,7 @@ class SideShooterGame {
   }
 
   updateGame() {
+    this.updateMouseMovement();
     const speedBoost = this.getPlayerSpeed();
     if (this.isKeyDown(UP_ARROW) || this.isKeyDown(87)) this.player.y -= speedBoost;
     if (this.isKeyDown(DOWN_ARROW) || this.isKeyDown(83)) this.player.y += speedBoost;
@@ -110,6 +111,7 @@ class SideShooterGame {
     this.updateOptionDrone();
 
     this.skillFlash = Math.max(0, this.skillFlash - 1);
+    this.updateSkillVisual();
 
     this.spawnTimer--;
     if (this.spawnTimer <= 0) {
@@ -145,7 +147,7 @@ class SideShooterGame {
     this.updateItems();
     this.collectItems();
     this.handleCollisions();
-    this.dopamine = this.clampDopamine(this.dopamine - 0.012);
+    this.dopamine = this.clampDopamine(this.dopamine - this.getDopamineDecayPerFrame());
 
     const elapsed = (millis() - this.startedAt) / 1000;
     if (elapsed >= this.durationSeconds) {
@@ -153,15 +155,6 @@ class SideShooterGame {
       return;
     }
 
-    if (this.dopamine >= this.overheatThreshold) {
-      if (this.overloadStart === null) this.overloadStart = millis();
-    } else {
-      this.overloadStart = null;
-    }
-
-    if (this.overloadStart !== null && millis() - this.overloadStart >= this.overheatDurationMs) {
-      this.endGame("도파민 과열");
-    }
   }
 
   isKeyDown(code) {
@@ -169,8 +162,18 @@ class SideShooterGame {
   }
 
   getPlayerSpeed() {
-    const speedUpgrade = this.upgrades && this.upgrades.speed ? 0.7 : 0;
+    const speedUpgrade = this.upgrades && this.upgrades.speed ? this.speedUpgradeBonus : 0;
     return this.getDopamineProfile().playerSpeed + speedUpgrade;
+  }
+
+  updateMouseMovement() {
+    const localMouseX = mouseX - (width - this.w) / 2;
+    const localMouseY = mouseY - (height - this.h) / 2;
+    const targetX = constrain(localMouseX, 40, this.w - 80);
+    const targetY = constrain(localMouseY, 92, this.h - 45);
+    const follow = 0.28;
+    this.player.x = lerp(this.player.x, targetX, follow);
+    this.player.y = lerp(this.player.y, targetY, follow);
   }
 
   getElapsedRatio() {
@@ -182,6 +185,11 @@ class SideShooterGame {
     return Math.floor(this.getElapsedRatio() * 4);
   }
 
+  getDopamineDecayPerFrame() {
+    const speedDecay = this.upgrades && this.upgrades.speed ? this.speedUpgradeDecayBonus : 0;
+    return this.getDopamineProfile().dopamineDecay + speedDecay;
+  }
+
   getDopamineProfile() {
     if (this.dopamine < 35) {
       return {
@@ -189,7 +197,8 @@ class SideShooterGame {
         shotSpeedBonus: -1.2,
         enemySpeedBonus: -0.15,
         bulletIntervalBonus: 8,
-        spawnPressure: 0
+        spawnPressure: 0,
+        dopamineDecay: 0.006
       };
     }
     if (this.dopamine < 70) {
@@ -198,7 +207,8 @@ class SideShooterGame {
         shotSpeedBonus: 0,
         enemySpeedBonus: 0,
         bulletIntervalBonus: 0,
-        spawnPressure: 0
+        spawnPressure: 0,
+        dopamineDecay: 0.012
       };
     }
     if (this.dopamine < 90) {
@@ -207,7 +217,8 @@ class SideShooterGame {
         shotSpeedBonus: 1.4,
         enemySpeedBonus: 0.35,
         bulletIntervalBonus: -8,
-        spawnPressure: 12
+        spawnPressure: 12,
+        dopamineDecay: 0.028
       };
     }
     return {
@@ -215,13 +226,14 @@ class SideShooterGame {
       shotSpeedBonus: 2,
       enemySpeedBonus: 0.65,
       bulletIntervalBonus: -14,
-      spawnPressure: 24
+      spawnPressure: 24,
+      dopamineDecay: 0.045
     };
   }
 
   getSpawnInterval() {
-    const difficultyPressure = this.getDifficultyLevel() * 17;
-    return Math.max(62, 155 - difficultyPressure - this.getDopamineProfile().spawnPressure);
+    const difficultyPressure = this.getDifficultyLevel() * 12;
+    return Math.max(78, 180 - difficultyPressure - this.getDopamineProfile().spawnPressure);
   }
 
   fireShot() {
@@ -282,9 +294,9 @@ class SideShooterGame {
 
   getUpgradeCatalog() {
     return [
-      { key: "speed", name: "속도 증가", slot: 1 },
+      { key: "absorb", name: "흡수 필터", slot: 1 },
       { key: "double", name: "더블 샷", slot: 2 },
-      { key: "absorb", name: "흡수 필터", slot: 3 },
+      { key: "speed", name: "속도 증가", slot: 3 },
       { key: "laser", name: "관통 레이저", slot: 4 },
       { key: "option", name: "보조 펫", slot: 5 },
       { key: "shield", name: "실드", slot: 6 }
@@ -306,6 +318,7 @@ class SideShooterGame {
     if (key === "option") {
       this.optionDrone = { x: this.player.x - 42, y: this.player.y, trail: [] };
     }
+    this.triggerSkillVisual(key);
   }
 
   useAbsorbSkill(upgrade) {
@@ -313,7 +326,33 @@ class SideShooterGame {
     this.powerLevel = 0;
     this.skillFlash = 24;
     this.lastActivatedUpgrade = upgrade.key;
+    this.triggerSkillVisual(upgrade.key);
     this.resultText = `${upgrade.name}: 도파민 ${this.absorbSkillDopamine}`;
+  }
+
+  triggerSkillVisual(key) {
+    const colorMap = {
+      speed: "#8ff7ff",
+      absorb: "#7be0b7",
+      double: "#ffd166",
+      laser: "#f8e7a2",
+      option: "#68a7ff",
+      shield: "#b48cff"
+    };
+    this.skillVisual = {
+      key,
+      age: 0,
+      duration: 34,
+      color: colorMap[key] || "#f8e7a2"
+    };
+  }
+
+  updateSkillVisual() {
+    if (!this.skillVisual) return;
+    this.skillVisual.age++;
+    if (this.skillVisual.age >= this.skillVisual.duration) {
+      this.skillVisual = null;
+    }
   }
 
   advancePowerMeter() {
@@ -410,9 +449,9 @@ class SideShooterGame {
   }
 
   enemyStats(type) {
-    if (type === "shooter") return { r: 20, hp: 5, speed: 2.55 };
-    if (type === "tank") return { r: 24, hp: 8, speed: 1.75 };
-    return { r: 18, hp: 4, speed: 2.75 };
+    if (type === "shooter") return { r: 20, hp: 3, speed: 2.35 };
+    if (type === "tank") return { r: 24, hp: 5, speed: 1.55 };
+    return { r: 18, hp: 2, speed: 2.55 };
   }
 
   getEnemyHpBonus(type) {
@@ -430,7 +469,7 @@ class SideShooterGame {
   }
 
   updateEnemyBullets() {
-    const interval = Math.max(34, 65 - this.getDifficultyLevel() * 5 + this.getDopamineProfile().bulletIntervalBonus);
+    const interval = Math.max(48, 82 - this.getDifficultyLevel() * 4 + this.getDopamineProfile().bulletIntervalBonus);
     if (frameCount % interval !== 0) return;
     for (const enemy of this.enemies) {
       if (enemy.type !== "shooter") continue;
@@ -536,8 +575,7 @@ class SideShooterGame {
     this.lives--;
     this.addDopamine(10);
     if (this.lives <= 0) {
-      this.dopamine = 0;
-      this.endGame("라이프 소진");
+      this.endGame("라이프 소진: 현재 도파민으로 종료");
     }
   }
 
@@ -569,6 +607,7 @@ class SideShooterGame {
     triangle(this.player.x - 18, this.player.y - 16, this.player.x - 18, this.player.y + 16, this.player.x + 24, this.player.y);
     fill("#e9fff4");
     circle(this.player.x - 4, this.player.y, 8);
+    this.drawSkillVisual();
 
     if (this.player.shield > 0) {
       noFill();
@@ -616,6 +655,30 @@ class SideShooterGame {
     fill("#ffc857");
     for (const b of this.bullets) circle(b.x, b.y, 8);
 
+  }
+
+  drawSkillVisual() {
+    if (!this.skillVisual) return;
+    const progress = this.skillVisual.age / this.skillVisual.duration;
+    noFill();
+    stroke(this.skillVisual.color);
+    strokeWeight(3);
+
+    if (this.skillVisual.key === "absorb") {
+      const radius = 74 - progress * 34;
+      circle(this.player.x, this.player.y, radius);
+      circle(this.player.x, this.player.y, radius * 0.62);
+    } else if (this.skillVisual.key === "speed") {
+      const length = 42 + progress * 20;
+      line(this.player.x - 26, this.player.y - 12, this.player.x - length, this.player.y - 22);
+      line(this.player.x - 30, this.player.y, this.player.x - length - 10, this.player.y);
+      line(this.player.x - 26, this.player.y + 12, this.player.x - length, this.player.y + 22);
+      circle(this.player.x, this.player.y, 44 + progress * 16);
+    } else {
+      circle(this.player.x, this.player.y, 42 + progress * 24);
+    }
+
+    noStroke();
   }
 
   shotColor(kind) {
@@ -684,10 +747,9 @@ class SideShooterGame {
     text("뉴럴 사이드 슈터", 28, 32);
     fill("#dfe8e2");
     textSize(14);
-    text("WASD/방향키 이동, Space/좌클릭 공격, Shift/X/우클릭 강화", 28, 63);
+    text("마우스로 이동, 좌클릭 공격, 우클릭 기술", 28, 63);
     this.drawMeter(615, 28, 280, this.dopamine);
     this.drawPowerMeter(615, 78, 310);
-    this.drawOverheatTimer(this.w - 28, 106);
     fill("#eef4ee");
     textAlign(RIGHT, CENTER);
     textSize(16);
@@ -756,16 +818,6 @@ class SideShooterGame {
     return this.getUpgradeCatalog()
       .filter((upgrade) => this.upgrades[upgrade.key])
       .map((upgrade) => upgrade.name);
-  }
-
-  drawOverheatTimer(x, y) {
-    if (this.overloadStart === null) return;
-    const elapsed = millis() - this.overloadStart;
-    const remain = Math.max(0, (this.overheatDurationMs - elapsed) / 1000);
-    fill("#ff5d73");
-    textAlign(RIGHT, CENTER);
-    textSize(14);
-    text(`과열 ${remain.toFixed(1)}s`, x, y);
   }
 
   drawEnd() {

@@ -251,7 +251,7 @@ function validateOptionNumber(options, key, min, max, location) {
 function validateCondition(condition, location) {
   if (!condition) return;
 
-  const validConditionKeys = ["dopamineMin", "dopamineMax", "affectionMin", "affectionMax"];
+  const validConditionKeys = ["dopamineState", "dopamineMin", "dopamineMax", "affectionMin", "affectionMax"];
 
   Object.keys(condition).forEach((key) => {
     if (!validConditionKeys.includes(key)) {
@@ -259,11 +259,20 @@ function validateCondition(condition, location) {
     }
   });
 
-  validConditionKeys.forEach((key) => {
+  ["dopamineMin", "dopamineMax", "affectionMin", "affectionMax"].forEach((key) => {
     if (condition[key] !== undefined && typeof condition[key] !== "number") {
       console.warn("Condition value must be a number at " + location + ": " + key);
     }
   });
+
+  if (condition.dopamineState !== undefined) {
+    const states = Array.isArray(condition.dopamineState) ? condition.dopamineState : [condition.dopamineState];
+    states.forEach((state) => {
+      if (!["LOW", "OPT", "HIGH"].includes(String(state || "").toUpperCase())) {
+        console.warn("Condition dopamineState must be LOW, OPT, or HIGH at " + location);
+      }
+    });
+  }
 }
 
 function validateFollowNodes(follow, location) {

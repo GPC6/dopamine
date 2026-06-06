@@ -5,6 +5,7 @@ const SPEAKER_COLORS = {
   파미니: "#ffb86c",
   주인공: "#ffffff",
   나레이션: "#cfd8dc",
+  지시문: "#cfd8dc",
   독백: "#ffffff",
   선택: "#ffd166",
   default: "#fff7dc"
@@ -31,27 +32,34 @@ class Button {
   }
 
   draw() {
-    const hover = this.contains(mouseX, mouseY);
+    const disabled = !!this.options.disabled;
+    const hover = !disabled && this.contains(mouseX, mouseY);
     const fillColor = hover
       ? (this.options.hoverFill || "#5f85f2")
-      : (this.options.fill || "#f4f4f8");
+      : (disabled ? (this.options.disabledFill || this.options.fill || "#f4f4f8") : (this.options.fill || "#f4f4f8"));
     const strokeColor = hover
       ? (this.options.hoverStroke || "#ffffff")
-      : (this.options.stroke || "rgba(0, 0, 0, 0)");
+      : (disabled ? (this.options.disabledStroke || this.options.stroke || "rgba(0, 0, 0, 0)") : (this.options.stroke || "rgba(0, 0, 0, 0)"));
     stroke(strokeColor);
-    strokeWeight(this.options.strokeWeight || 2);
+    strokeWeight(disabled ? (this.options.disabledStrokeWeight || this.options.strokeWeight || 2) : (hover ? (this.options.hoverStrokeWeight || this.options.strokeWeight || 2) : (this.options.strokeWeight || 2)));
     fill(fillColor);
     rect(this.x, this.y, this.w, this.h, this.options.radius ?? 10);
 
     noStroke();
-    fill(hover ? (this.options.hoverText || "#ffffff") : (this.options.text || "#242947"));
+    fill(disabled ? (this.options.disabledText || this.options.text || "#242947") : (hover ? (this.options.hoverText || "#ffffff") : (this.options.text || "#242947")));
     textStyle(this.options.bold === false ? NORMAL : BOLD);
     useGameFont(this.options.fontRole || (this.options.bold === false ? "ui" : "uiBold"));
     textSize(this.options.textSize || 22);
     if (this.options.align === "left") {
       const paddingX = this.options.paddingX || 24;
+      const suffixW = this.options.suffix ? (this.options.suffixW || 116) : 0;
+      const labelW = this.w - paddingX * 2 - suffixW - (this.options.suffix ? 18 : 0);
       textAlign(LEFT, CENTER);
-      text(this.label, this.x + paddingX, this.y + this.h / 2);
+      if (this.options.suffix) {
+        text(this.label, this.x + paddingX, this.y, labelW, this.h);
+      } else {
+        text(this.label, this.x + paddingX, this.y + this.h / 2);
+      }
       if (this.options.suffix) {
         textAlign(RIGHT, CENTER);
         text(this.options.suffix, this.x + this.w - paddingX, this.y + this.h / 2);
@@ -64,7 +72,7 @@ class Button {
   }
 
   mousePressed() {
-    if (this.contains(mouseX, mouseY)) {
+    if (!this.options.disabled && this.contains(mouseX, mouseY)) {
       this.onClick();
     }
   }

@@ -104,7 +104,7 @@
   }
 
   function replaceNameTokens(text, name) {
-    const playerName = name || "현수";
+    const playerName = name || "진수";
 
     return String(text || "")
       .replace(/(000|OO)\(([^)]+)\)/g, function (_, token, pair) {

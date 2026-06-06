@@ -12,6 +12,8 @@ class BrickBreakerGame {
     this.wallRight = this.left + (this.cols - 1) * this.cell + 74;
     this.ballLaunchGap = 8;
     this.ballRadius = 6;
+    this.speedUpAfterFrames = this.parsePacingFrames(options.speedUpAfterSeconds, 10);
+    this.forceDropAfterFrames = this.parsePacingFrames(options.forceDropAfterSeconds, 15);
     this.offsetX = 0;
     this.offsetY = 0;
     this.maxDopamine = 100;
@@ -24,8 +26,13 @@ class BrickBreakerGame {
   }
 
   parseMaxTurns(value) {
-    if (!Number.isFinite(Number(value))) return 10;
-    return Math.max(1, Math.min(30, Math.round(Number(value))));
+    if (!Number.isFinite(Number(value))) return 6;
+    return Math.max(1, Math.min(20, Math.round(Number(value))));
+  }
+
+  parsePacingFrames(value, fallbackSeconds) {
+    const seconds = Number.isFinite(Number(value)) ? Number(value) : fallbackSeconds;
+    return Math.max(1, Math.round(seconds * 60));
   }
 
   resetGame() {
@@ -35,10 +42,9 @@ class BrickBreakerGame {
     this.bricks = [];
     this.items = [];
     this.aiming = true;
-    this.message = "마우스로 각도를 정하고 클릭해서 발사";
+    this.message = `목표: ${this.maxTurns}턴 동안 도파민을 안정 구간에 가깝게 유지`;
     this.gameOver = false;
     this.settleTimer = 0;
-    this.overloadTurns = 0;
     this.finished = false;
     this.launchX = this.w / 2;
     this.launchY = this.floor - 18;
@@ -48,6 +54,7 @@ class BrickBreakerGame {
     this.lastItemName = "";
     this.rowsUntilNextItem = 1;
     this.permanentBallBonus = 0;
+    this.resetTurnPacing();
     this.resetTurnBuff();
 
     for (let r = 0; r < 3; r++) this.addBrickRow(r);
@@ -65,9 +72,54 @@ class BrickBreakerGame {
     };
   }
 
+  resetTurnPacing() {
+    this.turnElapsedFrames = 0;
+    this.turnSpeedMultiplier = 1;
+    this.turnDropForced = false;
+  }
+
+  updateTurnPacing() {
+    if (this.aiming || !this.balls.some((ball) => ball.alive)) return;
+
+    this.turnElapsedFrames++;
+    if (this.turnElapsedFrames >= this.speedUpAfterFrames) {
+      if (this.turnSpeedMultiplier !== 2) {
+        this.message = "턴이 길어져 게임속도 2배";
+      }
+      this.turnSpeedMultiplier = 2;
+    }
+    if (!this.turnDropForced && this.turnElapsedFrames >= this.forceDropAfterFrames) {
+      this.forceDropBalls();
+    }
+  }
+
+  forceDropBalls() {
+    let forced = false;
+    for (const ball of this.balls) {
+      if (!ball.alive) continue;
+      ball.launchDelay = 0;
+      ball.active = true;
+      ball.sliding = false;
+      ball.forceDropping = true;
+      ball.piercingBrick = null;
+      ball.vx = 0;
+      ball.vy = Math.max(14, Math.abs(ball.vy));
+      forced = true;
+    }
+    if (forced) {
+      this.turnDropForced = true;
+      this.message = "15초 경과: 공을 자동 낙하시킴";
+    }
+  }
+
   update() {
     if (!this.gameOver) {
-      this.updateBalls();
+      this.updateTurnPacing();
+      const physicsSteps = this.turnSpeedMultiplier;
+      for (let i = 0; i < physicsSteps; i++) {
+        this.updateBalls();
+        if (!this.balls.some((ball) => ball.alive)) break;
+      }
       this.checkTurnEnd();
     }
     if (this.effectFlash > 0) this.effectFlash--;
@@ -104,6 +156,7 @@ class BrickBreakerGame {
 
     const count = this.getBallCount();
     this.resetTurnBuff();
+    this.resetTurnPacing();
     this.nextLaunchX = null;
     this.nextLaunchCaptured = false;
     this.balls = [];
@@ -121,7 +174,7 @@ class BrickBreakerGame {
       });
     }
     this.aiming = false;
-    this.message = `${count}개 발사 / 아이템을 맞히면 즉시 효과 발동`;
+    this.message = `${count}개 발사 / P=공+1, 관통=블럭 통과, 완화=자극 차단`;
   }
 
   keyPressed() {
@@ -131,7 +184,7 @@ class BrickBreakerGame {
   }
 
   getBallCount() {
-    return Math.max(1, Math.floor(this.dopamine / 5) + this.permanentBallBonus);
+    return Math.max(1, Math.min(10, Math.floor(this.dopamine / 5) + this.permanentBallBonus));
   }
 
   addBrickRow(rowIndex = 0) {
@@ -164,8 +217,8 @@ class BrickBreakerGame {
 
   getStimChance() {
     if (this.dopamine < 40) return 0.84;
-    if (this.dopamine > 80) return 0.72;
-    if (this.dopamine > 65) return 0.78;
+    if (this.dopamine > 80) return 0.45;
+    if (this.dopamine > 65) return 0.65;
     return 0.82;
   }
 
@@ -185,7 +238,7 @@ class BrickBreakerGame {
   }
 
   getTurnHpBonus() {
-    return Math.min(4, Math.floor((this.turn - 1) / 3));
+    return Math.min(2, Math.floor((this.turn - 1) / 3));
   }
 
   tryAddItem(col, rowIndex) {
@@ -303,6 +356,7 @@ class BrickBreakerGame {
         this.handleBallFloorTouch(ball);
         continue;
       }
+      if (ball.forceDropping) continue;
 
       this.collectItems(ball);
       this.hitBricks(ball);
@@ -453,25 +507,18 @@ class BrickBreakerGame {
     this.nextLaunchX = null;
     this.nextLaunchCaptured = false;
 
-    if (this.dopamine >= 90) this.overloadTurns++;
-    else this.overloadTurns = 0;
-
     if (this.turn > this.maxTurns) {
       this.endGame(`${this.maxTurns}턴 생존 완료`);
       return;
     }
-    if (this.overloadTurns >= 2) {
-      this.endGame("도파민 과열이 오래 지속됨");
-      return;
-    }
 
+    this.resetTurnPacing();
     for (const brick of this.bricks) brick.r++;
     for (const item of this.items) item.r++;
     if (this.rowsUntilNextItem > 0) this.rowsUntilNextItem--;
     this.addBrickRow(0);
     if (this.bricks.some((brick) => this.getCellY(brick.r) + 38 > this.floor - 18)) {
-      this.dopamine = this.dopamine >= 50 ? 100 : 0;
-      this.endGame("블럭이 바닥에 닿아 도파민이 무너짐");
+      this.endGame("블럭이 내려와 현재 도파민으로 종료");
       return;
     }
     this.resetTurnBuff();
@@ -517,6 +564,11 @@ class BrickBreakerGame {
     textAlign(RIGHT, CENTER);
     textSize(17);
     text(`턴 ${Math.min(this.turn, this.maxTurns)}/${this.maxTurns}`, this.w - 34, 75);
+    if (!this.aiming && this.turnSpeedMultiplier > 1) {
+      fill("#ffcf66");
+      textSize(15);
+      text("2배속", this.w - 34, 100);
+    }
 
     if (this.turnBuff.name !== "기본" || this.effectFlash > 0) {
       fill(this.turnBuff.ballColor);

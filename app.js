@@ -13,6 +13,7 @@ const NODE_LABELS = {
 };
 
 const SUB_GAME_OPTIONS = typeof SUB_GAMES === "undefined" ? ["brickBreaker", "sideShooter"] : Object.values(SUB_GAMES);
+const DOPAMINE_STATE_OPTIONS = ["LOW", "OPT", "HIGH"];
 const UID_KEY = "__editorUid";
 const NEXT_UID_KEY = "__editorNextUid";
 const AFTER_UID_KEY = "__editorAfterUid";
@@ -301,6 +302,7 @@ function createChoiceItem(choice, choices, choiceIndex) {
   item.querySelector(".choice-next-node-input").value = numberToInput(getChoiceNextNodeId(choice));
   item.querySelector(".choice-affection-input").value = numberToInput(effects.affection);
   item.querySelector(".choice-dopamine-input").value = numberToInput(effects.dopamine);
+  item.querySelector(".condition-dopamine-state-input").value = getConditionDopamineStateInput(condition);
   item.querySelector(".condition-dopamine-min-input").value = numberToInput(condition.dopamineMin);
   item.querySelector(".condition-dopamine-max-input").value = numberToInput(condition.dopamineMax);
   item.querySelector(".condition-affection-min-input").value = numberToInput(condition.affectionMin);
@@ -310,6 +312,7 @@ function createChoiceItem(choice, choices, choiceIndex) {
   item.querySelector(".choice-next-node-input").addEventListener("input", (event) => setChoiceNextNode(choice, event.target.value));
   item.querySelector(".choice-affection-input").addEventListener("input", (event) => setNestedNumber(choice, "effects", "affection", event.target.value));
   item.querySelector(".choice-dopamine-input").addEventListener("input", (event) => setNestedNumber(choice, "effects", "dopamine", event.target.value));
+  item.querySelector(".condition-dopamine-state-input").addEventListener("input", (event) => setConditionDopamineState(choice, event.target.value));
   item.querySelector(".condition-dopamine-min-input").addEventListener("input", (event) => setNestedNumber(choice, "condition", "dopamineMin", event.target.value));
   item.querySelector(".condition-dopamine-max-input").addEventListener("input", (event) => setNestedNumber(choice, "condition", "dopamineMax", event.target.value));
   item.querySelector(".condition-affection-min-input").addEventListener("input", (event) => setNestedNumber(choice, "condition", "affectionMin", event.target.value));
@@ -460,8 +463,9 @@ function createConditionEditor(node) {
   summary.textContent = "실행 조건";
   const condition = node.condition || {};
   const grid = document.createElement("div");
-  grid.className = "field-grid four";
+  grid.className = "field-grid five";
   grid.append(
+    makeComboInput("도파민 상태", getConditionDopamineStateInput(condition), (value) => setConditionDopamineState(node, value), DOPAMINE_STATE_OPTIONS, "LOW, OPT, HIGH"),
     makeNumberInput("도파민 최소", condition.dopamineMin, (value) => setNestedNumber(node, "condition", "dopamineMin", value)),
     makeNumberInput("도파민 최대", condition.dopamineMax, (value) => setNestedNumber(node, "condition", "dopamineMax", value)),
     makeNumberInput("호감도 최소", condition.affectionMin, (value) => setNestedNumber(node, "condition", "affectionMin", value)),
@@ -917,6 +921,26 @@ function writeSubGameTutorial(node, tutorial) {
   }
 
   cleanupEmptyObject(node, "options");
+}
+
+function getConditionDopamineStateInput(condition) {
+  const state = condition.dopamineState;
+  if (Array.isArray(state)) return state.join(", ");
+  return state || "";
+}
+
+function setConditionDopamineState(node, rawValue) {
+  if (!node.condition) node.condition = {};
+
+  const states = rawValue
+    .split(",")
+    .map((state) => state.trim().toUpperCase())
+    .filter(Boolean);
+
+  if (!states.length) delete node.condition.dopamineState;
+  else node.condition.dopamineState = states.length === 1 ? states[0] : states;
+
+  cleanupEmptyObject(node, "condition");
 }
 
 function cleanupEmptyObject(target, key) {

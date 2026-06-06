@@ -189,17 +189,17 @@ function clampDopamine(value) {
 
 function clampTurns(value) {
   if (!Number.isFinite(value)) return defaultTurnsForGame(testSubGameId);
-  if (testSubGameId === SUB_GAMES.SIDE_SHOOTER) return Math.round(constrain(value, 5, 180));
-  return Math.round(constrain(value, 1, 30));
+  if (testSubGameId === SUB_GAMES.SIDE_SHOOTER) return Math.round(constrain(value, 10, 120));
+  return Math.round(constrain(value, 1, 20));
 }
 
 function defaultTurnsForGame(gameId) {
-  return gameId === SUB_GAMES.SIDE_SHOOTER ? 90 : 10;
+  return gameId === SUB_GAMES.SIDE_SHOOTER ? 45 : 6;
 }
 
 function updateTurnsInputForGame(input) {
-  input.min = testSubGameId === SUB_GAMES.SIDE_SHOOTER ? 5 : 1;
-  input.max = testSubGameId === SUB_GAMES.SIDE_SHOOTER ? 180 : 30;
+  input.min = testSubGameId === SUB_GAMES.SIDE_SHOOTER ? 10 : 1;
+  input.max = testSubGameId === SUB_GAMES.SIDE_SHOOTER ? 120 : 20;
   testMaxTurns = clampTurns(testMaxTurns);
   input.value = testMaxTurns;
 }

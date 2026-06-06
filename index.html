@@ -129,12 +129,18 @@
       </div>
       <details>
         <summary>선택 조건</summary>
-        <div class="field-grid four">
+        <div class="field-grid five">
+          <label>도파민 상태 <input class="condition-dopamine-state-input" type="text" list="dopamineStateOptions" placeholder="LOW, OPT, HIGH" /></label>
           <label>도파민 최소 <input class="condition-dopamine-min-input" type="number" step="1" /></label>
           <label>도파민 최대 <input class="condition-dopamine-max-input" type="number" step="1" /></label>
           <label>호감도 최소 <input class="condition-affection-min-input" type="number" step="1" /></label>
           <label>호감도 최대 <input class="condition-affection-max-input" type="number" step="1" /></label>
         </div>
+        <datalist id="dopamineStateOptions">
+          <option value="LOW"></option>
+          <option value="OPT"></option>
+          <option value="HIGH"></option>
+        </datalist>
       </details>
       <details>
         <summary>선택 직후 추가 발화</summary>

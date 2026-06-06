@@ -177,6 +177,15 @@ const EPISODES = {
       "id": 24
     },
     {
+      "type": "background",
+      "name": "(CG) 침실 앞 책상에서 과제를 하는 주인공 - 새벽",
+      "transition": {
+        "type": "fadeBlack",
+        "duration": 1800
+      },
+      "id": 1017
+    },
+    {
       "type": "dialogue",
       "speaker": "주인공",
       "text": "헉… 미친, 쇼츠 좀 봤다고 세 시간이 지났어?!",
@@ -348,11 +357,12 @@ const EPISODES = {
       "after": "EP2 동아리 OT",
       "id": 40,
       "options": {
-        "maxTurns": 8,
+        "maxTurns": 5,
         "tutorial": [
-          "여기는 꿈속 도파민 훈련장이야. 공을 조준해서 클릭하면 발사돼.",
-          "목표는 도파민을 무조건 많이 올리는 게 아니야. 50에서 80 사이를 노려봐.",
-          "아이템과 블록 효과를 보면서 짧게 버티면 돼. 준비됐으면 시작하자!"
+          "첫 벽돌깨기는 5턴만 진행돼. 마우스로 각도를 정하고 클릭하면 공이 나가.",
+          "블럭 숫자는 남은 내구도야. 목표는 끝날 때 도파민을 적당히 남기는 거야.",
+          "빨간 블럭은 맞힐 때마다 도파민이 +1씩 늘어나고, 파란 블럭은 부숴지면 도파민이 8 감소해.",
+          "블럭이 아래까지 내려오면 바로 끝나지만, 그 순간의 도파민이 결과로 돌아가."
         ]
       }
     }
@@ -380,7 +390,7 @@ const EPISODES = {
       "speaker": "독백",
       "text": "(으악 아직도 정신을 못 차리겠네… 실수하지 않게 조심해야겠다..)",
       "condition": {
-        "dopamineMin": 81
+        "dopamineState": "HIGH"
       },
       "id": 4
     },
@@ -389,8 +399,7 @@ const EPISODES = {
       "speaker": "독백",
       "text": "(휴… 다행히 짧게라도 푹 잤다… 오늘 예감이 좋은데?)",
       "condition": {
-        "dopamineMin": 51,
-        "dopamineMax": 80
+        "dopamineState": "OPT"
       },
       "id": 5
     },
@@ -399,7 +408,7 @@ const EPISODES = {
       "speaker": "독백",
       "text": "(하암… 영 집중이 잘 안 된다. 온몸에 기운이 하나도 없네. 대충 구석에 박혀 있다 가야지… )",
       "condition": {
-        "dopamineMax": 50
+        "dopamineState": "LOW"
       },
       "id": 6
     },
@@ -423,7 +432,7 @@ const EPISODES = {
     },
     {
       "type": "dialogue",
-      "speaker": "나레이션",
+      "speaker": "지시문",
       "text": "(수진이 저 끝에 앉아있다.)",
       "effects": {
         "dopamine": 5
@@ -606,7 +615,7 @@ const EPISODES = {
     },
     {
       "type": "dialogue",
-      "speaker": "나레이션",
+      "speaker": "지시문",
       "text": "(시끄러운 소리가 들린다)",
       "id": 29
     },
@@ -778,7 +787,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "nextNode": 55
         },
@@ -799,7 +808,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "nextNode": 55
         },
@@ -807,8 +816,7 @@ const EPISODES = {
           "text": "걱정 마세요ㅎㅎ",
           "follow": [],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "nextNode": 55
         },
@@ -816,8 +824,7 @@ const EPISODES = {
           "text": "네, 저희 다같이 잘 지내봐요~",
           "follow": [],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "nextNode": 55
         },
@@ -830,7 +837,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "nextNode": 55
         },
@@ -855,7 +862,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "nextNode": 55
         }
@@ -915,16 +922,15 @@ const EPISODES = {
       "after": "EP3 동아리 MT",
       "id": 63,
       "options": {
-        "difficulty": 1,
-        "durationSeconds": 75,
+        "difficulty": 0,
+        "durationSeconds": 45,
         "tutorial": [
-          "이번엔 뉴럴 슈터야. 네 기체는 왼쪽에서 시작하고, 오른쪽에서 밀려오는 생각들을 버티면 돼.",
-          "방향키나 WASD로 움직여. 위아래로 피하고, 너무 몰리면 앞뒤로도 살짝 움직일 수 있어.",
-          "Space나 왼쪽 클릭으로 공격해. 적을 쓰러뜨리면 도파민이 조금 오르고, 가끔 캡슐이 떨어져.",
-          "노란 P 캡슐은 파워 단계야. 모은 뒤 Shift, X, 또는 오른쪽 클릭을 누르면 현재 단계의 강화가 켜져.",
-          "초록 - 캡슐은 도파민을 낮추고, 분홍 + 캡슐은 도파민을 올려. 초록색 원형 게이트는 도파민을 안정 구간 쪽으로 당겨줘.",
-          "도파민이 90 이상으로 오래 유지되면 과열로 끝나고, 맞으면 라이프가 줄면서 도파민이 10 올라. 무리해서 들이받지는 마.",
-          "목표는 제한 시간 동안 살아남으면서 도파민을 50에서 80 사이에 가깝게 맞추는 거야. 이제 짧게 해보자!"
+          "슈팅은 45초만 버티면 돼. 마우스를 움직이면 캐릭터도 따라 움직여.",
+          "노란 P 캡슐을 먹으면 우측 위 파워 칸이 한 칸 올라가.",
+          "원하는 칸에서 우클릭하면 그 기술을 쓸 수 있어.",
+          "흡수 기술은 도파민을 크게 낮춰. 속도 증가는 더 빠르게 움직이고 도파민도 조금 더 빨리 낮춰.",
+          "적들에게 맞으면 체력이 줄고, 도파민이 증가해.", 
+          "체력은 3이고, 체력이 0이되면 그때의 도파민으로 게임이 끝나."
         ]
       }
     }
@@ -1249,7 +1255,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "nextNode": 34
         },
@@ -1273,7 +1279,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "nextNode": 36
         },
@@ -1293,8 +1299,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "nextNode": 38
         },
@@ -1326,8 +1331,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "nextNode": 40
         },
@@ -1351,7 +1355,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "nextNode": 42
         },
@@ -1383,7 +1387,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "effects": {
             "affection": -5
@@ -1404,7 +1408,7 @@ const EPISODES = {
       "after": "EP4-A 넷이",
       "id": 35,
       "options": {
-        "maxTurns": 10
+        "maxTurns": 6
       }
     },
     {
@@ -1418,7 +1422,7 @@ const EPISODES = {
       "after": "EP4-A 넷이",
       "id": 37,
       "options": {
-        "maxTurns": 10
+        "maxTurns": 6
       }
     },
     {
@@ -1432,7 +1436,7 @@ const EPISODES = {
       "after": "EP4-A 넷이",
       "id": 39,
       "options": {
-        "maxTurns": 10
+        "maxTurns": 6
       }
     },
     {
@@ -1446,7 +1450,7 @@ const EPISODES = {
       "after": "EP4-B 둘이",
       "id": 41,
       "options": {
-        "maxTurns": 10
+        "maxTurns": 6
       }
     },
     {
@@ -1460,7 +1464,7 @@ const EPISODES = {
       "after": "EP4-B 둘이",
       "id": 43,
       "options": {
-        "maxTurns": 10
+        "maxTurns": 6
       }
     },
     {
@@ -1474,7 +1478,7 @@ const EPISODES = {
       "after": "EP4-B 둘이",
       "id": 45,
       "options": {
-        "maxTurns": 10
+        "maxTurns": 6
       }
     }
   ],
@@ -1908,7 +1912,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "effects": {
             "affection": 5
@@ -1928,7 +1932,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "effects": {
             "affection": -5
@@ -1944,8 +1948,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "effects": {
             "affection": 20
@@ -1961,8 +1964,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "effects": {
             "affection": 15
@@ -1986,7 +1988,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "effects": {
             "affection": 10
@@ -2010,7 +2012,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "effects": {
             "affection": -5
@@ -2103,8 +2105,8 @@ const EPISODES = {
       "after": "EP5 미팅사건",
       "id": 72,
       "options": {
-        "difficulty": 3,
-        "durationSeconds": 90
+        "difficulty": 1,
+        "durationSeconds": 45
       }
     }
   ],
@@ -2470,7 +2472,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "effects": {
             "affection": 5
@@ -2490,7 +2492,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "effects": {
             "affection": 3
@@ -2514,8 +2516,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "effects": {
             "affection": 15
@@ -2539,8 +2540,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "effects": {
             "affection": 20
@@ -2564,7 +2564,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "effects": {
             "affection": 10
@@ -2584,7 +2584,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "effects": {
             "affection": 5
@@ -2604,8 +2604,8 @@ const EPISODES = {
       "minigame": "sideShooter",
       "after": "EP5 미팅사건",
       "options": {
-        "difficulty": 3,
-        "durationSeconds": 90
+        "difficulty": 1,
+        "durationSeconds": 45
       },
       "id": 44
     }
@@ -2649,7 +2649,7 @@ const EPISODES = {
     },
     {
       "type": "dialogue",
-      "speaker": "나레이션",
+      "speaker": "지시문",
       "text": "(동아리방 문을 연다)",
       "id": 7
     },
@@ -2727,7 +2727,7 @@ const EPISODES = {
       "speaker": "혜지",
       "text": "야 OO아, 수진이 이번 주에 미팅 나간대!",
       "effects": {
-        "dopamine": 10
+        "dopamine": 5
       },
       "id": 19
     },
@@ -2799,7 +2799,7 @@ const EPISODES = {
     },
     {
       "type": "dialogue",
-      "speaker": "나레이션",
+      "speaker": "지시문",
       "text": "(혜지가 가고 둘만 남는다)",
       "id": 31
     },
@@ -2824,7 +2824,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "nextNode": 33
         },
@@ -2849,7 +2849,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "effects": {
             "affection": 5
@@ -2880,8 +2880,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "nextNode": 33
         },
@@ -2905,8 +2904,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "nextNode": 33
         },
@@ -2938,7 +2936,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "nextNode": 33
         },
@@ -2962,7 +2960,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "nextNode": 33
         }
@@ -3063,7 +3061,7 @@ const EPISODES = {
       "after": "EP6 정기공연",
       "id": 41,
       "options": {
-        "maxTurns": 12
+        "maxTurns": 6
       }
     }
   ],
@@ -3168,7 +3166,7 @@ const EPISODES = {
     },
     {
       "type": "dialogue",
-      "speaker": "나레이션",
+      "speaker": "지시문",
       "text": "(공구박스를 들고 백스테이지로 달려간다)",
       "effects": {
         "dopamine": 5
@@ -3225,7 +3223,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "nextNode": 23
         },
@@ -3251,7 +3249,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMax": 50
+            "dopamineState": "LOW"
           },
           "effects": {
             "affection": 5
@@ -3280,8 +3278,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "effects": {
             "affection": 15
@@ -3317,8 +3314,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 51,
-            "dopamineMax": 80
+            "dopamineState": "OPT"
           },
           "nextNode": 23
         },
@@ -3351,7 +3347,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "nextNode": 23
         },
@@ -3381,7 +3377,7 @@ const EPISODES = {
             }
           ],
           "condition": {
-            "dopamineMin": 81
+            "dopamineState": "HIGH"
           },
           "effects": {
             "affection": -5
@@ -3538,7 +3534,7 @@ const EPISODES = {
     },
     {
       "type": "dialogue",
-      "speaker": "나레이션",
+      "speaker": "지시문",
       "text": "(잠시 수진을 바라본다)",
       "id": 14
     },
