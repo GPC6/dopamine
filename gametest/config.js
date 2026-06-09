@@ -69,7 +69,6 @@ const ASSET_MANIFEST = {
     "(CG) 자는 수진 클로즈업" : "./assets/bg/conveniece_sujin_cg.png",
     "(CG) 침실 앞 책상에서 과제를 하는 주인공": "./assets/bg/protagonist_desk_assignment_cg.png",
     "(CG) 침실 앞 책상에서 과제를 하는 주인공 - 새벽": "./assets/bg/protagonist_desk_assignment_dawn_cg.png",
-    "무대막이 내리는 장면": "./assets/bg/backstage_protagonist_sujin_cg.png",
     "동아리방": "./assets/bg/club_room_inside.png",
     "MT 장소": "./assets/bg/mt_room.png",
     "(CG) 동아리방에 둘러앉은 넷": "./assets/bg/club_room_group_cg.png",
@@ -89,6 +88,7 @@ const ASSET_MANIFEST = {
     "야외 교내": "./assets/bg/campus_outdoor.png",
     "카톡방 화면": "./assets/bg/kakaotalk_group_chat_screen.png",
     "(CG) 백스테이지에 있는 주인공과 수진": "./assets/bg/backstage_protagonist_sujin_cg.png",
+    "무대막이 내리는 장면" : "./assets/bg/backstage_curtain.png",
     "백스테이지": "./assets/bg/backstage.png",
     "문 세트": "./assets/bg/stage_door_set.png",
     "수진이 우는 모습": "./assets/bg/sujin_crying_backstage_cg.png",
@@ -141,7 +141,8 @@ const ASSET_MANIFEST = {
       running: "./assets/sound/effects/EP6 달리기.mp3",
       screwdriver: "./assets/sound/effects/EP6 드라이버.mp3",
       episodeTransition: "./assets/sound/effects/에피소드 전환.mp3",
-      click: "./assets/sound/effects/클릭.mp3"
+      click: "./assets/sound/effects/클릭.mp3",
+      clap: "./assets/sound/effects/EP6 박수.mp3"
     }
   },
   characters: {

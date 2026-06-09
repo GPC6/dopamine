@@ -4180,7 +4180,7 @@ const EPISODES = {
       "type": "sound",
       "soundType": "effect",
       "action": "play",
-      "name": "crowd",
+      "name": "clap",
       "id": 3
     },
     {
@@ -4437,7 +4437,7 @@ const EPISODES = {
       "type": "sound",
       "soundType": "effect",
       "action": "play",
-      "name": "crowd",
+      "name": "clap",
       "id": 3
     },
     {
@@ -4627,25 +4627,20 @@ const EPISODES = {
       "id": 33
     },
     {
-      "type": "background",
-      "name": "밤, 대학가",
-      "id": 34
-    },
-    {
       "type": "dialogue",
       "speaker": "주인공",
       "text": "(..어디서부터 잘못된 걸까.., 분명 처음엔 좋았는데..)",
-      "id": 35
+      "id": 34
     },
     {
       "type": "clear background",
-      "id": 36
+      "id": 35
     },
     {
       "type": "dialogue",
       "speaker": "END",
       "text": "베드엔딩",
-      "id": 37
+      "id": 36
     }
   ]
 };
