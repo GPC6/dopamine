@@ -52,6 +52,7 @@ class Game {
 
     this.textBox = new TextBox(0, 452, CONFIG.width, 268);
     this.choiceButtons = [];
+    this.choiceButtonsNodeKey = null;
     this.subGame = null;
     this.minigameTutorial = null;
     this.paminiBriefing = null;
@@ -64,6 +65,7 @@ class Game {
     this.lastClickSoundAt = 0;
     this.dialogueLog = [];
     this.loggedDialogueKeys = new Set();
+    this.appliedDialogueEffectKeys = new Set();
     this.logPanelOpen = false;
     this.logScrollIndex = 0;
     this.logVisibleCount = 7;
@@ -232,7 +234,7 @@ class Game {
       return;
     }
 
-    this.playClickSound();
+    if (scene !== SCENES.MINIGAME) this.playClickSound();
 
     if (scene === SCENES.TITLE) {
       this.titleButton.mousePressed();
@@ -412,7 +414,7 @@ class Game {
       return;
     }
 
-    if (this.state.background === "꿈속") {
+    if (this.state.background === "꿈속" || this.state.background === "파미니 화면") {
       this.drawDreamBackground();
       return;
     }
@@ -512,7 +514,7 @@ class Game {
       return;
     }
 
-    if (name === "꿈속") {
+    if (name === "꿈속" || name === "파미니 화면") {
       this.drawDreamBackground();
       return;
     }
@@ -637,7 +639,7 @@ class Game {
   }
 
   isSpecialBackground(name) {
-    return name === "검은 배경" || name === "꿈속";
+    return name === "검은 배경" || name === "꿈속" || name === "파미니 화면";
   }
 
   startBackgroundTransition(fromImage, toImage, options = "none") {
@@ -788,9 +790,16 @@ class Game {
     const promptY = this.getChoicePromptY();
     const promptW = 700;
     const headerStyle = this.getChoiceHeaderStyle(impactSummary.type, impactSummary.mixed);
+    const headerLayout = this.getChoiceHeaderLayout(promptX, promptY, headerStyle.label);
 
     fill(headerStyle.accent);
-    rect(promptX, promptY, 72, 22, 11);
+    rect(
+      headerLayout.choiceBadge.x,
+      headerLayout.choiceBadge.y,
+      headerLayout.choiceBadge.w,
+      headerLayout.choiceBadge.h,
+      headerLayout.choiceBadge.radius
+    );
 
     noStroke();
     fill("#ffffff");
@@ -798,16 +807,22 @@ class Game {
     textStyle(BOLD);
     this.useFont("uiBold");
     textSize(12);
-    text("CHOICE", promptX + 36, promptY + 11);
+    text("CHOICE", headerLayout.choiceBadge.textX, headerLayout.choiceBadge.textY);
 
-    if (headerStyle.label) {
+    if (headerLayout.labelBadge) {
       fill(headerStyle.fill);
-      rect(promptX + 82, promptY, 132, 22, 11);
+      rect(
+        headerLayout.labelBadge.x,
+        headerLayout.labelBadge.y,
+        headerLayout.labelBadge.w,
+        headerLayout.labelBadge.h,
+        headerLayout.labelBadge.radius
+      );
       fill(headerStyle.text);
       textAlign(CENTER, CENTER);
       this.useFont("uiBold");
       textSize(11);
-      text(headerStyle.label, promptX + 148, promptY + 11);
+      text(headerStyle.label, headerLayout.labelBadge.textX, headerLayout.labelBadge.textY);
     }
 
     noStroke();
@@ -822,6 +837,36 @@ class Game {
     strokeWeight(1);
     line(promptX, promptY + 76, promptX + promptW, promptY + 76);
     textStyle(NORMAL);
+  }
+
+  getChoiceHeaderLayout(x, y, label = "") {
+    const height = 22;
+    const choiceWidth = 72;
+    const gap = 10;
+    const labelWidth = 72;
+
+    const choiceBadge = {
+      x,
+      y,
+      w: choiceWidth,
+      h: height,
+      radius: height / 2,
+      textX: x + choiceWidth / 2,
+      textY: y + height / 2
+    };
+
+    return {
+      choiceBadge,
+      labelBadge: label ? {
+        x: x + choiceWidth + gap,
+        y,
+        w: labelWidth,
+        h: height,
+        radius: height / 2,
+        textX: x + choiceWidth + gap + labelWidth / 2,
+        textY: y + height / 2
+      } : null
+    };
   }
 
   getChoicePromptY() {
@@ -864,11 +909,24 @@ class Game {
     fill(0, 0, 0, 104);
     rect(0, 0, width, height);
 
+    this.ensurePaminiBriefingVisibleStarted();
+    this.drawPaminiBriefingContent(this.getPaminiBriefingVisualAlpha());
+    this.completePaminiBriefingFadeOutIfNeeded();
+  }
+
+  drawPaminiBriefingContent(alpha = 1) {
+    if (alpha <= 0) return;
+
+    push();
+    const previousAlpha = drawingContext.globalAlpha;
+    drawingContext.globalAlpha = previousAlpha * alpha;
     this.drawPaminiBriefingMascot();
     this.drawEpisodeBadge();
 
     const line = this.getCurrentPaminiBriefingLine();
     this.textBox.draw("파미니", line, "파미니");
+    drawingContext.globalAlpha = previousAlpha;
+    pop();
   }
 
   drawPaminiBriefingBackground() {
@@ -919,7 +977,9 @@ class Game {
     this.paminiBriefing = {
       lines: this.buildPaminiBriefingLines(snapshot),
       index: 0,
-      snapshot
+      snapshot,
+      visibleStartedAt: null,
+      fadeOutStartedAt: null
     };
     this.changeScene(SCENES.PAMINI_BRIEFING);
     this.startPaminiBriefingTransition();
@@ -949,7 +1009,7 @@ class Game {
 
   buildPaminiFirstMeetingLines(snapshot) {
     return [
-      "안녕, 또 만났네. 오늘 하루 감정의 변화가 큰 것 같던데?",
+      "안녕, 나는 파미니야. 네 마음속 도파민 흐름을 같이 봐주는 작은 안내자라고 생각해줘.",
       this.getPaminiFirstMeetingEmotionLine(snapshot.dopamine),
       "앞으로 매일 밤 이렇게 잠깐 나타날게. 하루 동안 네 감정이 어떤 방향으로 움직였는지 같이 정리해보자."
     ];
@@ -991,7 +1051,7 @@ class Game {
   getPaminiDopamineBriefingLine(dopamine) {
     const dopamineState = this.getDopamineState(dopamine);
     if (dopamineState === "LOW") return "내일은 조금 더 움직일 수 있는 방향만 기억해두자.";
-    if (dopamineState === "HIGH") return "내일은 마음보다 한 박자 느린 방향만 기억해두자.";
+    if (dopamineState === "HIGH") return "내일은 앞서가는 마음을 붙잡고, 조금 더 신중하게 행동해보자.";
     return "내일도 이 균형을 크게 흔들지 않는 방향만 기억해두자.";
   }
 
@@ -1008,6 +1068,32 @@ class Game {
     );
   }
 
+  ensurePaminiBriefingVisibleStarted() {
+    if (!this.paminiBriefing || this.paminiBriefing.visibleStartedAt != null) return;
+    this.paminiBriefing.visibleStartedAt = this.getTimeMs();
+  }
+
+  getPaminiBriefingFadeDuration() {
+    return 420;
+  }
+
+  getPaminiBriefingVisualAlpha() {
+    if (!this.paminiBriefing) return 0;
+
+    const duration = this.getPaminiBriefingFadeDuration();
+    const now = this.getTimeMs();
+
+    if (this.paminiBriefing.fadeOutStartedAt != null) {
+      const progress = (now - this.paminiBriefing.fadeOutStartedAt) / duration;
+      return constrain(1 - progress, 0, 1);
+    }
+
+    if (this.paminiBriefing.visibleStartedAt == null) return 0;
+
+    const progress = (now - this.paminiBriefing.visibleStartedAt) / duration;
+    return constrain(progress, 0, 1);
+  }
+
   getCurrentPaminiBriefingLine() {
     const briefing = this.paminiBriefing;
     if (!briefing || !briefing.lines.length) return "";
@@ -1015,15 +1101,32 @@ class Game {
   }
 
   advancePaminiBriefing() {
+    if (this.backgroundTransition || (this.paminiBriefing && this.paminiBriefing.fadeOutStartedAt != null)) return;
+
     if (!this.paminiBriefing) {
       this.changeScene(SCENES.DOPAMINE_READY);
       return;
     }
 
-    this.paminiBriefing.index += 1;
-    if (this.paminiBriefing.index >= this.paminiBriefing.lines.length) {
-      this.finishPaminiBriefing();
+    if (this.paminiBriefing.index >= this.paminiBriefing.lines.length - 1) {
+      this.startPaminiBriefingFadeOut();
+      return;
     }
+
+    this.paminiBriefing.index += 1;
+  }
+
+  startPaminiBriefingFadeOut() {
+    if (!this.paminiBriefing || this.paminiBriefing.fadeOutStartedAt != null) return;
+    this.paminiBriefing.fadeOutStartedAt = this.getTimeMs();
+  }
+
+  completePaminiBriefingFadeOutIfNeeded() {
+    if (!this.paminiBriefing || this.paminiBriefing.fadeOutStartedAt == null) return false;
+    if (this.getTimeMs() - this.paminiBriefing.fadeOutStartedAt < this.getPaminiBriefingFadeDuration()) return false;
+
+    this.finishPaminiBriefing();
+    return true;
   }
 
   finishPaminiBriefing() {
@@ -1193,7 +1296,7 @@ class Game {
       node = this.getCurrentNode();
     }
 
-    if (processed && node && node.type === NODE_TYPES.CHOICE) {
+    if (node && node.type === NODE_TYPES.CHOICE && (processed || this.needsChoiceButtonRefresh(node))) {
       this.refreshChoices();
     }
 
@@ -1458,7 +1561,7 @@ class Game {
   }
 
   getDopamineState(value) {
-    if (value <= 50) return "LOW";
+    if (value < 50) return "LOW";
     if (value <= 80) return "OPT";
     return "HIGH";
   }
@@ -1490,7 +1593,6 @@ class Game {
         return;
       }
 
-      this.applyEffects(node.effects);
       this.advanceCurrentNode();
       this.refreshChoices();
       return;
@@ -1741,6 +1843,7 @@ class Game {
       this.typewriter.visibleChars = 0;
       this.typewriter.fullText = fullText;
       this.addDialogueLog(node, fullText, nodeKey);
+      this.applyDialogueEffectsOnDisplay(node, nodeKey);
     }
 
     const chars = Array.from(this.typewriter.fullText);
@@ -1791,6 +1894,15 @@ class Game {
     });
   }
 
+  applyDialogueEffectsOnDisplay(node, nodeKey) {
+    if (!node || !node.effects) return;
+    if (!this.appliedDialogueEffectKeys) this.appliedDialogueEffectKeys = new Set();
+    if (this.appliedDialogueEffectKeys.has(nodeKey)) return;
+
+    this.appliedDialogueEffectKeys.add(nodeKey);
+    this.applyEffects(node.effects);
+  }
+
   addChoiceLog(choice, fullText) {
     const node = this.getCurrentNode();
     const nodeId = node && node.id !== undefined ? node.id : this.state.nodeIndex;
@@ -1816,9 +1928,11 @@ class Game {
   refreshChoices() {
     const node = this.getCurrentNode();
     this.choiceButtons = [];
+    this.choiceButtonsNodeKey = null;
 
     if (!node || node.type !== NODE_TYPES.CHOICE) return;
 
+    this.choiceButtonsNodeKey = this.getChoiceNodeKey(node);
     const choiceItems = this.getVisibleChoiceItems(node);
     const impactSummary = this.getChoiceImpactSummary(choiceItems.map((item) => item.choice));
     const frameStyle = this.getChoiceButtonFrameStyle(impactSummary.type);
@@ -1865,6 +1979,15 @@ class Game {
 
       this.choiceButtons.push(button);
     });
+  }
+
+  needsChoiceButtonRefresh(node) {
+    return this.choiceButtons.length === 0 || this.choiceButtonsNodeKey !== this.getChoiceNodeKey(node);
+  }
+
+  getChoiceNodeKey(node) {
+    const nodeKey = node && node.id !== undefined ? node.id : this.state.nodeIndex;
+    return `${this.state.episodeId}:${nodeKey}`;
   }
 
   getVisibleChoiceItems(node) {
@@ -1948,13 +2071,13 @@ class Game {
         accent: "#ffd166",
         fill: "rgba(255, 209, 102, 0.2)",
         text: "#ffe39a",
-        label: mixed ? "도파민 변화 포함" : "도파민 변화"
+        label: "도파민 변화"
       },
       affection: {
         accent: "#ff6fa9",
         fill: "rgba(255, 111, 169, 0.22)",
         text: "#ffd1e6",
-        label: mixed ? "호감도 변화 포함" : "호감도 변화"
+        label: "호감도 변화"
       }
     };
 
@@ -2061,18 +2184,42 @@ class Game {
   queueChoiceFollow(follow = []) {
     this.state.pendingNodes = follow.flatMap((line) => {
       const nodes = [];
+      if (line.background) {
+        nodes.push({
+          type: NODE_TYPES.BACKGROUND,
+          name: line.background,
+          transition: line.transition
+        });
+      }
+      if (line.clearCharacters) {
+        nodes.push({
+          type: NODE_TYPES.CLEAR_CHARACTERS
+        });
+      }
+      if (Array.isArray(line.characters)) {
+        line.characters.forEach((character) => {
+          if (!character || !character.name) return;
+          nodes.push({
+            type: NODE_TYPES.CHARACTER_IN,
+            name: character.name,
+            emotion: character.emotion
+          });
+        });
+      }
       if (line.sound) {
         nodes.push({
           type: NODE_TYPES.SOUND,
           ...line.sound
         });
       }
-      nodes.push({
-        type: NODE_TYPES.DIALOGUE,
-        speaker: line.speaker,
-        text: line.text,
-        effects: line.effects
-      });
+      if (line.text || line.speaker) {
+        nodes.push({
+          type: NODE_TYPES.DIALOGUE,
+          speaker: line.speaker,
+          text: line.text,
+          effects: line.effects
+        });
+      }
       return nodes;
     });
   }
@@ -2096,35 +2243,9 @@ class Game {
 
   createMinigameTutorial(options) {
     if (typeof MinigameTutorialOverlay !== "function") return null;
-    const subGameId = this.state.selectedSubGame || SUB_GAMES.BRICK_BREAKER;
-    const tutorial = options.tutorial !== undefined
-      ? options.tutorial
-      : this.getDefaultMinigameTutorial(subGameId);
-    return MinigameTutorialOverlay.fromOptions({
-      ...options,
-      tutorial
-    });
-  }
-
-  getDefaultMinigameTutorial(subGameId) {
-    if (subGameId === SUB_GAMES.BRICK_BREAKER) {
-      return [
-        { speaker: "파미니", text: "벽돌깨기는 6턴만 진행돼. 목표는 점수가 아니라 끝날 때 도파민을 적당히 남기는 거야." },
-        { speaker: "파미니", text: "마우스로 각도를 정하고 클릭하면 공이 나가. 블럭 숫자는 남은 내구도야." },
-        { speaker: "파미니", text: "블럭이 아래까지 내려오면 바로 끝나지만, 그 순간의 도파민이 결과로 돌아가." }
-      ];
-    }
-
-    if (subGameId === SUB_GAMES.SIDE_SHOOTER) {
-      return [
-        { speaker: "파미니", text: "슈팅은 짧게 45초만 버티면 돼. 마우스를 움직이면 캐릭터도 따라 움직여." },
-        { speaker: "파미니", text: "노란 P 캡슐은 파워 칸을 올려. 원하는 칸에서 우클릭하면 그 기술이 발동돼." },
-        { speaker: "파미니", text: "속도 증가는 이동과 도파민 감소를 돕고, 흡수 필터는 도파민을 크게 낮춰." },
-        { speaker: "파미니", text: "기술을 쓰면 캐릭터 주변에 색 빛 효과가 떠. 죽어도 현재 도파민으로 돌아가." }
-      ];
-    }
-
-    return [];
+    if (!options || options.tutorial === undefined) return null;
+    const tutorial = MinigameTutorialOverlay.fromOptions(options);
+    return tutorial && tutorial.isActive() ? tutorial : null;
   }
 
   getPlayableSubGameOptions(options = {}) {
@@ -2428,8 +2549,8 @@ class Game {
 
   getDopamineZones() {
     return [
-      { from: 0, to: 51, color: "#70d7aa" },
-      { from: 51, to: 81, color: "#ffd166" },
+      { from: 0, to: 50, color: "#70d7aa" },
+      { from: 50, to: 81, color: "#ffd166" },
       { from: 81, to: 100, color: "#ff5c93" }
     ];
   }
@@ -2533,7 +2654,7 @@ class Game {
     if (typeof window !== "undefined" && window.KoreanJosa) {
       return window.KoreanJosa.replaceNameTokens(text, playerName);
     }
-    return (text || "").replace(/000|OO/g, playerName);
+    return (text || "").replace(/000|OO|(?<!\d)00(?!\d)/g, playerName);
   }
 
   formatDialogueText(text, speaker) {
@@ -2559,7 +2680,8 @@ class Game {
       episodeAffectionDelta: this.state.episodeAffectionDelta || 0,
       playerName: this.state.playerName || "진수",
       background: this.state.background,
-      characters: this.state.characters
+      characters: this.state.characters,
+      appliedDialogueEffectKeys: Array.from(this.appliedDialogueEffectKeys || [])
     };
     localStorage.setItem("dopaSave", JSON.stringify(snapshot));
     localStorage.setItem("dopaPlayerName", snapshot.playerName);
@@ -2581,6 +2703,7 @@ class Game {
       this.state.episodeAffectionDelta = snapshot.episodeAffectionDelta || 0;
       this.state.playerName = snapshot.playerName || "진수";
       this.state.pendingNodes = [];
+      this.appliedDialogueEffectKeys = new Set(Array.isArray(snapshot.appliedDialogueEffectKeys) ? snapshot.appliedDialogueEffectKeys : []);
       this.state.characters = Array.isArray(snapshot.characters) ? snapshot.characters : [];
       this.character = {};
       this.state.characters.forEach((name) => {

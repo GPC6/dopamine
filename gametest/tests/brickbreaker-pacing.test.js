@@ -18,8 +18,8 @@ function loadBrickBreaker() {
 
 function loadEpisodes() {
   const context = {};
-  const code = fs.readFileSync(path.join(projectRoot, "story-data-excel.js"), "utf8");
-  vm.runInNewContext(code + "\nthis.EPISODES = EPISODES;", context, { filename: "story-data-excel.js" });
+  const code = fs.readFileSync(path.join(projectRoot, "story-data-v1.js"), "utf8");
+  vm.runInNewContext(code + "\nthis.EPISODES = EPISODES;", context, { filename: "story-data-v1.js" });
   return context.EPISODES;
 }
 

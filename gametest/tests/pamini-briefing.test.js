@@ -6,6 +6,8 @@ const vm = require("vm");
 const projectRoot = path.join(__dirname, "..");
 const context = {};
 context.constrain = (value, min, max) => Math.max(min, Math.min(max, value));
+context.now = 0;
+context.millis = () => context.now;
 
 const configCode = fs.readFileSync(path.join(projectRoot, "config.js"), "utf8");
 vm.runInNewContext(configCode + "\nthis.SCENES = SCENES;", context, { filename: "config.js" });
@@ -45,7 +47,7 @@ const lines = createGame().buildPaminiBriefingLines({
 
 assert.strictEqual(lines.length, 3, "briefing has three short lines");
 assert.ok(lines[0].includes("높은 도파민") && lines[0].includes("감정"), "first line combines affection delta and dopamine state");
-assert.ok(lines[1].includes("방향만"), "second line keeps dopamine guidance brief");
+assert.ok(lines[1].includes("내일은"), "second line keeps dopamine guidance brief");
 assert.ok(lines[2].includes("꿈속"), "last line connects to the night minigame");
 assert.ok(lines.every((line) => !/\d/.test(line)), "briefing does not expose numeric values");
 
@@ -73,6 +75,30 @@ assert.ok(firstMeetingLines[0].includes("파미니") && firstMeetingLines[0].inc
 assert.ok(firstMeetingLines[1].includes("오늘 하루") && firstMeetingLines[1].includes("감정"), "EP2 smalltalks about today's emotion");
 assert.ok(firstMeetingLines[2].includes("매일 밤"), "EP2 explains pamini will appear every night");
 assert.ok(!lines.join("\n").includes("매일 밤"), "EP3 and later do not repeat the first meeting intro");
+
+const fadeGame = createGame();
+fadeGame.paminiBriefing = {
+  lines: ["한 줄"],
+  index: 0,
+  snapshot: {},
+  visibleStartedAt: 1000
+};
+context.now = 1000;
+assert.strictEqual(fadeGame.getPaminiBriefingVisualAlpha(), 0, "pamini starts invisible before fade in");
+context.now = 1210;
+assert.ok(fadeGame.getPaminiBriefingVisualAlpha() > 0 && fadeGame.getPaminiBriefingVisualAlpha() < 1, "pamini fades in gradually");
+context.now = 1500;
+assert.strictEqual(fadeGame.getPaminiBriefingVisualAlpha(), 1, "pamini becomes fully visible after fade in");
+
+fadeGame.state.scene = context.SCENES.PAMINI_BRIEFING;
+context.now = 2000;
+fadeGame.advancePaminiBriefing();
+assert.strictEqual(fadeGame.paminiBriefing.fadeOutStartedAt, 2000, "final briefing click starts fade out");
+assert.strictEqual(fadeGame.state.scene, context.SCENES.PAMINI_BRIEFING, "scene waits during fade out");
+context.now = 2500;
+assert.strictEqual(fadeGame.completePaminiBriefingFadeOutIfNeeded(), true, "fade out completes after its duration");
+assert.strictEqual(fadeGame.state.scene, context.SCENES.DOPAMINE_READY, "briefing moves to ready after fade out");
+assert.strictEqual(fadeGame.paminiBriefing, null, "briefing state clears after fade out");
 
 const deltaGame = createGame();
 deltaGame.applyEffects({ affection: 3 });

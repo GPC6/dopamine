@@ -107,16 +107,16 @@
     const playerName = name || "진수";
 
     return String(text || "")
-      .replace(/(000|OO)\(([^)]+)\)/g, function (_, token, pair) {
+      .replace(/(000|OO|(?<!\d)00(?!\d))\(([^)]+)\)/g, function (_, token, pair) {
         return attach(playerName, pair);
       })
-      .replace(/(000|OO)(이가|으로|아|야|가|이|은|는|을|를|와|과|로)(?=$|[\s"'`.,!?()[\]{}<>:;~…“”‘’])/g, function (_, token, suffix) {
+      .replace(/(000|OO|(?<!\d)00(?!\d))(이가|으로|아|야|가|이|은|는|을|를|와|과|로)(?=$|[\s"'`.,!?()[\]{}<>:;~…“”‘’])/g, function (_, token, suffix) {
         if (suffix === "이") {
           return playerName + (getBatchimInfo(playerName).hasBatchim ? "이" : "");
         }
         return attach(playerName, DIRECT_SUFFIX_PAIRS[suffix]);
       })
-      .replace(/000|OO/g, playerName);
+      .replace(/000|OO|(?<!\d)00(?!\d)/g, playerName);
   }
 
   global.KoreanJosa = {

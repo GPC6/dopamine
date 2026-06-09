@@ -19,6 +19,16 @@ function loadEpisodes() {
   return context.EPISODES;
 }
 
+function loadGame(MinigameTutorialOverlay) {
+  const context = {
+    MinigameTutorialOverlay
+  };
+  loadScript("config.js", context);
+  const gameCode = fs.readFileSync(path.join(projectRoot, "game.js"), "utf8");
+  vm.runInNewContext(gameCode + "\nthis.Game = Game;", context, { filename: "game.js" });
+  return context.Game;
+}
+
 function findFirstMinigameNode(episodes, minigame) {
   for (const nodes of Object.values(episodes)) {
     const node = nodes.find((entry) => entry.type === "move" && entry.next === "MINIGAME" && entry.minigame === minigame);
@@ -59,6 +69,15 @@ function runTests() {
   assert.ok(sideShooter, "first sideShooter node exists");
   assert.ok(brickBreaker.options && brickBreaker.options.tutorial, "first brickBreaker has tutorial options");
   assert.ok(sideShooter.options && sideShooter.options.tutorial, "first sideShooter has tutorial options");
+
+  const Game = loadGame(MinigameTutorialOverlay);
+  const game = Object.create(Game.prototype);
+  game.state = { selectedSubGame: "sideShooter" };
+  assert.strictEqual(game.createMinigameTutorial({}), null, "minigame tutorial is not auto-generated without scenario tutorial");
+
+  const explicitTutorial = game.createMinigameTutorial({ tutorial: ["명시된 안내"] });
+  assert.strictEqual(explicitTutorial.isActive(), true, "explicit scenario tutorial still appears");
+  assert.strictEqual(explicitTutorial.getCurrentStep().text, "명시된 안내", "explicit tutorial text is preserved");
 }
 
 runTests();

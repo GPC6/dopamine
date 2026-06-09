@@ -329,6 +329,7 @@ function createChoiceItem(choice, choices, choiceIndex) {
     choice.follow.push({ speaker: "", text: "" });
     renderNodes();
   });
+  item.append(createChoiceDisplayEditor(choice));
   item.append(createEmbeddedSoundEditor(choice, "선택 효과음"));
 
   return item;
@@ -345,9 +346,21 @@ function createFollowLine(lines, line, lineIndex) {
       renderNodes();
     }),
     createEffectsEditor(line),
+    createFollowSceneEditor(line),
     createEmbeddedSoundEditor(line, "발화 효과음")
   );
   return row;
+}
+
+function createChoiceDisplayEditor(choice) {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  summary.textContent = "표시 옵션";
+  details.append(
+    summary,
+    makeCheckboxInput("조건 불일치 선택지도 비활성 상태로 미리보기", !!choice.disabledPreview, (checked) => setOptionalBoolean(choice, "disabledPreview", checked))
+  );
+  return details;
 }
 
 function createEffectsEditor(target) {
@@ -362,6 +375,44 @@ function createEffectsEditor(target) {
     makeNumberInput("호감도 변화", effects.affection, (value) => setNestedNumber(target, "effects", "affection", value))
   );
   details.append(summary, grid);
+  return details;
+}
+
+function createFollowSceneEditor(line) {
+  const details = document.createElement("details");
+  const summary = document.createElement("summary");
+  const grid = document.createElement("div");
+  const characterList = document.createElement("div");
+  const addButton = makeButton("등장 캐릭터 추가", "secondary-button small-button", () => {
+    if (!Array.isArray(line.characters)) line.characters = [];
+    line.characters.push({ name: "", emotion: "" });
+    renderNodes();
+  });
+
+  summary.textContent = "발화 전 장면";
+  grid.className = "field-grid two";
+  grid.append(
+    makeComboInput("배경", line.background, (value) => setOptionalString(line, "background", value), getSuggestionOptions("backgrounds")),
+    makeCheckboxInput("캐릭터 모두 지우기", !!line.clearCharacters, (checked) => setOptionalBoolean(line, "clearCharacters", checked))
+  );
+
+  characterList.className = "choice-items";
+  (line.characters || []).forEach((character, index) => {
+    const row = document.createElement("div");
+    row.className = "follow-line";
+    row.append(
+      makeComboInput("캐릭터 이름", character.name, (value) => setFollowCharacterString(line, index, "name", value), getSuggestionOptions("characters")),
+      makeComboInput("표정", character.emotion, (value) => setFollowCharacterString(line, index, "emotion", value), getSuggestionOptions("emotions", character.name), "일반"),
+      makeButton("삭제", "danger-button small-button", () => {
+        line.characters.splice(index, 1);
+        cleanupEmptyArray(line, "characters");
+        renderNodes();
+      })
+    );
+    characterList.append(row);
+  });
+
+  details.append(summary, grid, createBackgroundTransitionEditor(line), characterList, addButton);
   return details;
 }
 
@@ -585,6 +636,17 @@ function makeSelectInput(labelText, value, options, onInput) {
   select.value = value || "";
   select.addEventListener("change", (event) => onInput(event.target.value));
   label.append(select);
+  return label;
+}
+
+function makeCheckboxInput(labelText, checked, onInput) {
+  const label = makeLabel(labelText);
+  const input = document.createElement("input");
+  input.type = "checkbox";
+  input.checked = checked;
+  input.addEventListener("change", (event) => onInput(event.target.checked));
+  label.className = "checkbox-label";
+  label.prepend(input);
   return label;
 }
 
@@ -840,6 +902,23 @@ function setOptionalNumber(target, key, rawValue) {
   else target[key] = Number(rawValue);
 }
 
+function setOptionalBoolean(target, key, checked) {
+  if (checked) target[key] = true;
+  else delete target[key];
+}
+
+function setFollowCharacterString(line, index, key, rawValue) {
+  if (!Array.isArray(line.characters)) line.characters = [];
+  if (!line.characters[index]) line.characters[index] = {};
+
+  setOptionalString(line.characters[index], key, rawValue);
+
+  if (!Object.keys(line.characters[index]).length) {
+    line.characters.splice(index, 1);
+  }
+  cleanupEmptyArray(line, "characters");
+}
+
 function setNestedSoundString(target, key, rawValue) {
   if (!target.sound) target.sound = {};
   setOptionalString(target.sound, key, rawValue);
@@ -945,6 +1024,12 @@ function setConditionDopamineState(node, rawValue) {
 
 function cleanupEmptyObject(target, key) {
   if (target[key] && typeof target[key] === "object" && !Object.keys(target[key]).length) {
+    delete target[key];
+  }
+}
+
+function cleanupEmptyArray(target, key) {
+  if (Array.isArray(target[key]) && target[key].length === 0) {
     delete target[key];
   }
 }
@@ -1270,7 +1355,7 @@ elements.loadSampleButton.addEventListener("click", () => {
 });
 elements.loadGameStoryButton.addEventListener("click", () => {
   if (!gameStoryEpisodes) {
-    alert("본게임 story-data-excel 파일을 불러오지 못했습니다.");
+    alert("본게임 story-data-v1 파일을 불러오지 못했습니다.");
     return;
   }
 

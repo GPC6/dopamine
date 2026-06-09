@@ -253,6 +253,17 @@ select:focus {
   box-shadow: 0 0 0 3px rgba(233, 196, 106, 0.14);
 }
 
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-label input {
+  width: auto;
+  height: auto;
+}
+
 .node-fields > label + label,
 .node-fields > div + div,
 .node-fields > details,

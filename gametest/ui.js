@@ -56,7 +56,7 @@ class Button {
       const labelW = this.w - paddingX * 2 - suffixW - (this.options.suffix ? 18 : 0);
       textAlign(LEFT, CENTER);
       if (this.options.suffix) {
-        text(this.label, this.x + paddingX, this.y, labelW, this.h);
+        text(this.label, this.x + paddingX, this.y, labelW*2, this.h);
       } else {
         text(this.label, this.x + paddingX, this.y + this.h / 2);
       }
