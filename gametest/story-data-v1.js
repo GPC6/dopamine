@@ -64,7 +64,9 @@ const EPISODES = {
     {
       "type": "background",
       "name": "(CG) 졸고 있는 수진",
-      "id": 8
+      "id": 8,
+      "transitionDuration": 300,
+      "transition": "fadeBlack"
     },
     {
       "type": "dialogue",
@@ -73,62 +75,63 @@ const EPISODES = {
       "id": 9
     },
     {
+      "type": "background",
+      "name": "(CG) 자는 수진 클로즈업",
+      "id": 10,
+      "transition": "fadeBlack",
+      "transitionDuration": 1000
+    },
+    {
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "(…예쁘다.)",
-      "id": 10
+      "text": "(몽롱하던 시야가 번쩍 뜨인다.)",
+      "id": 11
     },
     {
       "type": "choice",
-      "prompt": "(…예쁘다.)",
+      "prompt": "(몽롱하던 시야가 번쩍 뜨인다.)",
       "choices": [
         {
           "text": "저기요…",
           "follow": [],
-          "nextNode": 12
+          "nextNode": 13
         },
         {
           "text": "(그냥 빤히 쳐다본다)",
           "follow": [],
-          "nextNode": 12
+          "nextNode": 13
         }
       ],
-      "id": 11
+      "id": 12
     },
     {
       "type": "background",
       "name": "(CG) 화들짝 깨는 수진",
-      "id": 12
+      "id": 13
     },
     {
       "type": "dialogue",
       "speaker": "수진",
       "text": "아, 네! 죄송합니다…!",
-      "id": 13
+      "id": 14
     },
     {
       "type": "sound",
       "soundType": "effect",
       "action": "play",
       "name": "ep1Barcode",
-      "id": 14
+      "id": 15
     },
     {
       "type": "dialogue",
       "speaker": "수진",
       "text": "1500원입니다…!",
-      "id": 15
-    },
-    {
-      "type": "dialogue",
-      "speaker": "주인공",
-      "text": "(몽롱하던 시야가 번쩍 뜨인다.)",
       "id": 16
     },
     {
       "type": "dialogue",
       "speaker": "주인공",
-      "text": "예쁘다…",
+      "text": "예쁘시네요.",
       "id": 17
     },
     {
@@ -157,7 +160,7 @@ const EPISODES = {
     {
       "type": "dialogue",
       "speaker": "수진",
-      "text": "ㅎㅎ 네, 그럼 안녕히계세요.",
+      "text": "아 네, 그럼 안녕히 가세요!",
       "id": 20
     },
     {
@@ -282,49 +285,97 @@ const EPISODES = {
     },
     {
       "type": "dialogue",
-      "speaker": "지시문",
-      "text": "위기 상황! 00의 뇌 속은 현재 과도한 밤샘 과제, 카페인 폭탄,",
+      "speaker": "파미니",
+      "text": "위기 상황!",
       "id": 40
     },
     {
       "type": "dialogue",
-      "speaker": "지시문",
-      "text": "그리고 3시간 연속 숏폼 시청으로 인해 도파민 체계가 완전히 붕괴되기 직전입니다.",
+      "speaker": "주인공",
+      "text": "뭐지... 꿈인가?",
       "id": 41
     },
     {
       "type": "dialogue",
-      "speaker": "지시문",
-      "text": "하필 이 타이밍에 첫사랑을 시작하다니!",
+      "speaker": "파미니",
+      "text": "안녕! 나는 파미니야.",
       "id": 42
     },
     {
       "type": "dialogue",
-      "speaker": "지시문",
-      "text": "당신은 주인공의 행동과 이성을 제어하는 '도파민’입니다.",
+      "speaker": "파미니",
+      "text": "네 마음속 도파민 흐름을 관리하는 작은 안내자라고 생각하면 돼.",
       "id": 43
     },
     {
       "type": "dialogue",
-      "speaker": "지시문",
-      "text": "다음 날 있을 첫 동아리 OT에서 주인공이 무기력해지거나",
+      "speaker": "파미니",
+      "text": "현재 너의 뇌 속은 과도한 밤샘 과제, 카페인 폭탄, 그리고 3시간 연속 숏폼 시청으로 인해,",
       "id": 44
     },
     {
       "type": "dialogue",
-      "speaker": "지시문",
-      "text": "반대로 과도한 각성 상태로 폭주하지 않도록,",
+      "speaker": "파미니",
+      "text": "도파민 체계가 완전히 무너지기 직전이야.",
       "id": 45
     },
     {
       "type": "dialogue",
-      "speaker": "지시문",
-      "text": "적절한 도파민 수치(50~80)를 유지하세요!",
+      "speaker": "파미니",
+      "text": "하필 이 타이밍에 첫사랑을 시작하다니!",
       "id": 46
     },
     {
-      "type": "clear background",
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "헉... 어떡하면 좋을까?",
       "id": 47
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "적절한 도파민 수치 50~80을 기억해!",
+      "id": 48
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "도파민 수치가 너무 낮으면 무기력해질 수 있고, 넘치면 폭주할 수 있어!",
+      "id": 49
+    },
+    {
+      "type": "dialogue",
+      "speaker": "주인공",
+      "text": "도파민에 따라 내 말과 행동이 바뀌는거야?",
+      "id": 50
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "정확해!",
+      "id": 51
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "너무 높아도 문제, 너무 낮아도 문제야.",
+      "id": 52
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": " 내일 있을 동아리 OT를 위해 도파민 수치를 조절해보자!",
+      "id": 53
+    },
+    {
+      "type": "dialogue",
+      "speaker": "파미니",
+      "text": "잊지 마. 목표는 50~80이야!",
+      "id": 54
+    },
+    {
+      "type": "clear background",
+      "id": 55
     },
     {
       "type": "move",
@@ -334,13 +385,14 @@ const EPISODES = {
       "options": {
         "maxTurns": 5,
         "tutorial": [
-          "첫 벽돌깨기는 5턴만 진행돼. 마우스로 각도를 정하고 클릭하면 공이 나가.",
-          "블럭 숫자는 남은 내구도야. 목표는 끝날 때 도파민을 적당히 남기는 거야.",
-          "빨간 블럭은 맞힐 때마다 도파민이 +1씩 늘어나고, 파란 블럭은 부숴지면 도파민이 8 감소해.",
-          "블럭이 바닥에 닿으면, 도파민은 그 상태로 유지된 채 게임 종료야!"
+          "첫 번째 게임은 벽돌깨기야.",
+          "마우스로 각도를 정하고 클릭하면 공이 발사돼.",
+          "빨강색 벽돌은 맞을 때마다 도파민 수치를 1 상승시키고, 초록색 벽돌은 1 감소시켜!",
+          "벽돌에 적힌 숫자는 벽돌의 내구도이자 도파민 변화량이야.",
+          "벽돌이 바닥에 닿으면 현재의 도파민 레벨 그대로 게임 종료야!"
         ]
       },
-      "id": 48
+      "id": 56
     }
   ],
   "EP2 동아리 OT": [
@@ -410,7 +462,7 @@ const EPISODES = {
       "speaker": "지시문",
       "text": "(수진이 저 끝에 앉아 있다.)",
       "effects": {
-        "dopamine": 5
+        "dopamine": 3
       },
       "id": 10
     },
@@ -446,7 +498,7 @@ const EPISODES = {
           "text": "(수진의 옆자리에 앉는다)",
           "follow": [],
           "effects": {
-            "dopamine": 3
+            "dopamine": 5
           },
           "sound": {
             "type": "sound",
@@ -460,7 +512,7 @@ const EPISODES = {
           "text": "(수진의 뒷자리에 앉는다)",
           "follow": [],
           "effects": {
-            "dopamine": -3
+            "dopamine": -5
           },
           "sound": {
             "type": "sound",
@@ -490,10 +542,10 @@ const EPISODES = {
       "prompt": "안녕하세요!",
       "choices": [
         {
-          "text": "(당연히 기억 못 하겠지) 안녕하세요~ 건축학과 00입니다",
+          "text": "(당연히 기억 못 하겠지) 안녕하세요~ 건축학과 00입니다.",
           "follow": [],
           "effects": {
-            "dopamine": -3
+            "dopamine": -5
           },
           "nextNode": 19
         },
@@ -523,7 +575,7 @@ const EPISODES = {
             }
           ],
           "effects": {
-            "dopamine": 3
+            "dopamine": 5
           },
           "nextNode": 19
         }
@@ -705,7 +757,7 @@ const EPISODES = {
       "speaker": "건호",
       "text": "난 몸 쓰는 거 말곤 젬병인데 도면 같은 건 00이 네가 다 짜주는 거지? 든든하다 야!",
       "effects": {
-        "dopamine": -5
+        "dopamine": -3
       },
       "id": 43
     },
@@ -938,13 +990,14 @@ const EPISODES = {
         "difficulty": 0,
         "durationSeconds": 45,
         "tutorial": [
-          "슈팅은 45초만 버티면 돼. 마우스로 움직이고 좌클릭을 꾹 누르면 자동으로 공격해.",
+          "이번 게임은 슈팅게임이야!",
+          "45초만 버티면 돼. 마우스로 우주선을 움직이고, 클릭하고 있으면 총알이 발사돼.",
           "모든 적들은 처치하면 모두 도파민 +3 증가해.",
-          "적에게 맞으면 도파민이 크게 올라. 빨간 표시는 도파민 상승이라고 보면 돼.",
-          "초록 안정 캡슐과 흡수 필터는 도파민을 낮춰. 초록색은 완화 신호야.",
-          "노란 P 캡슐은 파워 칸을 올려. 원하는 칸에서 우클릭하면 기술을 써.",
-          "예를 들어 흡수 기술은 도파민을 낮춰주는 기술이야.",
-          "흡수 기술을 제외한 기술은 한 번씩만 사용할 수 있어."
+          "적을 처치하면 캡슐이 나올 수 있어. 빨간 캡슐은 도파민 +8, 초록 캡슐은 도파민 -8이야.",
+          "더블샷 캡슐을 먹으면 발사체가 2배 늘어나.",
+          "도파민은 자연스럽게 빠르게 감소하니까 적을 꾸준히 처치해야 해.",
+          "적이나 투사체에 맞으면 도파민이 줄어들고 라이프가 줄어.",
+          "3개의 라이프를 모두 소진하면 현재의 도파민 레벨 그대로 게임 종료야!"
         ]
       },
       "id": 56
@@ -1023,7 +1076,7 @@ const EPISODES = {
               "background": "(CG) 동아리방에 둘러앉은 넷",
               "clearCharacters": true,
               "speaker": "수진",
-              "text": "가야지! 너도 가자 00아"
+              "text": "가야지! 너도 가자 00아."
             },
             {
               "background": "(CG) 동아리방에 둘러앉은 넷",
@@ -2123,7 +2176,7 @@ const EPISODES = {
           "nextNode": 58
         },
         {
-          "text": "(붙잡아주며) 오 괜찮아? 무서운게 너무 많다 여기.. 혹시 힘들면 얘기해 수진아.",
+          "text": "오 괜찮아? 무서운게 너무 많다 여기.. 혹시 힘들면 얘기해 수진아.",
           "follow": [
             {
               "background": "공포방탈출 내부",
@@ -2170,7 +2223,7 @@ const EPISODES = {
           "nextNode": 58
         },
         {
-          "text": "(어깨를 감싸며) 오 괜찮아? 아니 건호가 너무 무서운 데를 찾아왔는데?",
+          "text": "오 괜찮아? 아니 건호가 너무 무서운 데를 찾아왔는데?",
           "follow": [
             {
               "background": "공포방탈출 내부",
@@ -2320,7 +2373,7 @@ const EPISODES = {
     {
       "type": "character in",
       "name": "수진",
-      "emotion": "Normal",
+      "emotion": "Flustered",
       "id": 66
     },
     {
@@ -2706,17 +2759,11 @@ const EPISODES = {
         {
           "text": "왜? 피아노과면 그래도 무대 경험 많지 않아?",
           "follow": [],
-          "effects": {
-            "affection": 5
-          },
           "nextNode": 33
         },
         {
           "text": "에이, 너 공연도 엄청 자주 하고 잘 하잖아!",
           "follow": [],
-          "effects": {
-            "affection": 5
-          },
           "nextNode": 33
         }
       ],
@@ -2732,6 +2779,9 @@ const EPISODES = {
       "type": "dialogue",
       "speaker": "수진",
       "text": "피아노도 항상 무대 오르면 떨리는데, 게다가 무대 스태프는 처음이잖아.",
+      "effects": {
+        "affection": 5
+      },
       "id": 34
     },
     {
@@ -3356,7 +3406,7 @@ const EPISODES = {
               "speaker": "주인공",
               "text": "조금 서운하네ㅎㅎ",
               "effects": {
-                "dopamine": 5,
+                "dopamine": 3,
                 "affection": 5
               }
             },
@@ -3407,7 +3457,7 @@ const EPISODES = {
               "speaker": "수진",
               "text": "(당황하며) 미팅은 진짜 어쩔 수 없이 나가는 거야.",
               "effects": {
-                "dopamine": 5
+                "dopamine": 3
               }
             },
             {
@@ -3492,7 +3542,7 @@ const EPISODES = {
     },
     {
       "type": "choice",
-      "prompt": "생각해보니까 괜히 더 피곤할 것 같아서ㅋㅋ 공연 준비도 해야 하고.",
+      "prompt": "공연 준비도 해야 하고.",
       "choices": [
         {
           "text": "잘됐다..! 다행이야.",
@@ -3617,9 +3667,6 @@ const EPISODES = {
       "type": "dialogue",
       "speaker": "수진",
       "text": "(귓속말로) 오늘 순조롭게 잘되고 있다!",
-      "effects": {
-        "dopamine": -5
-      },
       "id": 5
     },
     {
@@ -3770,12 +3817,12 @@ const EPISODES = {
     {
       "type": "dialogue",
       "speaker": "수진",
-      "text": "아 이게 왜 안들어가지..",
+      "text": "아 이게 왜 안 들어가지..",
       "id": 29
     },
     {
       "type": "choice",
-      "prompt": "아 이게 왜 안들어가지..",
+      "prompt": "아 이게 왜 안 들어가지..",
       "choices": [
         {
           "text": "(불안해하며) 아 어떡하지.. 곧 시작인데..",
@@ -4411,14 +4458,10 @@ const EPISODES = {
       "id": 32
     },
     {
-      "type": "clear background",
-      "id": 33
-    },
-    {
       "type": "dialogue",
       "speaker": "END",
       "text": "해피엔딩",
-      "id": 34
+      "id": 33
     }
   ],
   "베드엔딩": [

@@ -92,6 +92,8 @@ assert.strictEqual(
   choiceHeaderLayout.labelBadge.x + choiceHeaderLayout.labelBadge.w / 2,
   "choice header label text is centered in its box"
 );
-assert.ok(choiceHeaderLayout.labelBadge.w >= 120, "choice header label box fits Korean status text");
+assert.strictEqual(choiceHeaderLayout.labelBadge.w, 72, "choice header label keeps its previous box width");
+assert.strictEqual(game.getChoiceHeaderStyle("dopamine", true).label, "도파민 변화", "choice header keeps dopamine change label text");
+assert.strictEqual(game.getChoiceHeaderStyle("affection", true).label, "호감도 변화", "affection header keeps affection change label text");
 
 console.log("choice-after-transition tests passed");

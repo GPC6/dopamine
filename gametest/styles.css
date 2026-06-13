@@ -24,6 +24,13 @@
   cursor: var(--game-cursor);
 }
 
+body.hide-game-cursor,
+body.hide-game-cursor *,
+body.hide-game-cursor *::before,
+body.hide-game-cursor *::after {
+  cursor: none !important;
+}
+
 html,
 body {
   margin: 0;
@@ -180,6 +187,7 @@ canvas {
 }
 
 .name-card input::placeholder {
+  font-size: 15px;
   color: #9499a6;
 }
 

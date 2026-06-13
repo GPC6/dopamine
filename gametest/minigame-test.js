@@ -3,8 +3,26 @@ let testSubGameId = SUB_GAMES.BRICK_BREAKER;
 let testInitialDopamine = CONFIG.initialDopamine;
 let testMaxTurns = 10;
 let testFinished = false;
+let testMinigameAssets = {};
 
 const TEST_STORAGE_KEY = "dopaMinigameTest";
+
+function preload() {
+  testMinigameAssets = {};
+  Object.entries(ASSET_MANIFEST.minigames || {}).forEach(([name, config]) => {
+    testMinigameAssets[name] = loadTestImageAssetTree(config.assets || {}, config.basePath || "");
+  });
+}
+
+function loadTestImageAssetTree(tree, basePath = "") {
+  if (typeof tree === "string") return loadImage(basePath + tree);
+
+  const loaded = {};
+  Object.entries(tree || {}).forEach(([name, value]) => {
+    loaded[name] = loadTestImageAssetTree(value, basePath);
+  });
+  return loaded;
+}
 
 function setup() {
   const canvas = createCanvas(CONFIG.width, CONFIG.height);
@@ -124,6 +142,10 @@ function setupTestPanel() {
 }
 
 function startTestSubGame() {
+  if (testSubGame && typeof testSubGame.cleanup === "function") {
+    testSubGame.cleanup();
+  }
+
   const subGame = SUB_GAME_MANIFEST[testSubGameId];
   const SubGameClass = subGame ? window[subGame.className] : null;
 
@@ -134,9 +156,11 @@ function startTestSubGame() {
     return;
   }
 
-  testSubGame = new SubGameClass(clampDopamine(testInitialDopamine), {
-    ...getSubGameOptions()
-  });
+  testSubGame = new SubGameClass(
+    clampDopamine(testInitialDopamine),
+    { ...getSubGameOptions() },
+    testMinigameAssets[testSubGameId] || {}
+  );
   updateTestUrl();
   syncTestStatus("플레이 중");
 }

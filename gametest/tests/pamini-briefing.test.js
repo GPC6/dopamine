@@ -45,10 +45,13 @@ const lines = createGame().buildPaminiBriefingLines({
   episodeId: "EP3"
 });
 
-assert.strictEqual(lines.length, 3, "briefing has three short lines");
-assert.ok(lines[0].includes("높은 도파민") && lines[0].includes("감정"), "first line combines affection delta and dopamine state");
-assert.ok(lines[1].includes("내일은"), "second line keeps dopamine guidance brief");
-assert.ok(lines[2].includes("꿈속"), "last line connects to the night minigame");
+assert.strictEqual(lines.length, 6, "briefing repeats the first meeting intro before the three short lines");
+assert.ok(lines[0].includes("파미니") && lines[0].includes("안녕"), "briefing starts with pamini greeting");
+assert.ok(lines[1].includes("오늘 하루") && lines[1].includes("감정"), "briefing smalltalks about today's emotion");
+assert.ok(lines[2].includes("매일 밤"), "briefing explains pamini appears every night");
+assert.ok(lines[3].includes("높은 도파민") && lines[3].includes("감정"), "first briefing line combines affection delta and dopamine state");
+assert.ok(lines[4].includes("내일은"), "second briefing line keeps dopamine guidance brief");
+assert.ok(lines[5].includes("꿈속"), "last line connects to the night minigame");
 assert.ok(lines.every((line) => !/\d/.test(line)), "briefing does not expose numeric values");
 
 const missedChanceLines = createGame().buildPaminiBriefingLines({
@@ -56,14 +59,14 @@ const missedChanceLines = createGame().buildPaminiBriefingLines({
   affectionDelta: -2,
   episodeId: "EP3"
 });
-assert.ok(missedChanceLines[0].includes("도파민이 낮아") && missedChanceLines[0].includes("기회"), "low dopamine and negative affection reads as missed chance");
+assert.ok(missedChanceLines[3].includes("도파민이 낮아") && missedChanceLines[3].includes("기회"), "low dopamine and negative affection reads as missed chance");
 
 const neutralGoodLines = createGame().buildPaminiBriefingLines({
   dopamine: 65,
   affectionDelta: 2,
   episodeId: "EP3"
 });
-assert.ok(neutralGoodLines[0].includes("적당한 도파민") && neutralGoodLines[0].includes("좋은 흐름"), "optimal dopamine and positive affection reads as good flow");
+assert.ok(neutralGoodLines[3].includes("적절한 도파민") && neutralGoodLines[3].includes("좋은 흐름"), "optimal dopamine and positive affection reads as good flow");
 
 const firstMeetingLines = createGame("EP2").buildPaminiBriefingLines({
   dopamine: 77,
@@ -74,7 +77,7 @@ assert.strictEqual(firstMeetingLines.length, 6, "EP2 includes first meeting intr
 assert.ok(firstMeetingLines[0].includes("파미니") && firstMeetingLines[0].includes("안녕"), "EP2 starts with pamini greeting");
 assert.ok(firstMeetingLines[1].includes("오늘 하루") && firstMeetingLines[1].includes("감정"), "EP2 smalltalks about today's emotion");
 assert.ok(firstMeetingLines[2].includes("매일 밤"), "EP2 explains pamini will appear every night");
-assert.ok(!lines.join("\n").includes("매일 밤"), "EP3 and later do not repeat the first meeting intro");
+assert.ok(lines.join("\n").includes("매일 밤"), "EP3 and later repeat the first meeting intro");
 
 const fadeGame = createGame();
 fadeGame.paminiBriefing = {

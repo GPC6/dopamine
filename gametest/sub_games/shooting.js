@@ -1,17 +1,15 @@
 class SideShooterGame {
-  constructor(initialDopamine, options = {}) {
+  constructor(initialDopamine, options = {}, minigameAssets = {}) {
+    this.assets = minigameAssets || {};
     this.w = 980;
     this.h = 620;
     this.maxDopamine = 100;
     this.durationSeconds = this.parseDurationSeconds(options.durationSeconds || options.maxDuration || options.maxSeconds);
     this.difficulty = this.parseDifficulty(options.difficulty);
     this.enemyKillDopamine = 3;
-    this.powerDropChance = 0.22;
+    this.powerDropChance = 0.32;
     this.stimItemDopamine = 8;
-    this.calmItemDopamine = -10;
-    this.absorbSkillDopamine = -25;
-    this.speedUpgradeBonus = 1.8;
-    this.speedUpgradeDecayBonus = 0.012;
+    this.calmItemDopamine = -8;
     this.autoFireInterval = 5;
     this.dopamineUpColor = "#ff5d73";
     this.dopamineDownColor = "#7be0b7";
@@ -31,7 +29,7 @@ class SideShooterGame {
   }
 
   resetGame() {
-    this.player = { x: 110, y: this.h / 2, r: 18, shield: 0 };
+    this.player = { x: 110, y: this.h / 2, r: 18 };
     this.shots = [];
     this.enemies = [];
     this.bullets = [];
@@ -43,30 +41,14 @@ class SideShooterGame {
     this.spawnTimer = 0;
     this.nextEnemyId = 1;
     this.gameOver = false;
-    this.resultText = "마우스로 이동 / 좌클릭 홀드 공격 / 우클릭 기술";
-    this.skillFlash = 0;
-    this.lastActivatedUpgrade = null;
-    this.skillVisual = null;
+    this.resultText = "마우스로 이동 / 좌클릭 홀드 공격";
     this.autoFireCooldown = 0;
     this.floatTexts = [];
+    this.hitFlash = 0;
+    this.invincibleFrames = 0;
+    this.doubleShotActive = false;
+    this.doubleShotCollected = false;
     this.finished = false;
-    this.powerLevel = 0;
-    this.upgrades = {
-      speed: false,
-      double: false,
-      absorb: false,
-      laser: false,
-      option: false,
-      shield: false
-    };
-    this.consumedOneTimeUpgrades = {
-      speed: false,
-      double: false,
-      laser: false,
-      option: false,
-      shield: false
-    };
-    this.optionDrone = null;
   }
 
   update() {
@@ -74,24 +56,63 @@ class SideShooterGame {
   }
 
   draw() {
+    this.setCursorHidden(true);
     push();
     translate((width - this.w) / 2, (height - this.h) / 2);
     background("#0e151c");
+    this.drawImageTopLeft(this.assets.background, 0, 0, this.w, this.h, 125);
     this.drawStars();
     this.drawGame();
     this.drawHud();
     if (this.gameOver) this.drawEnd();
     pop();
+    this.drawShooterCursor();
+  }
+
+  drawShooterCursor() {
+    push();
+    noStroke();
+    fill("#ff2f4f");
+    ellipse(mouseX, mouseY, 9, 9);
+    noFill();
+    stroke(255, 47, 79, 160);
+    strokeWeight(2);
+    ellipse(mouseX, mouseY, 18, 18);
+    pop();
+  }
+
+  setCursorHidden(hidden) {
+    if (typeof document === "undefined" || !document.body) return;
+    document.body.classList.toggle("hide-game-cursor", hidden);
+  }
+
+  cleanup() {
+    this.setCursorHidden(false);
+  }
+
+  drawImageTopLeft(img, x, y, w, h, alpha = 255) {
+    if (!img) return false;
+    push();
+    imageMode(CORNER);
+    if (alpha < 255) tint(255, alpha);
+    image(img, x, y, w, h);
+    pop();
+    return true;
+  }
+
+  drawImageCentered(img, x, y, w, h, alpha = 255) {
+    if (!img) return false;
+    push();
+    imageMode(CORNER);
+    if (alpha < 255) tint(255, alpha);
+    image(img, x - w / 2, y - h / 2, w, h);
+    pop();
+    return true;
   }
 
   mousePressed() {
     if (this.gameOver) {
       this.finished = true;
-      return false;
-    }
-
-    if (typeof mouseButton !== "undefined" && mouseButton === RIGHT) {
-      this.useSkill();
       return false;
     }
 
@@ -109,7 +130,6 @@ class SideShooterGame {
     }
 
     if (key === " ") this.fireShot();
-    if (keyCode === SHIFT || key === "x" || key === "X") this.useSkill();
   }
 
   updateGame() {
@@ -121,10 +141,9 @@ class SideShooterGame {
     if (this.isKeyDown(RIGHT_ARROW) || this.isKeyDown(68)) this.player.x += speedBoost * 0.75;
     this.player.x = constrain(this.player.x, 40, this.w - 80);
     this.player.y = constrain(this.player.y, 92, this.h - 45);
-    this.updateOptionDrone();
 
-    this.skillFlash = Math.max(0, this.skillFlash - 1);
-    this.updateSkillVisual();
+    this.hitFlash = Math.max(0, this.hitFlash - 1);
+    this.invincibleFrames = Math.max(0, this.invincibleFrames - 1);
     this.updateFloatingTexts();
     this.updateAutoFire();
 
@@ -177,8 +196,7 @@ class SideShooterGame {
   }
 
   getPlayerSpeed() {
-    const speedUpgrade = this.upgrades && this.upgrades.speed ? this.speedUpgradeBonus : 0;
-    return this.getDopamineProfile().playerSpeed + speedUpgrade;
+    return this.getDopamineProfile().playerSpeed;
   }
 
   updateMouseMovement() {
@@ -201,8 +219,7 @@ class SideShooterGame {
   }
 
   getDopamineDecayPerFrame() {
-    const speedDecay = this.upgrades && this.upgrades.speed ? this.speedUpgradeDecayBonus : 0;
-    return this.getDopamineProfile().dopamineDecay + speedDecay;
+    return this.getDopamineProfile().dopamineDecay;
   }
 
   getDopamineProfile() {
@@ -213,7 +230,7 @@ class SideShooterGame {
         enemySpeedBonus: -0.15,
         bulletIntervalBonus: 8,
         spawnPressure: 0,
-        dopamineDecay: 0.006
+        dopamineDecay: 0.04
       };
     }
     if (this.dopamine < 70) {
@@ -223,7 +240,7 @@ class SideShooterGame {
         enemySpeedBonus: 0,
         bulletIntervalBonus: 0,
         spawnPressure: 0,
-        dopamineDecay: 0.012
+        dopamineDecay: 0.075
       };
     }
     if (this.dopamine < 90) {
@@ -233,7 +250,7 @@ class SideShooterGame {
         enemySpeedBonus: 0.35,
         bulletIntervalBonus: -8,
         spawnPressure: 12,
-        dopamineDecay: 0.028
+        dopamineDecay: 0.11
       };
     }
     return {
@@ -242,13 +259,13 @@ class SideShooterGame {
       enemySpeedBonus: 0.65,
       bulletIntervalBonus: -14,
       spawnPressure: 24,
-      dopamineDecay: 0.045
+      dopamineDecay: 0.15
     };
   }
 
   getSpawnInterval() {
     const difficultyPressure = this.getDifficultyLevel() * 12;
-    return Math.max(78, 180 - difficultyPressure - this.getDopamineProfile().spawnPressure);
+    return Math.max(64, 150 - difficultyPressure - this.getDopamineProfile().spawnPressure);
   }
 
   updateAutoFire() {
@@ -277,153 +294,28 @@ class SideShooterGame {
   fireShot() {
     const originX = this.player.x + 18;
     const originY = this.player.y;
-
-    if (this.upgrades.double) {
+    if (this.doubleShotActive) {
       this.shots.push(this.createShot(originX, originY - 7, { vy: -0.45 }));
       this.shots.push(this.createShot(originX, originY + 7, { vy: 0.45 }));
-    } else {
-      this.shots.push(this.createShot(originX, originY));
+      return;
     }
 
-    if (this.upgrades.option && this.optionDrone) {
-      this.shots.push(this.createShot(this.optionDrone.x + 12, this.optionDrone.y, { owner: "option" }));
-    }
+    this.shots.push(this.createShot(originX, originY));
   }
 
   createShot(x, y, options = {}) {
-    const laser = Boolean(this.upgrades && this.upgrades.laser);
     return {
       x,
       y,
-      vx: options.vx ?? (laser ? 13.5 : 8.2) + this.getDopamineProfile().shotSpeedBonus,
+      vx: options.vx ?? 8.2 + this.getDopamineProfile().shotSpeedBonus,
       vy: options.vy ?? 0,
-      r: options.r ?? (laser ? 9 : 5),
-      beam: laser,
-      kind: options.kind || (laser ? "laser" : "normal"),
+      r: options.r ?? 5,
+      beam: false,
+      kind: options.kind || "normal",
       owner: options.owner || "player",
-      pierce: laser,
+      pierce: false,
       hitEnemyIds: []
     };
-  }
-
-  useSkill() {
-    const selectedUpgrade = this.getSelectedUpgrade();
-    if (!selectedUpgrade) {
-      this.resultText = this.powerLevel > 0 ? "비어있는 칸은 사용할 수 없음" : "파워 캡슐을 획득해 기술을 선택";
-      return;
-    }
-
-    if (selectedUpgrade.key === "absorb") {
-      this.useAbsorbSkill(selectedUpgrade);
-      return;
-    }
-
-    if (this.upgrades[selectedUpgrade.key]) {
-      this.resultText = `${selectedUpgrade.name} 이미 보유 중`;
-      return;
-    }
-
-    this.activateUpgrade(selectedUpgrade.key);
-    this.powerLevel = 0;
-    this.skillFlash = 24;
-    this.lastActivatedUpgrade = selectedUpgrade.key;
-    this.resultText = `${selectedUpgrade.name} 활성화`;
-  }
-
-  getUpgradeCatalog() {
-    return [
-      { key: "absorb", name: "흡수 필터", slot: 1 },
-      { key: "double", name: "더블 샷", slot: 2 },
-      { key: "speed", name: "속도 증가", slot: 3 },
-      { key: "laser", name: "관통 레이저", slot: 4 },
-      { key: "option", name: "보조 펫", slot: 5 },
-      { key: "shield", name: "실드", slot: 6 }
-    ];
-  }
-
-  getSelectedUpgrade() {
-    if (this.powerLevel <= 0) return null;
-    const upgrade = this.getUpgradeCatalog()[this.powerLevel - 1] || null;
-    if (upgrade && this.isConsumedOneTimeUpgrade(upgrade.key)) return null;
-    return upgrade;
-  }
-
-  activateUpgrade(key) {
-    if (key !== "shield") this.upgrades[key] = true;
-    if (key === "shield") this.player.shield = Math.min(4, this.player.shield + 2);
-    if (key === "option") {
-      this.optionDrone = { x: this.player.x - 42, y: this.player.y, trail: [] };
-    }
-    if (this.isOneTimeUpgrade(key)) this.consumeOneTimeUpgrade(key);
-    this.triggerSkillVisual(key);
-  }
-
-  useAbsorbSkill(upgrade) {
-    this.addDopamine(this.absorbSkillDopamine);
-    this.addFloatingText(`${this.absorbSkillDopamine}`, this.player.x, this.player.y - 38, this.absorbSkillDopamine);
-    this.powerLevel = 0;
-    this.skillFlash = 24;
-    this.lastActivatedUpgrade = upgrade.key;
-    this.triggerSkillVisual(upgrade.key);
-    this.resultText = `${upgrade.name}: 도파민 ${this.absorbSkillDopamine}`;
-  }
-
-  isOneTimeUpgrade(key) {
-    return key !== "absorb";
-  }
-
-  isConsumedOneTimeUpgrade(key) {
-    return Boolean(this.consumedOneTimeUpgrades && this.consumedOneTimeUpgrades[key]);
-  }
-
-  isCurrentPowerSlotEmpty() {
-    if (this.powerLevel <= 0) return false;
-    const upgrade = this.getUpgradeCatalog()[this.powerLevel - 1] || null;
-    return Boolean(upgrade && this.isConsumedOneTimeUpgrade(upgrade.key));
-  }
-
-  consumeOneTimeUpgrade(key) {
-    if (!this.isOneTimeUpgrade(key)) return;
-    this.consumedOneTimeUpgrades[key] = true;
-  }
-
-  triggerSkillVisual(key) {
-    const colorMap = {
-      speed: "#8ff7ff",
-      absorb: "#7be0b7",
-      double: "#ffd166",
-      laser: "#f8e7a2",
-      option: "#68a7ff",
-      shield: "#b48cff"
-    };
-    this.skillVisual = {
-      key,
-      age: 0,
-      duration: 34,
-      color: colorMap[key] || "#f8e7a2"
-    };
-  }
-
-  updateSkillVisual() {
-    if (!this.skillVisual) return;
-    this.skillVisual.age++;
-    if (this.skillVisual.age >= this.skillVisual.duration) {
-      this.skillVisual = null;
-    }
-  }
-
-  advancePowerMeter() {
-    this.powerLevel = Math.min(this.getUpgradeCatalog().length, this.powerLevel + 1);
-  }
-
-  updateOptionDrone() {
-    if (!this.optionDrone) return;
-    this.optionDrone.trail.push({ x: this.player.x, y: this.player.y });
-    if (this.optionDrone.trail.length > 18) {
-      const target = this.optionDrone.trail.shift();
-      this.optionDrone.x = target.x - 42;
-      this.optionDrone.y = target.y;
-    }
   }
 
   getEnemyWaveTemplates() {
@@ -548,21 +440,28 @@ class SideShooterGame {
   }
 
   collectItem(item) {
+    const collectedX = item.x;
+    const collectedY = item.y;
     item.x = -100;
-    if (item.type === "power") {
-      this.advancePowerMeter();
-      const selected = this.getSelectedUpgrade();
-      this.resultText = selected ? `파워 캡슐: ${selected.name} 선택 가능` : "파워 캡슐 획득";
+
+    if (item.type === "double") {
+      if (!this.doubleShotCollected) {
+        this.doubleShotActive = true;
+        this.doubleShotCollected = true;
+        this.resultText = "더블샷 캡슐: 발사체 2개 발사";
+      }
       return;
     }
+
     if (item.type === "calm") {
       this.addDopamine(this.calmItemDopamine);
-      this.addFloatingText(`${this.calmItemDopamine}`, item.x, item.y - 18, this.calmItemDopamine);
+      this.addFloatingText(`${this.calmItemDopamine}`, collectedX, collectedY - 18, this.calmItemDopamine);
       this.resultText = `안정 캡슐: 도파민 ${this.calmItemDopamine}`;
       return;
     }
+
     this.addDopamine(this.stimItemDopamine);
-    this.addFloatingText(`+${this.stimItemDopamine}`, item.x, item.y - 18, this.stimItemDopamine);
+    this.addFloatingText(`+${this.stimItemDopamine}`, collectedX, collectedY - 18, this.stimItemDopamine);
     this.resultText = `자극 캡슐: 도파민 +${this.stimItemDopamine}`;
   }
 
@@ -623,22 +522,31 @@ class SideShooterGame {
 
   randomItemType() {
     const roll = random();
-    if (roll < 0.7) return "power";
-    if (roll < 0.85) return "calm";
-    return "stim";
+    if (!this.doubleShotCollected && roll > 0.82) return "double";
+    if (roll < 0.55) return "stim";
+    return "calm";
   }
 
   takeHit() {
-    if (this.player.shield > 0) {
-      this.player.shield--;
-      return;
-    }
+    if (this.isPlayerInvincible()) return;
+
     this.lives--;
-    this.addDopamine(10);
-    this.addFloatingText("+10", this.player.x, this.player.y - 32, 10);
+    this.hitFlash = 32;
+    this.invincibleFrames = 60;
+    this.addDopamine(-10);
+    this.addFloatingText("-10", this.player.x, this.player.y - 32, -10);
     if (this.lives <= 0) {
       this.endGame("라이프 소진: 현재 도파민으로 종료");
     }
+  }
+
+  isPlayerInvincible() {
+    return this.invincibleFrames > 0;
+  }
+
+  getHitOverlayAlpha() {
+    if (this.hitFlash <= 0) return 0;
+    return 46 * (this.hitFlash / 32);
   }
 
   endGame(text) {
@@ -688,49 +596,48 @@ class SideShooterGame {
   }
 
   drawGame() {
-    fill("#7be0b7");
-    triangle(this.player.x - 18, this.player.y - 16, this.player.x - 18, this.player.y + 16, this.player.x + 24, this.player.y);
-    fill("#e9fff4");
-    circle(this.player.x - 4, this.player.y, 8);
-    this.drawSkillVisual();
-
-    if (this.player.shield > 0) {
-      noFill();
-      stroke("#68a7ff");
-      strokeWeight(2);
-      circle(this.player.x, this.player.y, 56);
-      noStroke();
+    const playerImg = this.getPlayerAsset();
+    if (!this.drawImageCentered(playerImg, this.player.x + 3, this.player.y, 64, 48)) {
+      fill("#7be0b7");
+      triangle(this.player.x - 18, this.player.y - 16, this.player.x - 18, this.player.y + 16, this.player.x + 24, this.player.y);
+      fill("#e9fff4");
+      circle(this.player.x - 4, this.player.y, 8);
     }
-
-    if (this.optionDrone) {
-      fill("#68a7ff");
-      circle(this.optionDrone.x, this.optionDrone.y, 16);
-    }
+    this.drawHitEffect();
 
     for (const gate of this.gates) {
-      noFill();
-      stroke("#7be0b7");
-      strokeWeight(4);
-      circle(gate.x, gate.y, gate.r * 2);
-      noStroke();
+      if (!this.drawImageCentered(this.assets.receptorGate, gate.x, gate.y, gate.r * 2, gate.r * 2)) {
+        noFill();
+        stroke("#7be0b7");
+        strokeWeight(4);
+        circle(gate.x, gate.y, gate.r * 2);
+        noStroke();
+      }
     }
 
     for (const item of this.items) {
-      fill(this.itemColor(item.type));
-      stroke("#f6f1df");
-      strokeWeight(2);
-      circle(item.x, item.y, item.r * 2);
-      noStroke();
-      fill("#111820");
-      textAlign(CENTER, CENTER);
-      textSize(10);
-      text(this.itemLabel(item.type), item.x, item.y);
+      const itemImg = this.getItemAsset(item.type);
+      if (!this.drawImageCentered(itemImg, item.x, item.y, 32, 32)) {
+        fill(this.itemColor(item.type));
+        stroke("#f6f1df");
+        strokeWeight(2);
+        circle(item.x, item.y, item.r * 2);
+        noStroke();
+        fill("#111820");
+        textAlign(CENTER, CENTER);
+        textSize(10);
+        text(this.itemLabel(item.type), item.x, item.y);
+      }
     }
 
     for (const s of this.shots) {
-      fill(this.shotColor(s.kind));
-      if (s.kind === "laser") ellipse(s.x, s.y, 58, 8);
-      else ellipse(s.x, s.y, 18, 8);
+      const shotImg = this.assets.shots && this.assets.shots.normal;
+      const shotW = 24;
+      const shotH = 12;
+      if (!this.drawImageCentered(shotImg, s.x, s.y, shotW, shotH)) {
+        fill(this.shotColor(s.kind));
+        ellipse(s.x, s.y, 18, 8);
+      }
     }
 
     for (const enemy of this.enemies) {
@@ -738,33 +645,34 @@ class SideShooterGame {
     }
 
     fill("#ffc857");
-    for (const b of this.bullets) circle(b.x, b.y, 8);
+    for (const b of this.bullets) {
+      if (!this.drawImageCentered(this.assets.enemyBullet, b.x, b.y, 14, 14)) {
+        circle(b.x, b.y, 8);
+      }
+    }
 
     this.drawFloatingTexts();
   }
 
-  drawSkillVisual() {
-    if (!this.skillVisual) return;
-    const progress = this.skillVisual.age / this.skillVisual.duration;
+  drawHitEffect() {
+    if (this.hitFlash <= 0) return;
+    const progress = this.hitFlash / 32;
+
     noFill();
-    stroke(this.skillVisual.color);
+    stroke("#ff5d73");
     strokeWeight(3);
-
-    if (this.skillVisual.key === "absorb") {
-      const radius = 74 - progress * 34;
-      circle(this.player.x, this.player.y, radius);
-      circle(this.player.x, this.player.y, radius * 0.62);
-    } else if (this.skillVisual.key === "speed") {
-      const length = 42 + progress * 20;
-      line(this.player.x - 26, this.player.y - 12, this.player.x - length, this.player.y - 22);
-      line(this.player.x - 30, this.player.y, this.player.x - length - 10, this.player.y);
-      line(this.player.x - 26, this.player.y + 12, this.player.x - length, this.player.y + 22);
-      circle(this.player.x, this.player.y, 44 + progress * 16);
-    } else {
-      circle(this.player.x, this.player.y, 42 + progress * 24);
-    }
-
+    circle(this.player.x, this.player.y, 72 - progress * 18);
     noStroke();
+
+    fill(255, 63, 87, this.getHitOverlayAlpha());
+    rect(0, 0, this.w, this.h);
+  }
+
+  getPlayerAsset() {
+    if (this.dopamine >= 85 && this.assets.player && this.assets.player.overdrive) {
+      return this.assets.player.overdrive;
+    }
+    return this.assets.player && this.assets.player.base;
   }
 
   drawFloatingTexts() {
@@ -777,25 +685,38 @@ class SideShooterGame {
   }
 
   shotColor(kind) {
-    if (kind === "laser") return "#ffd166";
     return "#f06c86";
+  }
+
+  getItemAsset(type) {
+    if (type === "double") {
+      return (this.assets.upgrades && this.assets.upgrades.double) || (this.assets.items && this.assets.items.power);
+    }
+    return this.assets.items && this.assets.items[type];
   }
 
   itemColor(type) {
     if (type === "calm") return this.dopamineDownColor;
-    if (type === "stim") return this.dopamineUpColor;
-    return "#ffd166";
+    if (type === "double") return "#ffd166";
+    return this.dopamineUpColor;
   }
 
   itemLabel(type) {
     if (type === "calm") return "-";
-    if (type === "stim") return "+";
-    return "P";
+    if (type === "double") return "2";
+    return "+";
   }
 
   drawEnemy(enemy) {
     const x = enemy.x;
     const y = enemy.y;
+    const enemyImg = this.assets.enemies && this.assets.enemies[enemy.type];
+    if (enemyImg) {
+      const size = this.getEnemyImageSize(enemy.type);
+      this.drawImageCentered(enemyImg, x, y, size.w, size.h);
+      return;
+    }
+
     fill(this.enemyColor(enemy.type));
     stroke("#101419");
     strokeWeight(2);
@@ -823,6 +744,12 @@ class SideShooterGame {
     text(this.enemyLabel(enemy.type), x, y);
   }
 
+  getEnemyImageSize(type) {
+    if (type === "shooter") return { w: 64, h: 50 };
+    if (type === "tank") return { w: 72, h: 56 };
+    return { w: 48, h: 48 };
+  }
+
   enemyColor(type) {
     if (type === "shooter") return "#ff7b8d";
     if (type === "tank") return "#d86c7f";
@@ -842,16 +769,18 @@ class SideShooterGame {
   }
 
   drawHud() {
+    this.drawImageTopLeft(this.assets.hudTopPanel, 0, 0, this.w, 102, 210);
+    this.drawImageTopLeft(this.assets.messagePanel, 0, this.h - 48, this.w, 48, 210);
+
     fill("#f8e7a2");
     textAlign(LEFT, CENTER);
     textSize(27);
     text("뉴럴 사이드 슈터", 28, 32);
     fill("#dfe8e2");
     textSize(14);
-    text("마우스로 이동, 좌클릭 홀드 공격, 우클릭 기술", 28, 63);
+    text("마우스로 이동, 좌클릭 홀드 공격", 28, 63);
     this.drawDopamineLegend(28, 88);
     this.drawMeter(615, 28, 280, this.dopamine);
-    this.drawPowerMeter(615, 78, 310);
     fill("#eef4ee");
     textAlign(RIGHT, CENTER);
     textSize(16);
@@ -894,59 +823,6 @@ class SideShooterGame {
     if (value < 50) return "#63d6a6";
     if (value < 80) return "#ffbd5a";
     return "#ff5d73";
-  }
-
-  drawPowerMeter(x, y, w) {
-    const upgrades = this.getUpgradeCatalog();
-    const cellW = w / upgrades.length;
-    fill("#17222b");
-    rect(x, y, w, 58, 6);
-
-    for (let i = 0; i < upgrades.length; i++) {
-      const upgrade = upgrades[i];
-      const cellX = x + i * cellW;
-      const consumed = this.isConsumedOneTimeUpgrade(upgrade.key);
-      const currentEmpty = consumed && this.powerLevel === i + 1;
-      const selected = !consumed && this.powerLevel === i + 1;
-      const activatedFlash = this.skillFlash > 0 && this.lastActivatedUpgrade === upgrade.key;
-      fill(consumed ? "#1c2630" : this.upgrades[upgrade.key] ? "#7be0b7" : selected ? "#ffd166" : "#2a3843");
-      rect(cellX + 4, y + 8, cellW - 8, 20, 4);
-      if (currentEmpty) {
-        noFill();
-        stroke("#ffd166");
-        strokeWeight(2);
-        rect(cellX + 2, y + 6, cellW - 4, 24, 5);
-        line(cellX + 10, y + 12, cellX + cellW - 10, y + 24);
-        line(cellX + cellW - 10, y + 12, cellX + 10, y + 24);
-        noStroke();
-      }
-      if (!consumed && activatedFlash) {
-        noFill();
-        stroke("#f8e7a2");
-        strokeWeight(2);
-        rect(cellX + 2, y + 6, cellW - 4, 24, 5);
-        noStroke();
-      }
-      fill("#111820");
-      textAlign(CENTER, CENTER);
-      textSize(10);
-      text(consumed ? "" : upgrade.name.slice(0, 2), cellX + cellW / 2, y + 18);
-    }
-
-    const selected = this.getSelectedUpgrade();
-    fill("#f8e7a2");
-    textAlign(LEFT, CENTER);
-    textSize(13);
-    text(`POWER ${this.powerLevel}/${upgrades.length}  선택: ${selected ? selected.name : "없음"}`, x + 12, y + 42);
-    fill("#dfe8e2");
-    textAlign(RIGHT, CENTER);
-    text(`보유 ${this.getActiveUpgradeLabels().length}`, x + w - 12, y + 42);
-  }
-
-  getActiveUpgradeLabels() {
-    return this.getUpgradeCatalog()
-      .filter((upgrade) => this.upgrades[upgrade.key])
-      .map((upgrade) => upgrade.name);
   }
 
   drawEnd() {

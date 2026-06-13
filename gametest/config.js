@@ -11,7 +11,8 @@ const SCENES = {
   PAMINI_BRIEFING: "paminiBriefing",
   DOPAMINE_READY: "dopamineReady",
   MINIGAME: "minigame",
-  ENDING: "ending"
+  ENDING: "ending",
+  CREDITS: "credits"
 };
 
 const NODE_TYPES = {
@@ -58,7 +59,16 @@ const ASSET_MANIFEST = {
     dialogueBold: "./assets/font/IM 혜민체 - 대사/IM_Hyemin-Bold.ttf",
     title: "./assets/font/시원한 설레임체 - 굵은글씨/SEOLEIMcool.ttf"
   },
+  episodeTransitions: {
+    Ep2: "./assets/ep_transition/Ep2.png",
+    Ep3: "./assets/ep_transition/Ep3.png",
+    Ep4A: "./assets/ep_transition/Ep4A.png",
+    Ep4B: "./assets/ep_transition/Ep4B.png",
+    Ep5: "./assets/ep_transition/Ep5.png",
+    Ep6: "./assets/ep_transition/Ep6.png"
+  },
   backgrounds: {
+    start_screen:"./assets/bg/start_screen.png",
     convenienceStore: "./assets/bg/convenience_store_night.png",
     bedroomNight: "./assets/bg/protagonist_bedroom_night.png",
     "도서관 열람실": "./assets/bg/library_reading_room.png",
@@ -96,7 +106,8 @@ const ASSET_MANIFEST = {
     "밤, 대학가": "./assets/bg/campus_night.png",
     "(CG) 서로 바라보는 둘": "./assets/bg/ending_looking_at_each_other_cg.png",
     "(CG) 손을 잡는 둘": "./assets/bg/ending_holding_hands_cg.png",
-    "(CG) 혼자 남은 주인공)": "./assets/bg/bad_ending_alone_protagonist_cg.png"
+    "(CG) 혼자 남은 주인공)": "./assets/bg/bad_ending_alone_protagonist_cg.png",
+    happyendcredit: "./assets/bg/happyend_cg.png"
   },
   sounds: {
     bgm: {
@@ -129,6 +140,11 @@ const ASSET_MANIFEST = {
         path: "./assets/sound/bgm/Game2.mp3",
         loopStart: 16.854,
         loopEnd: 202.125
+      },
+      title: {
+        path: "./assets/sound/bgm/title_bgm.mp3",
+        loopStart: 14.34,
+        loopEnd: 171.938
       }
     },
     effects: {
@@ -142,7 +158,8 @@ const ASSET_MANIFEST = {
       screwdriver: "./assets/sound/effects/EP6 드라이버.mp3",
       episodeTransition: "./assets/sound/effects/에피소드 전환.mp3",
       click: "./assets/sound/effects/클릭.mp3",
-      clap: "./assets/sound/effects/EP6 박수.mp3"
+      clap: "./assets/sound/effects/EP6 박수.mp3",
+      gameEffect: "./assets/sound/effects/game_effect.mp3"
     }
   },
   characters: {
@@ -192,6 +209,96 @@ const ASSET_MANIFEST = {
       default: "./assets/mascot/dopamine_mascot_concept_v1.png",
       일반: "./assets/mascot/dopamine_mascot_concept_v1.png",
       Normal: "./assets/mascot/dopamine_mascot_concept_v1.png"
+    }
+  },
+  minigames: {
+    brickBreaker: {
+      basePath: "./assets/minigame/breakblocks/original/",
+      assets: {
+        background: "game_background.png",
+        frame: "playfield_frame_exact.png",
+        floorDanger: "floor_danger_line.png",
+        ballDefault: "ball_default.png",
+        ballCalm: "ball_calm_effect.png",
+        ballStim: "ball_stim_effect.png",
+        ballFocus: "ball_focus_effect.png",
+        effectRing: "effect_flash_ring.png",
+        launchMarker: "launch_origin_marker.png",
+        nextLaunchMarker: "next_launch_marker.png",
+        bricks: {
+          normal: "brick_normal.png",
+          stim: "brick_stim.png",
+          recover: "brick_recover.png"
+        },
+        brickTints: {
+          calm: "brick_tint_calm.png",
+          boost: "brick_tint_boost.png",
+          power: "brick_tint_power.png",
+          pierce: "brick_tint_pierce.png",
+          warmup: "brick_tint_warmup.png",
+          stabilize: "brick_tint_stabilize.png",
+          focus: "brick_tint_focus.png"
+        },
+        items: {
+          calm: "item_calm.png",
+          boost: "item_boost.png",
+          power: "item_power.png",
+          pierce: "item_pierce.png",
+          warmup: "item_warmup.png",
+          stabilize: "item_stabilize.png",
+          focus: "item_focus.png"
+        }
+      }
+    },
+    sideShooter: {
+      basePath: "./assets/minigame/shooting/original/",
+      assets: {
+        background: "bg_starfield_full.png",
+        hudTopPanel: "hud_top_panel_blank.png",
+        messagePanel: "message_panel_blank.png",
+        powerMeter: "power_meter_empty_cells.png",
+        starParticle: "star_particle.png",
+        player: {
+          base: "player_ship_base.png",
+          speed: "player_ship_speed_boost.png",
+          overdrive: "player_ship_overdrive.png",
+          shield: "player_shield_ring.png"
+        },
+        optionDrone: "option_drone.png",
+        receptorGate: "receptor_gate.png",
+        shots: {
+          normal: "shot_normal.png",
+          laser: "shot_laser.png"
+        },
+        enemyBullet: "enemy_bullet.png",
+        enemies: {
+          drone: "enemy_drone.png",
+          shooter: "enemy_shooter.png",
+          tank: "enemy_tank.png"
+        },
+        items: {
+          calm: "item_calm_capsule.png",
+          power: "item_power_capsule.png",
+          stim: "item_stim_capsule.png"
+        },
+        skills: {
+          absorb: "skill_absorb_rings.png",
+          double: "skill_double_pulse.png",
+          speed: "skill_speed_trails.png",
+          laser: "skill_laser_pulse.png",
+          option: "skill_option_pulse.png",
+          shield: "skill_shield_pulse.png"
+        },
+        upgrades: {
+          absorb: "upgrade_absorb_filter_icon.png",
+          double: "upgrade_double_shot_icon.png",
+          speed: "upgrade_speed_icon.png",
+          laser: "upgrade_laser_icon.png",
+          option: "upgrade_option_pet_icon.png",
+          shield: "upgrade_shield_icon.png"
+        },
+        life: "life_core_icon.png"
+      }
     }
   }
 };

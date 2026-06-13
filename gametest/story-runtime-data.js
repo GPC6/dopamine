@@ -3,7 +3,7 @@ let DOPA_STORY_START_EPISODE_ID = "EP1";
 
 function loadDefaultEpisodes() {
   const request = new XMLHttpRequest();
-  request.open("GET", "./story-data-v1.js", false);
+  request.open("GET", "./story-data-v2.js", false);
   request.send(null);
 
   if (request.status !== 200 && request.status !== 0) {

@@ -7,8 +7,22 @@ const projectRoot = path.join(__dirname, "..");
 
 function loadSideShooter() {
   let now = 0;
+  const bodyClasses = new Set();
   const context = {
     window: {},
+    document: {
+      body: {
+        classList: {
+          toggle(name, force) {
+            if (force) bodyClasses.add(name);
+            else bodyClasses.delete(name);
+          },
+          contains(name) {
+            return bodyClasses.has(name);
+          }
+        }
+      }
+    },
     Math,
     width: 1280,
     height: 720,
@@ -29,6 +43,7 @@ function loadSideShooter() {
     setMillis: (value) => {
       now = value;
     },
+    isBodyClassSet: (name) => bodyClasses.has(name),
     keyIsDown: () => false,
     random: () => 0.99,
     constrain: (value, min, max) => Math.max(min, Math.min(max, value)),
@@ -59,60 +74,29 @@ function runTests() {
 
   const calm = new SideShooterGame(55, { durationSeconds: 120 });
   const high = new SideShooterGame(95, { durationSeconds: 120 });
-  const upgrades = calm.getUpgradeCatalog();
-  assert.strictEqual(upgrades[0].key, "absorb", "absorb skill is the first power slot");
-  assert.strictEqual(upgrades[2].key, "speed", "speed skill moves to the third power slot");
+  assert.strictEqual(typeof calm.useSkill, "undefined", "sideShooter no longer exposes a skill activation method");
+  assert.strictEqual(typeof calm.getUpgradeCatalog, "undefined", "sideShooter no longer exposes upgrade slots");
   assert.strictEqual(calm.enemyKillDopamine, 3, "enemy defeats raise dopamine by 3");
+  assert.ok(calm.powerDropChance > 0, "enemy defeats can drop capsules again");
+  assert.ok(calm.getSpawnInterval() <= 150, "enemy waves spawn more frequently after the rule change");
   assert.strictEqual(calm.getDopamineDeltaColor(1), "#ff5d73", "positive dopamine delta uses red");
   assert.strictEqual(calm.getDopamineDeltaColor(-1), "#7be0b7", "negative dopamine delta uses green");
   assert.ok(calm.getEnemyRoleText("drone").includes("+3"), "drone explains dopamine gain");
   assert.ok(calm.getEnemyRoleText("shooter").includes("+3"), "shooter explains dopamine gain");
   assert.ok(calm.getEnemyRoleText("tank").includes("+3"), "tank explains dopamine gain");
+  calm.setCursorHidden(true);
+  assert.strictEqual(context.isBodyClassSet("hide-game-cursor"), true, "sideShooter can hide the page cursor");
+  calm.cleanup();
+  assert.strictEqual(context.isBodyClassSet("hide-game-cursor"), false, "sideShooter restores the page cursor on cleanup");
 
   assert.ok(
     high.getDopamineDecayPerFrame() > calm.getDopamineDecayPerFrame(),
     "high dopamine has stronger passive decay than stable dopamine"
   );
-
-  assert.ok(calm.absorbSkillDopamine <= -25, "absorb skill lowers dopamine enough to be easy to read");
-  const beforeAbsorb = calm.dopamine;
-  calm.useAbsorbSkill({ key: "absorb", name: "흡수 필터" });
-  assert.strictEqual(calm.dopamine, beforeAbsorb + calm.absorbSkillDopamine, "absorb skill immediately lowers dopamine");
-  assert.strictEqual(calm.skillVisual.key, "absorb", "absorb skill creates a visual effect");
   assert.ok(
-    calm.floatTexts.some((entry) => entry.text.includes("-25") && entry.color === "#7be0b7"),
-    "absorb skill creates green floating dopamine feedback"
+    calm.getDopamineDecayPerFrame() >= 0.075,
+    "stable dopamine now falls fast enough to require continuous enemy defeats"
   );
-  assert.strictEqual(calm.consumedOneTimeUpgrades.absorb, undefined, "absorb slot is not consumed after use");
-  calm.powerLevel = 1;
-  assert.strictEqual(calm.getSelectedUpgrade().key, "absorb", "absorb remains usable after use");
-  calm.useSkill();
-  assert.strictEqual(calm.getSelectedUpgrade(), null, "using absorb resets the power cursor");
-
-  const speedSlotGame = new SideShooterGame(55, { durationSeconds: 120 });
-  speedSlotGame.powerLevel = 3;
-  speedSlotGame.useSkill();
-  assert.strictEqual(speedSlotGame.upgrades.speed, true, "speed effect stays active after use");
-  assert.strictEqual(speedSlotGame.consumedOneTimeUpgrades.speed, true, "speed slot is consumed after use");
-  speedSlotGame.powerLevel = 3;
-  assert.strictEqual(speedSlotGame.getSelectedUpgrade(), null, "consumed speed slot becomes unusable");
-  speedSlotGame.powerLevel = 2;
-  speedSlotGame.advancePowerMeter();
-  assert.strictEqual(speedSlotGame.powerLevel, 3, "power meter still lands on consumed speed slot");
-  assert.strictEqual(speedSlotGame.getSelectedUpgrade(), null, "consumed speed slot remains unusable after landing");
-  assert.strictEqual(speedSlotGame.isCurrentPowerSlotEmpty(), true, "consumed speed slot is visibly marked as an empty current slot");
-
-  const absorbPassGame = new SideShooterGame(55, { durationSeconds: 120 });
-  absorbPassGame.advancePowerMeter();
-  assert.strictEqual(absorbPassGame.powerLevel, 1, "power meter does not skip reusable absorb slot");
-
-  const shieldGame = new SideShooterGame(55, { durationSeconds: 120 });
-  shieldGame.powerLevel = 6;
-  shieldGame.useSkill();
-  assert.strictEqual(shieldGame.player.shield, 2, "shield still grants shield points");
-  assert.strictEqual(shieldGame.consumedOneTimeUpgrades.shield, true, "shield slot is consumed after use");
-  shieldGame.powerLevel = 6;
-  assert.strictEqual(shieldGame.getSelectedUpgrade(), null, "consumed shield slot becomes unusable");
 
   const defeatGame = new SideShooterGame(55, { durationSeconds: 120 });
   const defeatedEnemy = { id: 1, type: "shooter", x: 300, y: 210, r: 20 };
@@ -123,14 +107,40 @@ function runTests() {
     defeatGame.floatTexts.some((entry) => entry.text.includes("+3") && entry.color === "#ff5d73"),
     "enemy defeat creates red floating dopamine feedback"
   );
+  context.random = () => 0.1;
+  defeatGame.handleEnemyDefeat({ id: 2, type: "drone", x: 340, y: 230, r: 18 });
+  assert.strictEqual(defeatGame.items.length, 1, "enemy defeat can create item drops");
 
-  const speedGame = new SideShooterGame(55, { durationSeconds: 120 });
-  const baseSpeed = speedGame.getPlayerSpeed();
-  const baseDecay = speedGame.getDopamineDecayPerFrame();
-  speedGame.activateUpgrade("speed");
-  assert.ok(speedGame.getPlayerSpeed() >= baseSpeed + 1.5, "speed upgrade gives a stronger movement increase");
-  assert.ok(speedGame.getDopamineDecayPerFrame() > baseDecay, "speed upgrade helps dopamine fall faster");
-  assert.strictEqual(speedGame.skillVisual.key, "speed", "speed upgrade creates a visual effect");
+  const itemGame = new SideShooterGame(55, { durationSeconds: 120 });
+  itemGame.collectItem({ x: 320, y: 240, r: 13, vx: -2.8, type: "stim" });
+  assert.strictEqual(itemGame.dopamine, 63, "stim capsules raise dopamine");
+  itemGame.collectItem({ x: 320, y: 240, r: 13, vx: -2.8, type: "calm" });
+  assert.strictEqual(itemGame.dopamine, 55, "calm capsules lower dopamine");
+
+  const doubleGame = new SideShooterGame(55, { durationSeconds: 120 });
+  doubleGame.collectItem({ x: 320, y: 240, r: 13, vx: -2.8, type: "double" });
+  assert.strictEqual(doubleGame.doubleShotActive, true, "double-shot capsule activates double shot");
+  doubleGame.fireShot();
+  assert.strictEqual(doubleGame.shots.length, 2, "double-shot fires two projectiles");
+  context.random = () => 0.99;
+  assert.notStrictEqual(doubleGame.randomItemType(), "double", "double-shot capsule does not appear again after collection");
+
+  const hitGame = new SideShooterGame(55, { durationSeconds: 120 });
+  const beforeHit = hitGame.dopamine;
+  hitGame.takeHit();
+  assert.strictEqual(hitGame.dopamine, beforeHit - 10, "enemy hits now lower dopamine by 10");
+  assert.ok(hitGame.hitFlash > 0, "enemy hits start a visual hit effect");
+  assert.ok(
+    hitGame.floatTexts.some((entry) => entry.text === "-10" && entry.color === "#7be0b7"),
+    "enemy hit feedback uses green dopamine decrease text"
+  );
+  const livesAfterFirstHit = hitGame.lives;
+  const dopamineAfterFirstHit = hitGame.dopamine;
+  hitGame.takeHit();
+  assert.strictEqual(hitGame.lives, livesAfterFirstHit, "invincibility prevents immediate repeated life loss");
+  assert.strictEqual(hitGame.dopamine, dopamineAfterFirstHit, "invincibility prevents immediate repeated dopamine loss");
+  assert.ok(hitGame.isPlayerInvincible(), "player is invincible during hit recovery");
+  assert.ok(hitGame.getHitOverlayAlpha() > 0, "hit recovery shows a red screen flash");
 
   const autoFireGame = new SideShooterGame(55, { durationSeconds: 120 });
   autoFireGame.spawnTimer = 9999;
@@ -162,10 +172,12 @@ function runTests() {
   const sideShooter = findFirstSideShooter(loadEpisodes());
   assert.ok(sideShooter, "first sideShooter node exists");
   const tutorialText = sideShooter.options.tutorial.join("\n");
-  assert.ok(tutorialText.includes("P 캡슐") && tutorialText.includes("우클릭"), "tutorial explains power capsule mechanism");
-  assert.ok(tutorialText.includes("흡수"), "tutorial explains absorb skills");
+  assert.ok(!tutorialText.includes("P 캡슐") && !tutorialText.includes("우클릭"), "tutorial no longer explains removed power capsule controls");
+  assert.ok(!tutorialText.includes("흡수"), "tutorial no longer explains removed absorb skills");
   assert.ok(tutorialText.includes("빨간") && tutorialText.includes("도파민"), "tutorial explains red dopamine gain cues");
-  assert.ok(tutorialText.includes("초록") && tutorialText.includes("낮춰"), "tutorial explains green dopamine lowering cues");
+  assert.ok(tutorialText.includes("자연스럽게") && tutorialText.includes("감소"), "tutorial explains stronger passive dopamine decay");
+  assert.ok(tutorialText.includes("맞으면") && tutorialText.includes("줄어"), "tutorial explains hits now lower dopamine");
+  assert.ok(tutorialText.includes("캡슐") && tutorialText.includes("더블샷"), "tutorial explains restored capsules and double-shot item");
   assert.ok(tutorialText.includes("모두 도파민 +3"), "tutorial explains all enemy defeats add dopamine");
 }
 
